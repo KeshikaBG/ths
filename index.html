@@ -1149,72 +1149,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   
-let heroSwiperInstance = null;
-let heroImagesCache = null;
-
 async function loadHeroSwiper() {
-  try {
-    // Only fetch images once
-    if (!heroImagesCache) {
-      const data = await client.fetch(`*[_type == "home"][0] {
-        "images": heroImages[]{ asset->{ url } }
-      }`);
-      heroImagesCache = data?.images || [];
-    }
-
-    const images = heroImagesCache;
-    const heroContainer = document.querySelector('.hero-swiper');
-    const swiperWrapper = heroContainer.querySelector('.swiper-wrapper');
-    const slideTemplate = heroContainer.querySelector('.swiper-slide');
-
-    // Only populate once
-    if (swiperWrapper.children.length === 1) {
-      swiperWrapper.innerHTML = '';
-      images.forEach((imgData, index) => {
-        const slide = slideTemplate.cloneNode(true);
-        slide.innerHTML = '';
-        const img = new Image();
-        img.src = imgData.asset.url;
-        img.alt = `Hero Image ${index + 1}`;
-        applyMediaStyles(img, { fit: 'cover' });
-        slide.appendChild(img);
-        swiperWrapper.appendChild(slide);
-      });
-    }
-
-    // Initialize swiper only once
-    if (!heroSwiperInstance) {
-      heroSwiperInstance = new Swiper(heroContainer, {
-        direction: 'horizontal',
-        loop: true,
-        autoplay: {
-          delay: 4000,
-          disableOnInteraction: false,
-        },
-        speed: 1600,
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-      });
-
-      // Handle resize properly
-      window.addEventListener('resize', () => {
-        heroSwiperInstance.update();
-      });
-    }
-  } catch (err) {
-    console.error('❌ Hero Swiper error:', err);
-  }
-}
-
-
-  // ✅ HERO Swiper
- /* async function loadHeroSwiper() {
     try {
       const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
         "images": heroImages[]{asset->{url}}
@@ -1278,7 +1213,7 @@ async function loadHeroSwiper() {
     } catch (err) {
       console.error('❌ Hero Swiper error:', err);
     }
-  }**/
+  }
   // ✅ Featured + Other Sections
   async function loadOtherSections() {
     try {
