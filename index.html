@@ -1285,7 +1285,7 @@ if (!heroSwiperInitialized) {
   heroSwiperInitialized = true;
 const swiper = new Swiper(heroContainer, {
   loop: true,
-  speed: 1000,
+  speed: 1000, // duration in ms
   autoplay: { delay: 5500, disableOnInteraction: false },
   preloadImages: false,
   lazy: { loadPrevNext: true, loadOnTransitionStart: true },
@@ -1294,7 +1294,15 @@ const swiper = new Swiper(heroContainer, {
   observeParents: false,
   navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
   pagination: { el: '.swiper-pagination', clickable: true },
+
+  on: {
+    setTransition(swiperInstance, duration) {
+      // Add custom easing to the wrapper
+      swiperInstance.wrapperEl.style.transitionTimingFunction = 'cubic-bezier(0.65, 0, 0.35, 1)'; // ease-in-out
+    }
+  }
 });
+
 
 
   // debounced update
