@@ -836,11 +836,7 @@
         </div>
       </div>
       <div class="fixed-element">
-        <div class="div-block-9"><img
-            sizes="(max-width: 767px) 100vw, (max-width: 991px) 727.989990234375px, 939.989990234375px"
-            srcset="https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181cef85d5b1aac6efe75_image%2520(4)-p-500.jpg 500w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181cef85d5b1aac6efe75_image%2520(4)-p-800.jpg 800w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181cef85d5b1aac6efe75_image%20(4).jpg 1236w"
-            alt="" src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181cef85d5b1aac6efe75_image%20(4).jpg"
-            loading="lazy" class="img-2" /></div>
+        <div class="div-block-9"></div>
       </div>
     </div>
   </section>
@@ -866,9 +862,7 @@
         </div>
       </div>
       <div class="fixed-element">
-        <div class="div-block-10 pink"><img loading="lazy"
-            src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181d7412aaae181d80972_1000068653.jpg" alt=""
-            class="img-3" /></div>
+        <div class="div-block-10 pink"></div>
       </div>
     </div>
   </section>
@@ -894,10 +888,7 @@
         </div>
       </div>
       <div class="fixed-element">
-        <div class="div-block-11"><img sizes="(max-width: 767px) 100vw, (max-width: 991px) 727.97998046875px, 909px"
-            srcset="https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181dff37f468c0b35247f_image%252013-p-500.png 500w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181dff37f468c0b35247f_image%252013-p-800.png 800w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181dff37f468c0b35247f_image%2013.png 909w"
-            alt="" src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/68c181dff37f468c0b35247f_image%2013.png"
-            loading="lazy" class="img-3" /></div>
+        <div class="div-block-11"></div>
       </div>
     </div>
   </section>
@@ -1099,13 +1090,13 @@
           }
         }`),
           client.fetch(`*[_type == "about"] | order(_createdAt asc)[2] {
-          heroImages[] { asset->{ url, _type } }
+          aboutImages[] { asset->{ url, _type } }
         }`),
           client.fetch(`*[_type == "about"] | order(_createdAt asc)[3] {
-          heroImages[] { asset->{ url, _type } }
+          aboutImages[] { asset->{ url, _type } }
         }`),
           client.fetch(`*[_type == "about"] | order(_createdAt asc)[4] {
-          heroImages[] { asset->{ url, _type } }
+          aboutImages[] { asset->{ url, _type } }
         }`)
         ]);
         const heroImages = heroData?.aboutImages || [];
@@ -1156,9 +1147,9 @@
         }
         insertImage(heroImgDiv, heroImages, 'About Hero Media');
         insertImage(contImgDiv, contImages, 'Contact Media');
-        insertImage(thsImgDiv, heroImages, 'THS Media');
-        insertImage(osImgDiv, heroImages, 'OS Media');
-        insertImage(e2eImgDiv, heroImages, 'E2E Media');
+        insertImage(thsImgDiv, thsImages, 'THS Media');
+        insertImage(osImgDiv, osImages, 'OS Media');
+        insertImage(e2eImgDiv, e2eImages, 'E2E Media');
         
         let cardIndex = 0;
         teamSections.forEach(section => {
