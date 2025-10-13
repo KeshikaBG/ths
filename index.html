@@ -1524,31 +1524,34 @@ if (!heroSwiperInitialized) {
 <script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.innerWidth < 1024) return;
+  if (window.innerWidth < 1024) return; 
 
-  const body = document.body;
   const wrapper = document.createElement('div');
   wrapper.id = 'scroll-container';
-  while (body.firstChild) {
-    wrapper.appendChild(body.firstChild);
+
+  while (document.body.firstChild) {
+    wrapper.appendChild(document.body.firstChild);
   }
-  body.appendChild(wrapper);
-  body.style.overflow = 'hidden';
+  document.body.appendChild(wrapper);
+  document.body.style.overflow = 'hidden';
 
   const scrollbar = Scrollbar.init(wrapper, {
     damping: 0.08,
-    renderByPixels: true,
     alwaysShowTracks: true,
-    continuousScrolling: true,
   });
 
-  window.scrollbar = scrollbar;
+  scrollbar.addListener(({ offset }) => {
+    window.scrollTo(0, offset.y);
+  });
 
-  const updateScrollbar = () => scrollbar.update();
-  window.addEventListener('load', updateScrollbar);
-  document.querySelectorAll('img').forEach(img => img.addEventListener('load', updateScrollbar));
+  const update = () => scrollbar.update();
+  window.addEventListener('load', update);
+  document.querySelectorAll('img').forEach(img => img.addEventListener('load', update));
+
+  window.scrollbar = scrollbar;
 });
 </script>
+
 
 
 
