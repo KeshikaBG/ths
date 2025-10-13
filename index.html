@@ -1149,7 +1149,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   
-async function loadHeroSwiper() {
+/**async function loadHeroSwiper() {
     try {
       const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
         "images": heroImages[]{asset->{url}}
@@ -1213,7 +1213,94 @@ async function loadHeroSwiper() {
     } catch (err) {
       console.error('❌ Hero Swiper error:', err);
     }
+  }**/
+let heroSwiperInitialized = false;
+
+async function loadHeroSwiper() {
+  try {
+    const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
+      "images": heroImages[]{asset->{url}}
+    }`);
+
+    const images = data?.images || [];
+    const heroContainer = document.querySelector('.hero-swiper');
+    if (!heroContainer) return;
+
+    const swiperWrapper = heroContainer.querySelector('.swiper-wrapper');
+    const slideTemplate = heroContainer.querySelector('.swiper-slide');
+    if (!swiperWrapper || !slideTemplate) return;
+
+    // ✅ Clear existing slides
+    swiperWrapper.innerHTML = '';
+
+    // ✅ Create all slides at once
+    const loadPromises = images.map((imgData, index) => {
+      return new Promise((resolve) => {
+        const slide = slideTemplate.cloneNode(true);
+        slide.innerHTML = '';
+
+        const img = new Image();
+        img.src = imgData.asset.url;
+        img.alt = `Hero Image ${index + 1}`;
+        applyMediaStyles(img, { fit: 'cover' });
+
+        img.onload = resolve;
+        img.onerror = resolve;
+
+        // Optional overlay if you had it before
+        const overlay = document.createElement('div');
+        Object.assign(overlay.style, {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.2)',
+          pointerEvents: 'none',
+        });
+
+        slide.appendChild(overlay);
+        slide.appendChild(img);
+        swiperWrapper.appendChild(slide);
+      });
+    });
+
+    // ✅ Wait for all images to load before initializing swiper
+    await Promise.all(loadPromises);
+
+    // ✅ Initialize Swiper only once
+    if (!heroSwiperInitialized) {
+      heroSwiperInitialized = true;
+      const swiper = new Swiper(heroContainer, {
+        direction: 'horizontal',
+        loop: true,
+        autoplay: {
+          delay: 4000,
+          disableOnInteraction: false,
+        },
+        speed: 1600,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+      });
+
+      // ✅ Handle resize properly (update, not rebuild)
+      window.addEventListener('resize', () => swiper.update());
+    }
+
+  } catch (err) {
+    console.error('❌ Hero Swiper error:', err);
   }
+}
+
+
+
+  
   // ✅ Featured + Other Sections
   async function loadOtherSections() {
     try {
