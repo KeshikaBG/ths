@@ -1276,7 +1276,8 @@ if (!heroSwiperInitialized) {
   heroSwiperInitialized = true;
 
   const swiper = new Swiper(heroContainer, {
-    loop: true,
+loop: false, // to test if looping is the cause
+allowTouchMove: false, // disables drag, makes autoplay smoother
     speed: 1000,
     preloadImages: true,
     lazy: false,
