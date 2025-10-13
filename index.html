@@ -570,7 +570,6 @@ gsap.to(hdr, {
 /* Slides: avoid animating layout properties. Ensure they are composited */
 .hero-swiper .swiper-slide {
   will-change: transform;
-  backface-visibility: hidden;
   transform: translateZ(0); /* force GPU layer */
 }
 
