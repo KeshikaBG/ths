@@ -1272,39 +1272,45 @@ async function loadHeroSwiper() {
     // ✅ Wait for all images to load before initializing swiper
     await Promise.all(loadPromises);
 
-// after images have been appended and Promise.all resolved
 if (!heroSwiperInitialized) {
   heroSwiperInitialized = true;
-const swiper = new Swiper(heroContainer, {
-  loop: true,
-  speed: 1000, // duration in ms
-  autoplay: { delay: 5500, disableOnInteraction: false },
-  preloadImages: true,
-  lazy: { loadPrevNext: true, loadOnTransitionStart: true },
-  updateOnWindowResize: false,
-  observer: false,
-  observeParents: false,
-  navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-  pagination: { el: '.swiper-pagination', clickable: true },
 
-  on: {
-    setTransition(swiperInstance, duration) {
-      // Add custom easing to the wrapper
-      swiperInstance.wrapperEl.style.transitionTimingFunction = 'cubic-bezier(0.65, 0, 0.35, 1)'; // ease-in-out
-    }
-  }
-});
+  const swiper = new Swiper(heroContainer, {
+    loop: true,
+    speed: 1000,
+    preloadImages: true,
+    lazy: false,
+    autoplay: {
+      delay: 5500,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: false,
+    },
+    updateOnWindowResize: false,
+    observer: false,
+    observeParents: false,
+    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+    pagination: { el: '.swiper-pagination', clickable: true },
 
+    on: {
+      init(swiperInstance) {
+        swiperInstance.wrapperEl.style.transitionTimingFunction =
+          'cubic-bezier(0.65, 0, 0.35, 1)';
+        // Wait for browser to settle
+        setTimeout(() => swiperInstance.autoplay.start(), 400);
+      },
+      setTransition(swiperInstance) {
+        swiperInstance.wrapperEl.style.transitionTimingFunction =
+          'cubic-bezier(0.65, 0, 0.35, 1)';
+      },
+    },
+  });
 
-
-  // debounced update
   let t;
   window.addEventListener('resize', () => {
     clearTimeout(t);
     t = setTimeout(() => swiper.update(), 180);
   });
 }
-
 
   } catch (err) {
     console.error('❌ Hero Swiper error:', err);
