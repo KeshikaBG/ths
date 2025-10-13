@@ -567,7 +567,11 @@ gsap.to(hdr, {
 
 
 
-
+/* Slides: avoid animating layout properties. Ensure they are composited */
+.hero-swiper .swiper-slide {
+  will-change: transform;
+  transform: translateZ(0); /* force GPU layer */
+}
 
 
   .overlay {
@@ -1278,7 +1282,7 @@ if (!heroSwiperInitialized) {
     autoplay: { delay: 4000, disableOnInteraction: false },
     navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
     pagination: { el: '.swiper-pagination', clickable: true },
-    preloadImages: false,
+    preloadImages: true,
     lazy: { loadPrevNext: true, loadOnTransitionStart: true },
     updateOnWindowResize: false
   });
