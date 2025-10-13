@@ -1275,35 +1275,24 @@ async function loadHeroSwiper() {
 if (!heroSwiperInitialized) {
   heroSwiperInitialized = true;
 
-  const swiper = new Swiper(heroContainer, {
-loop: true, // to test if looping is the cause
-allowTouchMove: false, // disables drag, makes autoplay smoother
-    speed: 1200,
-    preloadImages: true,
-    lazy: false,
-    autoplay: {
-      delay: 5500,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: false,
-    },
-    updateOnWindowResize: false,
-    observer: false,
-    observeParents: false,
-    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-    pagination: { el: '.swiper-pagination', clickable: true },
+const swiper = new Swiper(heroContainer, {
+  loop: false, // disables cloning
+  speed: 1000,
+  autoplay: { delay: 5500, disableOnInteraction: false },
+  effect: 'slide',
+  on: {
+    slideChangeTransitionEnd(swiper) {
+      // When reaching the end, move first slide to end
+      if (swiper.activeIndex === swiper.slides.length - 1) {
+        const first = swiper.slides[0];
+        swiper.wrapperEl.appendChild(first);
+        swiper.updateSlides();
+        swiper.slideTo(0, 0); // reset instantly
+      }
+    }
+  }
+});
 
-    on: {
-      init(swiperInstance) {
-        swiperInstance.wrapperEl.style.transitionTimingFunction =
-          'cubic-bezier(0.65, 0, 0.35, 1)';
-        setTimeout(() => swiperInstance.autoplay.start(), 400);
-      },
-      setTransition(swiperInstance) {
-        swiperInstance.wrapperEl.style.transitionTimingFunction =
-          'cubic-bezier(0.65, 0, 0.35, 1)';
-      },
-    },
-  });
 
   let t;
   window.addEventListener('resize', () => {
