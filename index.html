@@ -1473,74 +1473,79 @@ if (!heroSwiperInitialized) {
 
 
 
+<!-- Smooth Scrollbar -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.css">
+
+<style>
+  html, body, #scroll-container {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  #scroll-container {
+    position: relative;
+    min-height: 100%;
+  }
+
+  /* Force scrollbar track to always show */
+  .scrollbar-track {
+    background: rgba(0, 0, 0, 0.1); /* light gray track */
+    border-radius: 4px;
+    opacity: 1 !important;
+    width: 10px !important;  /* ← scrollbar width */
+    right: 0 !important;
+  }
+
+  .scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.6); /* darker thumb */
+    border-radius: 4px;
+    opacity: 1 !important;
+    width: 10px !important;
+  }
+
+  .scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  /* Make sure scrollbar container doesn't hide track */
+  .scroll-content {
+    overflow: visible !important;
+  }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.js"></script>
 <script>
-(function () {
-  if (window.innerWidth < 1024) return;
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.innerWidth < 1024) return; // skip mobile
 
-  const currentScript = document.currentScript;
-
+  // Wrap page content inside a scroll container
+  const body = document.body;
   const wrapper = document.createElement('div');
   wrapper.id = 'scroll-container';
-
-  const body = document.body;
-  const nodes = Array.from(body.childNodes);
-  for (const node of nodes) {
-    if (node === currentScript) continue;
-    wrapper.appendChild(node);
+  while (body.firstChild) {
+    wrapper.appendChild(body.firstChild);
   }
-
   body.appendChild(wrapper);
-
   body.style.overflow = 'hidden';
-  body.style.height = '100%';
 
-  const options = {
-    damping: 0.08,       
+  // Initialize Smooth Scrollbar
+  const scrollbar = Scrollbar.init(wrapper, {
+    damping: 0.08,
     renderByPixels: true,
-    alwaysShowTracks: false
-  };
+    alwaysShowTracks: true,
+    continuousScrolling: true,
+  });
 
-  const scrollbar = Scrollbar.init(wrapper, options);
   window.scrollbar = scrollbar;
 
-  const safeUpdate = () => {
-    try {
-      scrollbar && scrollbar.update();
-    } catch (err) {
-    }
-  };
-
-  window.addEventListener('load', safeUpdate);
-
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(safeUpdate).catch(() => {});
-  }
-
-  document.querySelectorAll('img').forEach(img => img.addEventListener('load', safeUpdate));
-  const mo = new MutationObserver(mutations => {
-    let shouldUpdate = false;
-    for (const m of mutations) {
-      if (m.addedNodes && m.addedNodes.length) {
-        shouldUpdate = true;
-        m.addedNodes.forEach(node => {
-          if (node.nodeType === 1) { // element
-            node.querySelectorAll && node.querySelectorAll('img').forEach(i => i.addEventListener('load', safeUpdate));
-            if (node.tagName === 'IMG') node.addEventListener('load', safeUpdate);
-          }
-        });
-      }
-    }
-    if (shouldUpdate) safeUpdate();
-  });
-  mo.observe(wrapper, { childList: true, subtree: true });
-
-  const ro = new ResizeObserver(safeUpdate);
-  ro.observe(wrapper);
-
-  console.log('Smooth Scrollbar initialized:', scrollbar);
-})();
+  // Update scrollbar when fonts or images load
+  const updateScrollbar = () => scrollbar.update();
+  window.addEventListener('load', updateScrollbar);
+  document.querySelectorAll('img').forEach(img => img.addEventListener('load', updateScrollbar));
+});
 </script>
+
 
 
 
