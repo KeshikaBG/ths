@@ -7,6 +7,11 @@
 <script src="../cdn.jsdelivr.net/npm/%40studio-freight/lenis%40latest/bundled/lenis.min.js" defer></script>
 
 <style>
+  
+html {
+  scroll-behavior: smooth; /* built-in smoothness */
+}
+
   .w-webflow-badge {
   display: none !important;
 }
@@ -365,95 +370,7 @@ document.querySelectorAll("[stagger-animation]").forEach(el => {
 
 
 
-<!-- lenis 
-<script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.js"></script>
-<script>
-(function () {
-  // Only enable on desktop (optional)
-  if (window.innerWidth < 1024) return;
 
-  // Avoid moving the running script node (use document.currentScript)
-  const currentScript = document.currentScript;
-
-  // Create scroll container
-  const wrapper = document.createElement('div');
-  wrapper.id = 'scroll-container';
-
-  // Move nodes EXCEPT the running script into the wrapper
-  // Use while-loop for better performance with live DOM manipulation
-  const body = document.body;
-  const nodes = Array.from(body.childNodes);
-  for (const node of nodes) {
-    if (node === currentScript) continue;
-    wrapper.appendChild(node);
-  }
-
-  // Append wrapper into body (script remains where it is)
-  body.appendChild(wrapper);
-
-  // Prevent native body scroll (Smooth Scrollbar will manage it)
-  body.style.overflow = 'hidden';
-  body.style.height = '100%';
-
-  // Init Smooth Scrollbar on the wrapper
-  const options = {
-    damping: 0.08,        // smoothness (0 < damping < 1)
-    renderByPixels: true,
-    alwaysShowTracks: false
-  };
-
-  const scrollbar = Scrollbar.init(wrapper, options);
-  window.scrollbar = scrollbar;
-
-  // Helpers to update scrollbar when content/layout changes
-  const safeUpdate = () => {
-    try {
-      scrollbar && scrollbar.update();
-    } catch (err) {
-      // swallow errors
-    }
-  };
-
-  // Update on full load
-  window.addEventListener('load', safeUpdate);
-
-  // Update when fonts are ready (if supported)
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(safeUpdate).catch(() => {});
-  }
-
-  // Update when images load (use delegation for already present and future ones)
-  document.querySelectorAll('img').forEach(img => img.addEventListener('load', safeUpdate));
-  // For images added later from Sanity, use a MutationObserver
-  const mo = new MutationObserver(mutations => {
-    let shouldUpdate = false;
-    for (const m of mutations) {
-      if (m.addedNodes && m.addedNodes.length) {
-        shouldUpdate = true;
-        // attach listeners to any added images
-        m.addedNodes.forEach(node => {
-          if (node.nodeType === 1) { // element
-            node.querySelectorAll && node.querySelectorAll('img').forEach(i => i.addEventListener('load', safeUpdate));
-            if (node.tagName === 'IMG') node.addEventListener('load', safeUpdate);
-          }
-        });
-      }
-    }
-    if (shouldUpdate) safeUpdate();
-  });
-  mo.observe(wrapper, { childList: true, subtree: true });
-
-  // Resize observer for layout changes
-  const ro = new ResizeObserver(safeUpdate);
-  ro.observe(wrapper);
-
-  // If you have anchor links, you may want to override default behavior:
-  // Example: document.querySelector('a[href^="#"]').addEventListener('click', (e)=>{ e.preventDefault(); scrollbar.scrollTo(document.querySelector('#target')); });
-
-  // Expose for debugging
-  console.log('Smooth Scrollbar initialized:', scrollbar);
-})();
-</script>-->
 
 
 <!-- Header ANIMATION -->
@@ -683,10 +600,6 @@ gsap.to(hdr, {
 
 
 
-
-html {
-  scroll-behavior: smooth; /* built-in smoothness */
-}
 
 </style>
 
