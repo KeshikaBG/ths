@@ -483,7 +483,11 @@ gsap.to(hdr, {
     });
   });
 });
-</script><style>
+</script>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.css">
+
+  <style>
 .menu, .testimonials-next, .testimonials-prev {
   background: #ffffff;
   transition: background 0.3s ease;
@@ -676,6 +680,48 @@ gsap.to(hdr, {
     z-index: 9996!important;
   }
 }
+
+
+
+
+
+
+  html, body, #scroll-container {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  #scroll-container {
+    position: relative;
+    min-height: 100%;
+  }
+
+  /* Force scrollbar track to always show */
+  .scrollbar-track {
+    background: rgba(0, 0, 0, 0.1); /* light gray track */
+    border-radius: 4px;
+    opacity: 1 !important;
+    width: 10px !important;  /* ← scrollbar width */
+    right: 0 !important;
+  }
+
+  .scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.6); /* darker thumb */
+    border-radius: 4px;
+    opacity: 1 !important;
+    width: 10px !important;
+  }
+
+  .scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  /* Make sure scrollbar container doesn't hide track */
+  .scroll-content {
+    overflow: visible !important;
+  }
+
 </style>
 
 
@@ -1473,53 +1519,13 @@ if (!heroSwiperInitialized) {
 
 
 
-<!-- Smooth Scrollbar -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.css">
 
-<style>
-  html, body, #scroll-container {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  #scroll-container {
-    position: relative;
-    min-height: 100%;
-  }
-
-  /* Force scrollbar track to always show */
-  .scrollbar-track {
-    background: rgba(0, 0, 0, 0.1); /* light gray track */
-    border-radius: 4px;
-    opacity: 1 !important;
-    width: 10px !important;  /* ← scrollbar width */
-    right: 0 !important;
-  }
-
-  .scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.6); /* darker thumb */
-    border-radius: 4px;
-    opacity: 1 !important;
-    width: 10px !important;
-  }
-
-  .scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.8);
-  }
-
-  /* Make sure scrollbar container doesn't hide track */
-  .scroll-content {
-    overflow: visible !important;
-  }
-</style>
 
 <script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.innerWidth < 1024) return; // skip mobile
+  if (window.innerWidth < 1024) return;
 
-  // Wrap page content inside a scroll container
   const body = document.body;
   const wrapper = document.createElement('div');
   wrapper.id = 'scroll-container';
@@ -1529,7 +1535,6 @@ document.addEventListener('DOMContentLoaded', () => {
   body.appendChild(wrapper);
   body.style.overflow = 'hidden';
 
-  // Initialize Smooth Scrollbar
   const scrollbar = Scrollbar.init(wrapper, {
     damping: 0.08,
     renderByPixels: true,
@@ -1539,7 +1544,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.scrollbar = scrollbar;
 
-  // Update scrollbar when fonts or images load
   const updateScrollbar = () => scrollbar.update();
   window.addEventListener('load', updateScrollbar);
   document.querySelectorAll('img').forEach(img => img.addEventListener('load', updateScrollbar));
