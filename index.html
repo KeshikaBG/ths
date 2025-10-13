@@ -1489,14 +1489,29 @@ if (!heroSwiperInitialized) {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // optional: fine-tune scroll smoothness on wheel
-  let isScrolling;
+  if (window.innerWidth < 1024) return; // optional: skip mobile
+
+  let lastScroll = window.scrollY;
+  let ticking = false;
+  const ease = 0.08; // adjust for smoother/faster
+
+  function smooth() {
+    const currentScroll = window.scrollY;
+    const delta = currentScroll - lastScroll;
+
+    if (Math.abs(delta) > 0.1) {
+      window.scrollBy(0, delta * ease); // small smoothing step
+    }
+
+    lastScroll += delta * ease;
+    ticking = false;
+  }
+
   window.addEventListener('scroll', () => {
-    window.clearTimeout(isScrolling);
-    document.body.classList.add('is-scrolling');
-    isScrolling = setTimeout(() => {
-      document.body.classList.remove('is-scrolling');
-    }, 100);
+    if (!ticking) {
+      requestAnimationFrame(smooth);
+      ticking = true;
+    }
   });
 });
 </script>
