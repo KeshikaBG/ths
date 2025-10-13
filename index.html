@@ -1276,45 +1276,26 @@ if (!heroSwiperInitialized) {
   heroSwiperInitialized = true;
 
 const swiper = new Swiper(heroContainer, {
-  loop: true,
+  loop: false,
   speed: 1000,
   autoplay: { delay: 5500, disableOnInteraction: false },
-  preloadImages: true,
-  lazy: { loadPrevNext: true, loadOnTransitionStart: true },
-  updateOnWindowResize: false,
-  observer: false,
-  observeParents: false,
   navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
   pagination: { el: '.swiper-pagination', clickable: true },
-  
   on: {
-    setTransition(swiperInstance, duration) {
+    setTransition(swiperInstance) {
       swiperInstance.wrapperEl.style.transitionTimingFunction = 'cubic-bezier(0.65, 0, 0.35, 1)';
     },
-
-    slideChangeTransitionEnd(swiperInstance) {
-      const wrapper = swiperInstance.wrapperEl;
-      const slides = Array.from(wrapper.children);
-
-      // Find the current active slide
-      const activeIndex = swiperInstance.realIndex; 
-      const activeSlide = slides.find(slide => 
-        slide.getAttribute('data-swiper-slide-index') == activeIndex
-      );
-
-      // Find the next logical slide
-      const nextIndex = (activeIndex + 1) % swiperInstance.slides.length;
-      const nextSlide = slides.find(slide => 
-        slide.getAttribute('data-swiper-slide-index') == nextIndex
-      );
-
-      // ✅ Move the "next" slide to the end of the DOM, right before Swiper clones
-      if (nextSlide && wrapper.contains(nextSlide)) {
-        wrapper.appendChild(nextSlide);
+    slideChange(swiperInstance) {
+      // Fake loop
+      if (swiperInstance.isEnd) {
+        setTimeout(() => {
+          swiperInstance.slideTo(0, 0); // instantly reset to first slide
+        }, swiperInstance.params.autoplay.delay);
       }
     }
   }
 });
+
 
 
 
