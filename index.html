@@ -366,7 +366,7 @@ document.querySelectorAll("[stagger-animation]").forEach(el => {
 
 
 
-<!-- lenis -->
+<!-- lenis 
 <script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.js"></script>
 <script>
 (function () {
@@ -454,7 +454,7 @@ document.querySelectorAll("[stagger-animation]").forEach(el => {
   // Expose for debugging
   console.log('Smooth Scrollbar initialized:', scrollbar);
 })();
-</script>
+</script>-->
 
 
 <!-- Header ANIMATION -->
@@ -1466,5 +1466,122 @@ if (!heroSwiperInitialized) {
     loadHeroSwiper();
     loadOtherSections();
   });
-</script></body>
+</script>
+
+
+
+
+<!-- Smooth Scrollbar (place this before </body>) -->
+<link rel="stylesheet" href="data:text/css,
+  html,body,#scroll-container{height:100%;} 
+  #scroll-container{position:relative;min-height:100%;}
+" />
+
+<script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.js"></script>
+<script>
+(function () {
+  // Only enable on desktop (optional)
+  if (window.innerWidth < 1024) return;
+
+  // Wait for DOM ready so document.body exists
+  function init() {
+    const body = document.body;
+    if (!body) return; // safety guard
+
+    // identify the running script so we don't move it
+    const runningScript = document.currentScript || document.querySelector('script[data-smooth-scrollbar]');
+
+    // If a wrapper already exists, don't double-wrap
+    if (document.getElementById('scroll-container')) {
+      startScrollbar(document.getElementById('scroll-container'));
+      return;
+    }
+
+    // Create scroll container
+    const wrapper = document.createElement('div');
+    wrapper.id = 'scroll-container';
+
+    // Move all body children into wrapper except the running script (if found)
+    const nodes = Array.from(body.childNodes);
+    for (const node of nodes) {
+      if (node === runningScript) continue;
+      wrapper.appendChild(node);
+    }
+
+    // Append wrapper back into body (script stays where it is)
+    body.appendChild(wrapper);
+
+    // Prevent native body scroll
+    body.style.overflow = 'hidden';
+    body.style.height = '100%';
+
+    startScrollbar(wrapper);
+  }
+
+  function startScrollbar(wrapperEl) {
+    const options = {
+      damping: 0.07,        // try 0.07 - 0.12 for different smoothness; lower = snappier
+      renderByPixels: true,
+      alwaysShowTracks: false
+    };
+
+    // Initialize Smooth Scrollbar
+    const scrollbar = Scrollbar.init(wrapperEl, options);
+    window.scrollbar = scrollbar;
+
+    // Safe updater
+    const safeUpdate = () => {
+      try { scrollbar && scrollbar.update(); } catch (err) { /* ignore */ }
+    };
+
+    // update on load
+    window.addEventListener('load', safeUpdate);
+
+    // update when fonts are ready
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(safeUpdate).catch(() => {});
+    }
+
+    // attach to existing images
+    document.querySelectorAll('img').forEach(img => img.addEventListener('load', safeUpdate));
+
+    // observe DOM changes (images/content from Sanity)
+    const mo = new MutationObserver(mutations => {
+      let added = false;
+      for (const m of mutations) {
+        if (m.addedNodes && m.addedNodes.length) {
+          added = true;
+          m.addedNodes.forEach(node => {
+            if (node.nodeType === 1) {
+              node.querySelectorAll && node.querySelectorAll('img').forEach(i => i.addEventListener('load', safeUpdate));
+              if (node.tagName === 'IMG') node.addEventListener('load', safeUpdate);
+            }
+          });
+        }
+      }
+      if (added) safeUpdate();
+    });
+    mo.observe(wrapperEl, { childList: true, subtree: true });
+
+    // resize observer
+    const ro = new ResizeObserver(safeUpdate);
+    ro.observe(wrapperEl);
+
+    // expose for debugging
+    console.log('Smooth Scrollbar initialized', scrollbar);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+
+
+
+</body>
 </html>
