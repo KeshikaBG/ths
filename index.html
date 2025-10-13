@@ -1268,30 +1268,29 @@ async function loadHeroSwiper() {
     // ✅ Wait for all images to load before initializing swiper
     await Promise.all(loadPromises);
 
-    // ✅ Initialize Swiper only once
-    if (!heroSwiperInitialized) {
-      heroSwiperInitialized = true;
-      const swiper = new Swiper(heroContainer, {
-        direction: 'horizontal',
-        loop: true,
-        autoplay: {
-          delay: 4000,
-          disableOnInteraction: false,
-        },
-        speed: 1600,
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-      });
+// after images have been appended and Promise.all resolved
+if (!heroSwiperInitialized) {
+  heroSwiperInitialized = true;
+  const swiper = new Swiper(heroContainer, {
+    direction: 'horizontal',
+    loop: true,
+    speed: 1200,
+    autoplay: { delay: 4000, disableOnInteraction: false },
+    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+    pagination: { el: '.swiper-pagination', clickable: true },
+    preloadImages: false,
+    lazy: { loadPrevNext: true, loadOnTransitionStart: true },
+    updateOnWindowResize: false
+  });
 
-      // ✅ Handle resize properly (update, not rebuild)
-      window.addEventListener('resize', () => swiper.update());
-    }
+  // debounced update
+  let t;
+  window.addEventListener('resize', () => {
+    clearTimeout(t);
+    t = setTimeout(() => swiper.update(), 180);
+  });
+}
+
 
   } catch (err) {
     console.error('❌ Hero Swiper error:', err);
