@@ -1085,7 +1085,7 @@
     }
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        const [heroData, contData, works] = await Promise.all([
+        const [heroData, contData, works, thsData, osData, e2eData] = await Promise.all([
           client.fetch(`*[_type == "about"] | order(_createdAt asc)[0] {
           aboutImages[] { asset->{ url, _type } }
         }`),
@@ -1097,14 +1097,31 @@
             title,
             images[]{ asset->{ url, _type } }
           }
+        }`),
+          client.fetch(`*[_type == "about"] | order(_createdAt asc)[2] {
+          heroImages[] { asset->{ url, _type } }
+        }`),
+          client.fetch(`*[_type == "about"] | order(_createdAt asc)[3] {
+          heroImages[] { asset->{ url, _type } }
+        }`),
+          client.fetch(`*[_type == "about"] | order(_createdAt asc)[4] {
+          heroImages[] { asset->{ url, _type } }
         }`)
         ]);
         const heroImages = heroData?.aboutImages || [];
         const contImages = contData?.heroImages || [];
+        const thsImages = thsData?.aboutImages || [];
+        const osImages = osData?.aboutImages || [];
+        const e2eImages = e2eData?.aboutImages || [];
+        
         const teamSections = works?.featuredSections || [];
 
         const heroImgDiv = document.querySelector('.abt-img-wrp');
         const contImgDiv = document.querySelector('.contact-div');
+        const thsImgDiv = document.querySelector('.Div Block 9');
+        const osImgDiv = document.querySelector('.Div Block 10');
+        const e2eImgDiv = document.querySelector('.Div Block 11');
+        
         const teamCards = document.querySelectorAll('.card');
         const slider = document.querySelector('.slider');
 
@@ -1139,6 +1156,10 @@
         }
         insertImage(heroImgDiv, heroImages, 'About Hero Media');
         insertImage(contImgDiv, contImages, 'Contact Media');
+        insertImage(thsImgDiv, heroImages, 'THS Media');
+        insertImage(osImgDiv, heroImages, 'OS Media');
+        insertImage(e2eImgDiv, heroImages, 'E2E Media');
+        
         let cardIndex = 0;
         teamSections.forEach(section => {
           section.images.forEach(imgObj => {
