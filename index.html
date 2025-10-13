@@ -1471,7 +1471,7 @@ if (!heroSwiperInitialized) {
 
 
 
-<!-- Smooth Scrollbar (place this before </body>) -->
+<!-- Smooth Scrollbar (place this before the closing </body>) -->
 <link rel="stylesheet" href="data:text/css,
   html,body,#scroll-container{height:100%;} 
   #scroll-container{position:relative;min-height:100%;}
@@ -1480,105 +1480,71 @@ if (!heroSwiperInitialized) {
 <script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.js"></script>
 <script>
 (function () {
-  // Only enable on desktop (optional)
   if (window.innerWidth < 1024) return;
 
-  // Wait for DOM ready so document.body exists
-  function init() {
-    const body = document.body;
-    if (!body) return; // safety guard
+  const currentScript = document.currentScript;
 
-    // identify the running script so we don't move it
-    const runningScript = document.currentScript || document.querySelector('script[data-smooth-scrollbar]');
+  const wrapper = document.createElement('div');
+  wrapper.id = 'scroll-container';
 
-    // If a wrapper already exists, don't double-wrap
-    if (document.getElementById('scroll-container')) {
-      startScrollbar(document.getElementById('scroll-container'));
-      return;
-    }
-
-    // Create scroll container
-    const wrapper = document.createElement('div');
-    wrapper.id = 'scroll-container';
-
-    // Move all body children into wrapper except the running script (if found)
-    const nodes = Array.from(body.childNodes);
-    for (const node of nodes) {
-      if (node === runningScript) continue;
-      wrapper.appendChild(node);
-    }
-
-    // Append wrapper back into body (script stays where it is)
-    body.appendChild(wrapper);
-
-    // Prevent native body scroll
-    body.style.overflow = 'hidden';
-    body.style.height = '100%';
-
-    startScrollbar(wrapper);
+  const body = document.body;
+  const nodes = Array.from(body.childNodes);
+  for (const node of nodes) {
+    if (node === currentScript) continue;
+    wrapper.appendChild(node);
   }
 
-  function startScrollbar(wrapperEl) {
-    const options = {
-      damping: 0.07,        // try 0.07 - 0.12 for different smoothness; lower = snappier
-      renderByPixels: true,
-      alwaysShowTracks: false
-    };
+  body.appendChild(wrapper);
 
-    // Initialize Smooth Scrollbar
-    const scrollbar = Scrollbar.init(wrapperEl, options);
-    window.scrollbar = scrollbar;
+  body.style.overflow = 'hidden';
+  body.style.height = '100%';
 
-    // Safe updater
-    const safeUpdate = () => {
-      try { scrollbar && scrollbar.update(); } catch (err) { /* ignore */ }
-    };
+  const options = {
+    damping: 0.08,       
+    renderByPixels: true,
+    alwaysShowTracks: false
+  };
 
-    // update on load
-    window.addEventListener('load', safeUpdate);
+  const scrollbar = Scrollbar.init(wrapper, options);
+  window.scrollbar = scrollbar;
 
-    // update when fonts are ready
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(safeUpdate).catch(() => {});
+  const safeUpdate = () => {
+    try {
+      scrollbar && scrollbar.update();
+    } catch (err) {
     }
+  };
 
-    // attach to existing images
-    document.querySelectorAll('img').forEach(img => img.addEventListener('load', safeUpdate));
+  window.addEventListener('load', safeUpdate);
 
-    // observe DOM changes (images/content from Sanity)
-    const mo = new MutationObserver(mutations => {
-      let added = false;
-      for (const m of mutations) {
-        if (m.addedNodes && m.addedNodes.length) {
-          added = true;
-          m.addedNodes.forEach(node => {
-            if (node.nodeType === 1) {
-              node.querySelectorAll && node.querySelectorAll('img').forEach(i => i.addEventListener('load', safeUpdate));
-              if (node.tagName === 'IMG') node.addEventListener('load', safeUpdate);
-            }
-          });
-        }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(safeUpdate).catch(() => {});
+  }
+
+  document.querySelectorAll('img').forEach(img => img.addEventListener('load', safeUpdate));
+  const mo = new MutationObserver(mutations => {
+    let shouldUpdate = false;
+    for (const m of mutations) {
+      if (m.addedNodes && m.addedNodes.length) {
+        shouldUpdate = true;
+        m.addedNodes.forEach(node => {
+          if (node.nodeType === 1) { // element
+            node.querySelectorAll && node.querySelectorAll('img').forEach(i => i.addEventListener('load', safeUpdate));
+            if (node.tagName === 'IMG') node.addEventListener('load', safeUpdate);
+          }
+        });
       }
-      if (added) safeUpdate();
-    });
-    mo.observe(wrapperEl, { childList: true, subtree: true });
+    }
+    if (shouldUpdate) safeUpdate();
+  });
+  mo.observe(wrapper, { childList: true, subtree: true });
 
-    // resize observer
-    const ro = new ResizeObserver(safeUpdate);
-    ro.observe(wrapperEl);
+  const ro = new ResizeObserver(safeUpdate);
+  ro.observe(wrapper);
 
-    // expose for debugging
-    console.log('Smooth Scrollbar initialized', scrollbar);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  console.log('Smooth Scrollbar initialized:', scrollbar);
 })();
 </script>
-
 
 
 
