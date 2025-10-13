@@ -570,11 +570,8 @@ gsap.to(hdr, {
 /* Slides: avoid animating layout properties. Ensure they are composited */
 .hero-swiper .swiper-slide {
   will-change: transform;
+  backface-visibility: hidden;
   transform: translateZ(0); /* force GPU layer */
-}
-.swiper-slide {
-  will-change: transform;
-  transform: translateZ(0);
 }
 .hero-swiper, .swiper-wrapper {
   transform: translate3d(0,0,0);
@@ -1288,8 +1285,8 @@ if (!heroSwiperInitialized) {
   heroSwiperInitialized = true;
 const swiper = new Swiper(heroContainer, {
   loop: true,
-  speed: 1200,
-  autoplay: { delay: 5000, disableOnInteraction: false },
+  speed: 1000,
+  autoplay: { delay: 5500, disableOnInteraction: false },
   preloadImages: false,
   lazy: { loadPrevNext: true, loadOnTransitionStart: true },
   updateOnWindowResize: false,
