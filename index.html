@@ -5,8 +5,6 @@
 <script src="https://cdn.jsdelivr.net/npm/split-type@0.3.4"></script>
 <script src="../unpkg.com/swiper%4012.0.2/swiper-bundle.min.js"></script>
 <script src="../cdn.jsdelivr.net/npm/%40studio-freight/lenis%40latest/bundled/lenis.min.js" defer></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.css">
-
 
 <style>
   .w-webflow-badge {
@@ -686,41 +684,9 @@ gsap.to(hdr, {
 
 
 
-  html, body, #scroll-container {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  #scroll-container {
-    position: relative;
-    min-height: 100%;
-  }
-
-  /* Force scrollbar track to always show */
-  .scrollbar-track {
-    background: rgba(0, 0, 0, 0.1); /* light gray track */
-    border-radius: 4px;
-    opacity: 1 !important;
-    width: 10px !important;  /* ← scrollbar width */
-    right: 0 !important;
-  }
-
-  .scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.6); /* darker thumb */
-    border-radius: 4px;
-    opacity: 1 !important;
-    width: 10px !important;
-  }
-
-  .scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.8);
-  }
-
-  /* Make sure scrollbar container doesn't hide track */
-  .scroll-content {
-    overflow: visible !important;
-  }
+html {
+  scroll-behavior: smooth; /* built-in smoothness */
+}
 
 </style>
 
@@ -1521,34 +1487,17 @@ if (!heroSwiperInitialized) {
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.7.4/dist/smooth-scrollbar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.innerWidth < 1024) return; 
-
-  const wrapper = document.createElement('div');
-  wrapper.id = 'scroll-container';
-
-  while (document.body.firstChild) {
-    wrapper.appendChild(document.body.firstChild);
-  }
-  document.body.appendChild(wrapper);
-  document.body.style.overflow = 'hidden';
-
-  const scrollbar = Scrollbar.init(wrapper, {
-    damping: 0.08,
-    alwaysShowTracks: true,
+  // optional: fine-tune scroll smoothness on wheel
+  let isScrolling;
+  window.addEventListener('scroll', () => {
+    window.clearTimeout(isScrolling);
+    document.body.classList.add('is-scrolling');
+    isScrolling = setTimeout(() => {
+      document.body.classList.remove('is-scrolling');
+    }, 100);
   });
-
-  scrollbar.addListener(({ offset }) => {
-    window.scrollTo(0, offset.y);
-  });
-
-  const update = () => scrollbar.update();
-  window.addEventListener('load', update);
-  document.querySelectorAll('img').forEach(img => img.addEventListener('load', update));
-
-  window.scrollbar = scrollbar;
 });
 </script>
 
