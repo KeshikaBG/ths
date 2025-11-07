@@ -905,13 +905,13 @@
           return;
         }
         const { _type, mimeType, url } = media.asset;
-        if (_type === 'sanity.imageAsset' || mimeType?.startsWith('image/index.html')) {
+        if (_type === 'sanity.imageAsset' || mimeType?.startsWith('image/')) {
           const img = document.createElement('img');
           img.src = url;
           img.alt = label;
           applyImageStyles(img);
           container.appendChild(img);
-        } else if (_type === 'sanity.fileAsset' && mimeType?.startsWith('video/index.html')) {
+        } else if (_type === 'sanity.fileAsset' && mimeType?.startsWith('video/')) {
           const video = document.createElement('video');
           video.src = url;
           video.autoplay = true;
@@ -1002,7 +1002,7 @@
             } else if (youtubeUrl) {
               let videoId = null;
               try {
-                const urlObj = new URL(youtubeUrl.html);
+                const urlObj = new URL(youtubeUrl);
                 if (urlObj.hostname.includes('youtu.be')) {
                   videoId = urlObj.pathname.slice(1);
                 } else {
