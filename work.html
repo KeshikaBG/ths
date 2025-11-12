@@ -1024,7 +1024,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[0...8] {
+        const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...15] {
       featuredSections[] {
         title,
         images[]{ asset->{ url } }
@@ -1191,7 +1191,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         const [heroData, contData] = await Promise.all([
-          client.fetch(`*[_type == "work"] | order(_createdAt asc)[8] {
+          client.fetch(`*[_type == "work"] | order(_createdAt asc)[0] {
     featuredSections[] {
       images[]{
         asset->{ url, _type }
