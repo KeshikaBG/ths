@@ -1078,19 +1078,31 @@
 
         
 section.preloadedImages = images.map((imgObj, i) => {
-  const img = new Image();
-  const src = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
-  img.src = src;
+  const img = document.createElement('img');
+  const lowRes = `${imgObj.asset?.url}?w=60&blur=30&auto=format`;
+  const highRes = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
+
+  img.src = lowRes;
+  img.dataset.src = highRes; // save high-res for lazy load
   img.alt = section.title || '';
   img.style.height = '40vh';
   img.style.width = 'auto';
   img.style.objectFit = 'cover';
   img.style.marginRight = '1rem';
-  img.loading = i === 0 ? 'eager' : 'lazy';
+  img.style.filter = 'blur(10px)';
+  img.loading = 'lazy';
+
+  // swap to high-res after load
+  const full = new Image();
+  full.src = highRes;
+  full.onload = () => {
+    img.src = highRes;
+    img.style.transition = 'filter 0.6s ease';
+    img.style.filter = 'blur(0px)';
+  };
+
   return img;
 });
-
-        
 
 
 
