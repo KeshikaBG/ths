@@ -1024,7 +1024,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...15] {
+        const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[0...15] {
       featuredSections[] {
         title,
         images[]{ asset->{ url } }
