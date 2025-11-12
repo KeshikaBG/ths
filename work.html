@@ -1306,182 +1306,162 @@ section.preloadedImages.forEach(img => {
   }
   function cancelMomentum() { if (momentumFrame) cancelAnimationFrame(momentumFrame); }
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20]{
-        heroTitle,
-        featuredSections[]{
-          title,
-          images[]{ asset->{ url } }
-        }
-      }`);
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    // ✅ Fetch all works
+    const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[0...20] {
+      heroTitle,
+      featuredSections[] {
+        title,
+        images[]{ asset->{ url } }
+      }
+    }`);
 
-      const container = document.querySelector('.work-img-wrpr-div');
-      const parents = document.querySelectorAll('.work-divs-wrpr');
-      const separateWorkDiv = document.querySelector('.separate-work-div');
-      const titleInrImg = separateWorkDiv.querySelector('.title-inr-img');
-      const imagesFlex = separateWorkDiv.querySelectorAll('.images-flex');
-      const overlayWork = document.querySelector('.overlay-work');
-      const wrkClose = document.querySelector('.wrk-close');
-      const allChip = document.querySelector('.wrk-chip-all');
-      const chipWrapper = document.querySelector('.work-chip-wrp');
+    const container = document.querySelector('.work-img-wrpr-div');
+    const parents = document.querySelectorAll('.work-divs-wrpr');
+    const separateWorkDiv = document.querySelector('.separate-work-div');
+    const titleInrImg = separateWorkDiv.querySelector('.title-inr-img');
+    const imagesFlex = separateWorkDiv.querySelectorAll('.images-flex');
+    const overlayWork = document.querySelector('.overlay-work');
+    const wrkClose = document.querySelector('.wrk-close');
+    const allChip = document.querySelector('.wrk-chip-all');
+    const chipWrapper = document.querySelector('.work-chip-wrp');
 
-      let usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
-      usedParents.forEach(p => p.innerHTML = '');
+    let usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
+    usedParents.forEach(p => p.innerHTML = '');
 
-      // --- Preload all images immediately ---
-      window.addEventListener('load', () => {
-        works.forEach(work => {
-          work.featuredSections?.forEach(section => {
-            section.images?.forEach(imgObj => {
-              const preload = new Image();
-              preload.src = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
+    // Remove old chips except All
+    chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(chip => chip.remove());
+
+    // ✅ Create chips dynamically from heroTitle
+    works.forEach((work, index) => {
+      if (!work.heroTitle) return;
+      const chip = document.createElement('div');
+      chip.classList.add('wrk-chip');
+      chip.dataset.index = index;
+      chip.innerHTML = `<div class="chip-text">${work.heroTitle}</div>`;
+      chipWrapper.appendChild(chip);
+    });
+
+    const chips = document.querySelectorAll('.wrk-chip');
+
+    // ✅ Preload and create “All” clones + individual work clones
+    const allClones = [];
+    const workClones = {}; // { 0: [div1, div2...], 1: [div1, div2...] }
+
+    works.forEach((work, workIndex) => {
+      const perWorkClones = [];
+
+      work.featuredSections?.forEach(section => {
+        const images = section.images || [];
+        if (!images.length) return;
+
+        const firstImg = images[0]?.asset?.url;
+        if (!firstImg) return;
+
+        // 🔹 Create a card clone
+        const clone = container.cloneNode(true);
+        clone.dataset.chipIndex = workIndex;
+
+        const titleEl = clone.querySelector('.title-img');
+        if (titleEl) titleEl.textContent = section.title || '';
+
+        // Image setup
+        const img = clone.querySelector('img') || document.createElement('img');
+        img.src = `${firstImg}?w=800&auto=format&fit=crop`;
+        img.alt = section.title || '';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        clone.prepend(img);
+
+        // Overlay click logic
+        const overlayEl = clone.querySelector('.overlay-div');
+        if (overlayEl) {
+          overlayEl.style.opacity = '0';
+          overlayEl.style.cursor = 'pointer';
+          overlayEl.addEventListener('click', () => {
+            separateWorkDiv.style.display = 'block';
+            setTimeout(() => separateWorkDiv.style.opacity = '1', 100);
+            overlayWork.style.display = 'block';
+            setTimeout(() => overlayWork.style.opacity = '1', 100);
+
+            if (titleInrImg) titleInrImg.textContent = section.title || '';
+            imagesFlex.forEach(flex => {
+              flex.innerHTML = '';
+              images.forEach(imgObj => {
+                const fullImg = document.createElement('img');
+                fullImg.src = `${imgObj.asset?.url}?w=1000&auto=format`;
+                fullImg.alt = section.title || '';
+                fullImg.style.height = '40vh';
+                fullImg.style.objectFit = 'cover';
+                fullImg.style.marginRight = '1rem';
+                flex.appendChild(fullImg);
+              });
             });
           });
-        });
+        }
+
+        // Push to both arrays
+        perWorkClones.push(clone);
+        allClones.push(clone);
       });
 
-      // Remove old chips
-      chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(chip => chip.remove());
+      // ✅ Store per-work clones
+      workClones[workIndex] = perWorkClones;
+    });
 
-      // Create chips
-      works.forEach((work, workIndex) => {
-        if (!work.heroTitle) return;
-        const chip = document.createElement('div');
-        chip.classList.add('wrk-chip');
-        chip.dataset.index = workIndex;
-        const chipText = document.createElement('div');
-        chipText.classList.add('chip-text');
-        chipText.textContent = work.heroTitle;
-        chip.appendChild(chipText);
-        chipWrapper.appendChild(chip);
+    // ✅ Distribute helper
+    function distribute(clones) {
+      usedParents.forEach(p => (p.innerHTML = ''));
+      clones.forEach((clone, i) => {
+        usedParents[i % usedParents.length].appendChild(clone);
       });
-
-      const chips = document.querySelectorAll('.wrk-chip');
-
-      // Function to create clones for a specific work
-      function createWorkClones(work, workIndex) {
-        const clones = [];
-        work.featuredSections?.forEach(section => {
-          const images = section.images || [];
-          if (!images.length) return;
-
-          const clone = container.cloneNode(true);
-          clone.dataset.chipIndex = workIndex;
-
-          const titleEl = clone.querySelector('.title-img');
-          if (titleEl) titleEl.textContent = section.title || '';
-
-          const overlayEl = clone.querySelector('.overlay-div');
-          if (overlayEl) {
-            overlayEl.style.cursor = 'pointer';
-            overlayEl.addEventListener('click', () => {
-              separateWorkDiv.style.display = 'block';
-              setTimeout(() => separateWorkDiv.style.opacity = '1', 100);
-              overlayWork.style.display = 'block';
-              setTimeout(() => overlayWork.style.opacity = '1', 100);
-              if (titleInrImg) titleInrImg.textContent = section.title || '';
-              imagesFlex.forEach(flex => {
-                flex.innerHTML = '';
-                section.images?.forEach(imgObj => {
-                  const img = document.createElement('img');
-                  img.src = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
-                  img.style.height = '40vh';
-                  img.style.width = 'auto';
-                  img.style.objectFit = 'cover';
-                  img.style.marginRight = '1rem';
-                  flex.appendChild(img);
-                });
-              });
-
-              scrlContnr = document.querySelector('.images-flex-wrpr');
-              scrlCntnt = scrlContnr.querySelector('.images-flex');
-              const oldClone = scrlContnr.querySelector('.images-flex-clone');
-              if (oldClone) oldClone.remove();
-              cloneCntnt = scrlCntnt.cloneNode(true);
-              cloneCntnt.classList.add('images-flex-clone');
-              scrlContnr.appendChild(cloneCntnt);
-              scrlPos = 0;
-
-              scrlContnr.addEventListener('mousedown', e => startDrag(e));
-              scrlContnr.addEventListener('mousemove', e => moveDrag(e));
-              scrlContnr.addEventListener('mouseup', endDrag);
-              scrlContnr.addEventListener('mouseleave', () => {
-                if (isDragging) { isDragging = false; scrlContnr.style.cursor = "grab"; applyMomentum(); }
-                else startAnimation();
-              });
-              scrlContnr.addEventListener('touchstart', e => startDrag(e, true));
-              scrlContnr.addEventListener('touchmove', e => moveDrag(e, true));
-              scrlContnr.addEventListener('touchend', endDrag);
-              scrlContnr.addEventListener('touchcancel', endDrag);
-              document.addEventListener('scroll', startAnimation);
-              startAnimation();
-            });
-          }
-
-          let img = clone.querySelector('img');
-          if (!img) {
-            img = document.createElement('img');
-            clone.prepend(img);
-          }
-
-          img.src = `${images[0]?.asset?.url}?w=900&auto=format&fit=crop`;
-          img.alt = section.title || '';
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.objectFit = 'cover';
-          clones.push(clone);
-        });
-        return clones;
-      }
-
-      function distribute(clones) {
-        usedParents.forEach(p => p.innerHTML = '');
-        let counter = 0;
-        clones.forEach(clone => {
-          const parent = usedParents[counter % usedParents.length];
-          parent.appendChild(clone);
-          counter++;
-        });
-      }
-
-      // --- Build and show "All" works initially ---
-      const allClones = works.flatMap((work, i) => createWorkClones(work, i));
-      distribute(allClones);
-      container.style.display = 'none';
-      allChip.classList.add('selected');
-
-      // --- Filter by chip instantly ---
-      chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          const idx = Number(chip.dataset.index);
-          const filteredClones = createWorkClones(works[idx], idx);
-          distribute(filteredClones);
-          chips.forEach(c => c.classList.remove('selected'));
-          allChip.classList.remove('selected');
-          chip.classList.add('selected');
-        });
-      });
-
-      allChip.addEventListener('click', () => {
-        distribute(allClones);
-        chips.forEach(c => c.classList.remove('selected'));
-        allChip.classList.add('selected');
-      });
-
-      // --- Close overlay ---
-      [overlayWork, wrkClose].forEach(el => {
-        el.addEventListener('click', () => {
-          separateWorkDiv.style.opacity = '0';
-          setTimeout(() => separateWorkDiv.style.display = 'none', 300);
-          overlayWork.style.opacity = '0';
-          setTimeout(() => overlayWork.style.display = 'none', 300);
-        });
-      });
-    } catch (err) {
-      console.error('❌ Sanity fetch error:', err);
     }
-  });
+
+    // ✅ Initially show all
+    distribute(allClones);
+    allChip.classList.add('selected');
+
+    // ✅ Chip filter logic
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const index = chip.dataset.index;
+        const clones = workClones[index] || [];
+        distribute(clones);
+
+        chips.forEach(c => c.classList.remove('selected'));
+        allChip.classList.remove('selected');
+        chip.classList.add('selected');
+      });
+    });
+
+    // ✅ All chip
+    allChip.addEventListener('click', () => {
+      distribute(allClones);
+      chips.forEach(c => c.classList.remove('selected'));
+      allChip.classList.add('selected');
+    });
+
+    // ✅ Close overlay
+    [overlayWork, wrkClose].forEach(el => {
+      el.addEventListener('click', () => {
+        separateWorkDiv.style.opacity = '0';
+        overlayWork.style.opacity = '0';
+        setTimeout(() => {
+          separateWorkDiv.style.display = 'none';
+          overlayWork.style.display = 'none';
+        }, 300);
+      });
+    });
+
+    // ✅ Hide the original template container
+    container.style.display = 'none';
+  } catch (err) {
+    console.error('❌ Sanity fetch error:', err);
+  }
+});
+
 </script>
 
 
