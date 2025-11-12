@@ -1104,26 +1104,37 @@ section.preloadedImages = images.map((imgObj, i) => {
   return img;
 });
 
-
-
-// 🧠 Lazy load only when visible
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const img = entry.target;
-      const src = img.dataset.src;
-      if (src && img.src !== src) {
-        img.src = src;
-        img.style.transition = 'filter 0.6s ease';
-        img.style.filter = 'blur(0px)';
-      }
-      observer.unobserve(img);
-    }
+// ✅ Preload all high-res images once the window has finished loading
+window.addEventListener('load', () => {
+  works.forEach(work => {
+    work.featuredSections?.forEach(section => {
+      section.preloadedImages?.forEach(img => {
+        const highRes = img.dataset.src;
+        if (highRes) {
+          const preload = new Image();
+          preload.src = highRes;
+        }
+      });
+    });
   });
-}, { rootMargin: '150px' });
+});
 
-// Start observing all images in this section
-section.preloadedImages.forEach(img => observer.observe(img));
+
+// 🧠 Preload all images immediately when page loads
+section.preloadedImages.forEach(img => {
+  const highRes = img.dataset.src;
+  if (highRes) {
+    const full = new Image();
+    full.src = highRes;
+
+    full.onload = () => {
+      img.src = highRes;
+      img.style.transition = 'filter 0.6s ease';
+      img.style.filter = 'blur(0px)';
+    };
+  }
+});
+
 
 
 
