@@ -1286,7 +1286,6 @@ section.preloadedImages.forEach(img => {
   }
 
   function endDrag() { isDragging = false; scrlContnr.style.cursor = "grab"; applyMomentum(); }
-
   function applyMomentum() {
     if (Math.abs(velocity) < 1) return;
     let speed = Math.min(Math.abs(velocity), 15);
@@ -1305,32 +1304,13 @@ section.preloadedImages.forEach(img => {
     }
     momentumLoop();
   }
-
   function cancelMomentum() { if (momentumFrame) cancelAnimationFrame(momentumFrame); }
-
-  // Helper to preload one image
-  function preloadImage(url) {
-    const img = new Image();
-    img.src = `${url}?w=900&auto=format&fit=crop`;
-  }
-
-  // Fetch one work by index
-  async function fetchWork(index) {
-    return await client.fetch(`*[_type == "work"] | order(_createdAt asc)[${index}] {
-      heroTitle,
-      featuredSections[] {
-        title,
-        images[]{ asset->{ url } }
-      }
-    }`);
-  }
 
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      // Fetch all works once for chips + “All” tab
-      const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20] {
+      const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20]{
         heroTitle,
-        featuredSections[] {
+        featuredSections[]{
           title,
           images[]{ asset->{ url } }
         }
@@ -1349,6 +1329,19 @@ section.preloadedImages.forEach(img => {
       let usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
       usedParents.forEach(p => p.innerHTML = '');
 
+      // --- Preload all images immediately ---
+      window.addEventListener('load', () => {
+        works.forEach(work => {
+          work.featuredSections?.forEach(section => {
+            section.images?.forEach(imgObj => {
+              const preload = new Image();
+              preload.src = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
+            });
+          });
+        });
+      });
+
+      // Remove old chips
       chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(chip => chip.remove());
 
       // Create chips
@@ -1366,75 +1359,82 @@ section.preloadedImages.forEach(img => {
 
       const chips = document.querySelectorAll('.wrk-chip');
 
-      // Helper to create image clone
-      function createClone(section, workIndex) {
-        const clone = container.cloneNode(true);
-        clone.dataset.chipIndex = workIndex;
-        clone.dataset.chipGroup = 'all';
-        const titleEl = clone.querySelector('.title-img');
-        if (titleEl) titleEl.textContent = section.title || '';
-        const overlayEl = clone.querySelector('.overlay-div');
-        if (overlayEl) {
-          overlayEl.style.opacity = '0';
-          overlayEl.style.cursor = 'pointer';
-          overlayEl.addEventListener('click', () => {
-            separateWorkDiv.style.display = 'block';
-            setTimeout(() => separateWorkDiv.style.opacity = '1', 100);
-            overlayWork.style.display = 'block';
-            setTimeout(() => overlayWork.style.opacity = '1', 100);
-            if (titleInrImg) titleInrImg.textContent = section.title || '';
-            imagesFlex.forEach(flex => {
-              flex.innerHTML = '';
-              section.images?.forEach(imgObj => {
-                const img = document.createElement('img');
-                img.src = imgObj.asset?.url;
-                img.style.width = 'auto';
-                img.style.height = '40vh';
-                img.style.objectFit = 'cover';
-                img.style.marginRight = '1rem';
-                flex.appendChild(img);
+      // Function to create clones for a specific work
+      function createWorkClones(work, workIndex) {
+        const clones = [];
+        work.featuredSections?.forEach(section => {
+          const images = section.images || [];
+          if (!images.length) return;
+
+          const clone = container.cloneNode(true);
+          clone.dataset.chipIndex = workIndex;
+
+          const titleEl = clone.querySelector('.title-img');
+          if (titleEl) titleEl.textContent = section.title || '';
+
+          const overlayEl = clone.querySelector('.overlay-div');
+          if (overlayEl) {
+            overlayEl.style.cursor = 'pointer';
+            overlayEl.addEventListener('click', () => {
+              separateWorkDiv.style.display = 'block';
+              setTimeout(() => separateWorkDiv.style.opacity = '1', 100);
+              overlayWork.style.display = 'block';
+              setTimeout(() => overlayWork.style.opacity = '1', 100);
+              if (titleInrImg) titleInrImg.textContent = section.title || '';
+              imagesFlex.forEach(flex => {
+                flex.innerHTML = '';
+                section.images?.forEach(imgObj => {
+                  const img = document.createElement('img');
+                  img.src = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
+                  img.style.height = '40vh';
+                  img.style.width = 'auto';
+                  img.style.objectFit = 'cover';
+                  img.style.marginRight = '1rem';
+                  flex.appendChild(img);
+                });
               });
+
+              scrlContnr = document.querySelector('.images-flex-wrpr');
+              scrlCntnt = scrlContnr.querySelector('.images-flex');
+              const oldClone = scrlContnr.querySelector('.images-flex-clone');
+              if (oldClone) oldClone.remove();
+              cloneCntnt = scrlCntnt.cloneNode(true);
+              cloneCntnt.classList.add('images-flex-clone');
+              scrlContnr.appendChild(cloneCntnt);
+              scrlPos = 0;
+
+              scrlContnr.addEventListener('mousedown', e => startDrag(e));
+              scrlContnr.addEventListener('mousemove', e => moveDrag(e));
+              scrlContnr.addEventListener('mouseup', endDrag);
+              scrlContnr.addEventListener('mouseleave', () => {
+                if (isDragging) { isDragging = false; scrlContnr.style.cursor = "grab"; applyMomentum(); }
+                else startAnimation();
+              });
+              scrlContnr.addEventListener('touchstart', e => startDrag(e, true));
+              scrlContnr.addEventListener('touchmove', e => moveDrag(e, true));
+              scrlContnr.addEventListener('touchend', endDrag);
+              scrlContnr.addEventListener('touchcancel', endDrag);
+              document.addEventListener('scroll', startAnimation);
+              startAnimation();
             });
+          }
 
-            scrlContnr = document.querySelector('.images-flex-wrpr');
-            scrlCntnt = scrlContnr.querySelector('.images-flex');
-            const oldClone = scrlContnr.querySelector('.images-flex-clone');
-            if (oldClone) oldClone.remove();
-            cloneCntnt = scrlCntnt.cloneNode(true);
-            cloneCntnt.classList.add('images-flex-clone');
-            scrlContnr.appendChild(cloneCntnt);
+          let img = clone.querySelector('img');
+          if (!img) {
+            img = document.createElement('img');
+            clone.prepend(img);
+          }
 
-            scrlPos = 0;
-            scrlContnr.addEventListener('mousedown', e => startDrag(e));
-            scrlContnr.addEventListener('mousemove', e => moveDrag(e));
-            scrlContnr.addEventListener('mouseup', endDrag);
-            scrlContnr.addEventListener('mouseleave', () => {
-              if (isDragging) { isDragging = false; scrlContnr.style.cursor = "grab"; applyMomentum(); }
-              else startAnimation();
-            });
-            scrlContnr.addEventListener('touchstart', e => startDrag(e, true));
-            scrlContnr.addEventListener('touchmove', e => moveDrag(e, true));
-            scrlContnr.addEventListener('touchend', endDrag);
-            scrlContnr.addEventListener('touchcancel', endDrag);
-            document.addEventListener('scroll', startAnimation);
-            startAnimation();
-          });
-        }
-
-        let img = clone.querySelector('img');
-        if (!img) {
-          img = document.createElement('img');
-          clone.prepend(img);
-        }
-        const firstImg = section.images?.[0]?.asset?.url;
-        if (firstImg) img.src = firstImg;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
-        return clone;
+          img.src = `${images[0]?.asset?.url}?w=900&auto=format&fit=crop`;
+          img.alt = section.title || '';
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          clones.push(clone);
+        });
+        return clones;
       }
 
-      // Distribute function
       function distribute(clones) {
         usedParents.forEach(p => p.innerHTML = '');
         let counter = 0;
@@ -1445,52 +1445,31 @@ section.preloadedImages.forEach(img => {
         });
       }
 
-      // Preload all images on load
-      window.addEventListener('load', () => {
-        works.forEach(work => {
-          work.featuredSections?.forEach(section => {
-            section.images?.forEach(imgObj => preloadImage(imgObj.asset?.url));
-          });
-        });
-      });
-
-      // Build “All” clones
-      const allClones = [];
-      works.forEach((work, workIndex) => {
-        work.featuredSections?.forEach(section => {
-          allClones.push(createClone(section, workIndex));
-        });
-      });
-
+      // --- Build and show "All" works initially ---
+      const allClones = works.flatMap((work, i) => createWorkClones(work, i));
       distribute(allClones);
       container.style.display = 'none';
       allChip.classList.add('selected');
 
-      // Chip click: fetch that specific work from Sanity
+      // --- Filter by chip instantly ---
       chips.forEach(chip => {
-        chip.addEventListener('click', async () => {
-          const chipIndex = Number(chip.dataset.index);
-          const work = await fetchWork(chipIndex);
-          const clones = [];
-          work.featuredSections?.forEach(section => {
-            section.images?.forEach(imgObj => preloadImage(imgObj.asset?.url));
-            clones.push(createClone(section, chipIndex));
-          });
-          distribute(clones);
+        chip.addEventListener('click', () => {
+          const idx = Number(chip.dataset.index);
+          const filteredClones = createWorkClones(works[idx], idx);
+          distribute(filteredClones);
           chips.forEach(c => c.classList.remove('selected'));
           allChip.classList.remove('selected');
           chip.classList.add('selected');
         });
       });
 
-      // “All” chip
       allChip.addEventListener('click', () => {
         distribute(allClones);
         chips.forEach(c => c.classList.remove('selected'));
         allChip.classList.add('selected');
       });
 
-      // Overlay close
+      // --- Close overlay ---
       [overlayWork, wrkClose].forEach(el => {
         el.addEventListener('click', () => {
           separateWorkDiv.style.opacity = '0';
@@ -1499,7 +1478,6 @@ section.preloadedImages.forEach(img => {
           setTimeout(() => overlayWork.style.display = 'none', 300);
         });
       });
-
     } catch (err) {
       console.error('❌ Sanity fetch error:', err);
     }
