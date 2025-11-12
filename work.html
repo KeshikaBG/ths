@@ -963,6 +963,7 @@
   
 <script type="module">
   import { createClient } from 'https://esm.sh/@sanity/client';
+
   const client = createClient({
     projectId: 'n7jjk6nd',
     dataset: 'production',
@@ -970,11 +971,19 @@
     apiVersion: '2023-01-01'
   });
 
-  // 🔹 Scroll + drag system
-  let scrlContnr = null, scrlCntnt = null, cloneCntnt = null;
-  let scrlPos = 0, defltSpeed = 0.6, scrlSpeed = defltSpeed;
-  let isDragging = false, startX = 0, lastX = 0, velocity = 0;
-  let dirctn = -1, isRunning = false, momentumFrame;
+  let scrlContnr = null,
+    scrlCntnt = null,
+    cloneCntnt = null;
+  let scrlPos = 0,
+    defltSpeed = 0.6,
+    scrlSpeed = defltSpeed;
+  let isDragging = false,
+    startX = 0,
+    lastX = 0,
+    velocity = 0;
+  let dirctn = -1,
+    isRunning = false,
+    momentumFrame;
 
   function isElemInVp(el) {
     const rect = el.getBoundingClientRect();
@@ -983,56 +992,89 @@
 
   function moveContent() {
     if (!scrlContnr || !scrlCntnt || !cloneCntnt) return;
-    if (!isElemInVp(scrlContnr)) { isRunning = false; return; }
+    if (!isElemInVp(scrlContnr)) {
+      isRunning = false;
+      return;
+    }
     isRunning = true;
     if (!isDragging) scrlPos += scrlSpeed * dirctn;
+
     let maxScroll = -scrlCntnt.scrollWidth;
     if (scrlPos <= maxScroll) scrlPos = 0;
     else if (scrlPos >= 0) scrlPos = maxScroll;
+
     scrlCntnt.style.transform = `translateX(${scrlPos}px)`;
     cloneCntnt.style.transform = `translateX(${scrlPos}px)`;
     requestAnimationFrame(moveContent);
   }
-  function startAnimation() { if (!isRunning) moveContent(); }
+
+  function startAnimation() {
+    if (!isRunning) moveContent();
+  }
+
   function startDrag(e, touch = false) {
-    isDragging = true; cancelMomentum();
+    isDragging = true;
+    cancelMomentum();
     startX = touch ? e.touches[0].pageX : e.pageX;
-    lastX = startX; velocity = 0;
+    lastX = startX;
+    velocity = 0;
     scrlContnr.style.cursor = "grabbing";
   }
+
   function moveDrag(e, touch = false) {
     if (!isDragging) return;
     let currentX = touch ? e.touches[0].pageX : e.pageX;
-    let dragDistance = currentX - lastX; lastX = currentX;
-    velocity = dragDistance; scrlPos += dragDistance;
+    let dragDistance = currentX - lastX;
+    lastX = currentX;
+    velocity = dragDistance;
+    scrlPos += dragDistance;
     scrlCntnt.style.transform = `translateX(${scrlPos}px)`;
     cloneCntnt.style.transform = `translateX(${scrlPos}px)`;
   }
-  function endDrag() { isDragging = false; scrlContnr.style.cursor = "grab"; applyMomentum(); }
+
+  function endDrag() {
+    isDragging = false;
+    scrlContnr.style.cursor = "grab";
+    applyMomentum();
+  }
+
   function applyMomentum() {
     if (Math.abs(velocity) < 1) return;
     let speed = Math.min(Math.abs(velocity), 15);
     let momentumDirection = velocity > 0 ? 1 : -1;
     cancelMomentum();
+
     function momentumLoop() {
-      if (speed <= defltSpeed) { scrlSpeed = defltSpeed; dirctn = momentumDirection; return; }
-      scrlSpeed = speed; dirctn = momentumDirection;
+      if (speed <= defltSpeed) {
+        scrlSpeed = defltSpeed;
+        dirctn = momentumDirection;
+        return;
+      }
+      scrlSpeed = speed;
+      dirctn = momentumDirection;
       scrlPos += scrlSpeed * dirctn;
+
       let maxScroll = -scrlCntnt.scrollWidth;
-      if (scrlPos <= maxScroll) scrlPos = 0; else if (scrlPos >= 0) scrlPos = maxScroll;
+      if (scrlPos <= maxScroll) scrlPos = 0;
+      else if (scrlPos >= 0) scrlPos = maxScroll;
+
       scrlCntnt.style.transform = `translateX(${scrlPos}px)`;
       cloneCntnt.style.transform = `translateX(${scrlPos}px)`;
-      speed *= 0.95; if (speed < defltSpeed) speed = defltSpeed;
+
+      speed *= 0.95;
+      if (speed < defltSpeed) speed = defltSpeed;
       momentumFrame = requestAnimationFrame(momentumLoop);
     }
+
     momentumLoop();
   }
-  function cancelMomentum() { if (momentumFrame) cancelAnimationFrame(momentumFrame); }
 
-  // 🔹 Main logic
+  function cancelMomentum() {
+    if (momentumFrame) cancelAnimationFrame(momentumFrame);
+  }
+
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      // ✅ Fetch works (starting from 1, not 0)
       const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20] {
         heroTitle,
         featuredSections[] {
@@ -1052,153 +1094,174 @@
       const chipWrapper = document.querySelector('.work-chip-wrp');
 
       let usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
-      usedParents.forEach(p => p.innerHTML = '');
+      usedParents.forEach(p => (p.innerHTML = ''));
 
-      // Remove old chips except All
-      chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(chip => chip.remove());
+      const allClones = [];
 
-      // ✅ Create chips dynamically from heroTitle
-      works.forEach((work, index) => {
+      // Remove existing dynamic chips except “All”
+      chipWrapper
+        .querySelectorAll('.wrk-chip:not(.wrk-chip-all)')
+        .forEach(chip => chip.remove());
+
+      // Create chips dynamically
+      works.forEach((work, workIndex) => {
         if (!work.heroTitle) return;
+
         const chip = document.createElement('div');
         chip.classList.add('wrk-chip');
-        chip.dataset.index = index;
-        chip.innerHTML = `<div class="chip-text">${work.heroTitle}</div>`;
+        chip.dataset.index = workIndex;
+
+        const chipText = document.createElement('div');
+        chipText.classList.add('chip-text');
+        chipText.textContent = work.heroTitle;
+        chip.appendChild(chipText);
+
         chipWrapper.appendChild(chip);
       });
 
       const chips = document.querySelectorAll('.wrk-chip');
 
-      // ✅ Build “All” view
-      const allClones = [];
+      // Build image clones
       works.forEach((work, workIndex) => {
         work.featuredSections?.forEach(section => {
-          const imgUrl = section.images?.[0]?.asset?.url;
+          const images = section.images || [];
+          if (!images.length) return;
+
+          // Preload section images
+          section.preloadedImages = images.map((imgObj, i) => {
+            const img = new Image();
+            const src = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
+            img.src = src;
+            img.alt = section.title || '';
+            img.style.height = '40vh';
+            img.style.width = 'auto';
+            img.style.objectFit = 'cover';
+            img.style.marginRight = '1rem';
+            img.loading = i === 0 ? 'eager' : 'lazy';
+            return img;
+          });
+
+          const imgUrl = images[0]?.asset?.url;
           if (!imgUrl) return;
+
           const clone = container.cloneNode(true);
+          clone.dataset.chipIndex = workIndex;
+          clone.dataset.chipGroup = 'all';
+
           const titleEl = clone.querySelector('.title-img');
           if (titleEl) titleEl.textContent = section.title || '';
-          const img = clone.querySelector('img') || document.createElement('img');
-          img.src = `${imgUrl}?w=900&auto=format`;
-          img.alt = section.title || '';
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.objectFit = 'cover';
-          clone.prepend(img);
-          allClones.push(clone);
-        });
-      });
 
-      // ✅ Function to distribute clones
-      function distribute(clones) {
-        usedParents.forEach(p => (p.innerHTML = ''));
-        clones.forEach((clone, i) => {
-          usedParents[i % usedParents.length].appendChild(clone);
-        });
-      }
-
-      // ✅ Function to load selected filter images directly
-      async function loadWorkImages(index) {
-        const work = works[index];
-        if (!work) return [];
-
-        const perWorkClones = [];
-        for (const section of work.featuredSections || []) {
-          const imgUrl = section.images?.[0]?.asset?.url;
-          if (!imgUrl) continue;
-          const clone = container.cloneNode(true);
-          const titleEl = clone.querySelector('.title-img');
-          if (titleEl) titleEl.textContent = section.title || '';
-          const img = clone.querySelector('img') || document.createElement('img');
-          img.src = `${imgUrl}?w=900&auto=format`;
-          img.alt = section.title || '';
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.objectFit = 'cover';
-          clone.prepend(img);
-          perWorkClones.push(clone);
-
-          // Overlay click logic (with scroll)
           const overlayEl = clone.querySelector('.overlay-div');
           if (overlayEl) {
+            overlayEl.style.opacity = '0';
+            overlayEl.style.cursor = 'pointer';
             overlayEl.addEventListener('click', () => {
               separateWorkDiv.style.display = 'block';
-              setTimeout(() => separateWorkDiv.style.opacity = '1', 100);
+              setTimeout(() => (separateWorkDiv.style.opacity = '1'), 100);
               overlayWork.style.display = 'block';
-              setTimeout(() => overlayWork.style.opacity = '1', 100);
+              setTimeout(() => (overlayWork.style.opacity = '1'), 100);
+
               if (titleInrImg) titleInrImg.textContent = section.title || '';
               imagesFlex.forEach(flex => {
                 flex.innerHTML = '';
-                (section.images || []).forEach(imgObj => {
-                  const fullImg = document.createElement('img');
-                  fullImg.src = `${imgObj.asset?.url}?w=1200&auto=format`;
-                  fullImg.style.height = '40vh';
-                  fullImg.style.objectFit = 'cover';
-                  fullImg.style.marginRight = '1rem';
-                  flex.appendChild(fullImg);
+                section.preloadedImages.forEach(preImg => {
+                  const cloneImg = preImg.cloneNode(true);
+                  flex.appendChild(cloneImg);
                 });
               });
 
-              // Scroll functionality setup
               scrlContnr = document.querySelector('.images-flex-wrpr');
               scrlCntnt = scrlContnr.querySelector('.images-flex');
               const oldClone = scrlContnr.querySelector('.images-flex-clone');
               if (oldClone) oldClone.remove();
+
               cloneCntnt = scrlCntnt.cloneNode(true);
               cloneCntnt.classList.add('images-flex-clone');
               scrlContnr.appendChild(cloneCntnt);
+
               scrlPos = 0;
+
               scrlContnr.addEventListener('mousedown', e => startDrag(e));
               scrlContnr.addEventListener('mousemove', e => moveDrag(e));
               scrlContnr.addEventListener('mouseup', endDrag);
-              scrlContnr.addEventListener('mouseleave', endDrag);
+              scrlContnr.addEventListener('mouseleave', () => {
+                if (isDragging) {
+                  isDragging = false;
+                  scrlContnr.style.cursor = "grab";
+                  applyMomentum();
+                } else startAnimation();
+              });
+
               scrlContnr.addEventListener('touchstart', e => startDrag(e, true));
               scrlContnr.addEventListener('touchmove', e => moveDrag(e, true));
               scrlContnr.addEventListener('touchend', endDrag);
+              scrlContnr.addEventListener('touchcancel', endDrag);
+
+              document.addEventListener('scroll', startAnimation);
               startAnimation();
             });
           }
-        }
 
-        return perWorkClones;
+          let img = clone.querySelector('img');
+          if (!img) {
+            img = document.createElement('img');
+            clone.prepend(img);
+          }
+
+          img.src = imgUrl;
+          img.alt = section.title || '';
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+
+          allClones.push(clone);
+        });
+      });
+
+      function distribute(clones) {
+        usedParents.forEach(p => (p.innerHTML = ''));
+        let counter = 0;
+        clones.forEach(clone => {
+          const parent = usedParents[counter % usedParents.length];
+          parent.appendChild(clone);
+          counter++;
+        });
       }
 
-      // ✅ Initially show all
       distribute(allClones);
+      container.style.display = 'none';
       allChip.classList.add('selected');
 
-      // ✅ Chip filter logic
+      // Filter by chip
       chips.forEach(chip => {
-        chip.addEventListener('click', async () => {
-          const index = chip.dataset.index;
-          const clones = await loadWorkImages(index); // load fresh for this work
-          distribute(clones);
+        chip.addEventListener('click', () => {
+          const chipIndex = Number(chip.dataset.index);
+          const filtered = allClones.filter(
+            div => Number(div.dataset.chipIndex) === chipIndex
+          );
+          distribute(filtered);
           chips.forEach(c => c.classList.remove('selected'));
           allChip.classList.remove('selected');
           chip.classList.add('selected');
         });
       });
 
-      // ✅ All chip
+      // Show All
       allChip.addEventListener('click', () => {
         distribute(allClones);
         chips.forEach(c => c.classList.remove('selected'));
         allChip.classList.add('selected');
       });
 
-      // ✅ Close overlay
+      // Close overlay
       [overlayWork, wrkClose].forEach(el => {
         el.addEventListener('click', () => {
           separateWorkDiv.style.opacity = '0';
+          setTimeout(() => (separateWorkDiv.style.display = 'none'), 300);
           overlayWork.style.opacity = '0';
-          setTimeout(() => {
-            separateWorkDiv.style.display = 'none';
-            overlayWork.style.display = 'none';
-          }, 300);
+          setTimeout(() => (overlayWork.style.display = 'none'), 300);
         });
       });
-
-      container.style.display = 'none';
     } catch (err) {
       console.error('❌ Sanity fetch error:', err);
     }
