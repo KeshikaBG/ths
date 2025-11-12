@@ -1215,8 +1215,7 @@
       chipText.textContent = work.heroTitle;
       chip.appendChild(chipText);
 
-      // Append to wrapper before the .wrk-chip-all
-      chipWrapper.insertBefore(chip, allChip.nextSibling);
+      chipWrapper.appendChild(chip);
     });
 
     const chips = document.querySelectorAll('.wrk-chip');
