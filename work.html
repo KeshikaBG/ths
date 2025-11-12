@@ -1200,6 +1200,8 @@
 
     const allClones = [];
 
+    chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(chip => chip.remove());
+
     // 💡 Create dynamic chips based on heroTitle
     works.forEach((work, workIndex) => {
       if (!work.heroTitle) return;
