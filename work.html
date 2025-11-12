@@ -1023,7 +1023,10 @@
     }
     function cancelMomentum() { if (momentumFrame) cancelAnimationFrame(momentumFrame); }
 
-    document.addEventListener('DOMContentLoaded', async () => {
+
+
+    
+  /**   document.addEventListener('DOMContentLoaded', async () => {
   try {
     const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20] {
       heroTitle,
@@ -1251,7 +1254,163 @@ section.preloadedImages.forEach(img => {
       });
     });
   } catch (err) { console.error('❌ Sanity fetch error:', err); }
+});**/
+
+    document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20] {
+      heroTitle,
+      featuredSections[] {
+        title,
+        images[]{ asset->{ url } }
+      }
+    }`);
+
+    const container = document.querySelector('.work-img-wrpr-div');
+    const parents = document.querySelectorAll('.work-divs-wrpr');
+    const separateWorkDiv = document.querySelector('.separate-work-div');
+    const titleInrImg = separateWorkDiv.querySelector('.title-inr-img');
+    const imagesFlex = separateWorkDiv.querySelectorAll('.images-flex');
+    const overlayWork = document.querySelector('.overlay-work');
+    const wrkClose = document.querySelector('.wrk-close');
+    const allChip = document.querySelector('.wrk-chip-all');
+    const chipWrapper = document.querySelector('.work-chip-wrp');
+
+    const usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
+    usedParents.forEach(p => p.innerHTML = '');
+    chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(chip => chip.remove());
+
+    // 🟢 Create chips for each work
+    works.forEach((work, workIndex) => {
+      if (!work.heroTitle) return;
+      const chip = document.createElement('div');
+      chip.classList.add('wrk-chip');
+      chip.dataset.index = workIndex;
+
+      const chipText = document.createElement('div');
+      chipText.classList.add('chip-text');
+      chipText.textContent = work.heroTitle;
+      chip.appendChild(chipText);
+
+      chipWrapper.appendChild(chip);
+    });
+
+    const chips = document.querySelectorAll('.wrk-chip');
+    const allClones = [];
+
+    // 🟢 Function to build image clones directly from Sanity data
+    function buildClones(workIndex = null) {
+      const clones = [];
+
+      works.forEach((work, wIndex) => {
+        if (workIndex !== null && wIndex !== workIndex) return;
+
+        work.featuredSections?.forEach(section => {
+          const imgUrl = section.images?.[0]?.asset?.url;
+          if (!imgUrl) return;
+
+          const clone = container.cloneNode(true);
+          clone.dataset.chipIndex = wIndex;
+          clone.dataset.chipGroup = 'all';
+
+          const titleEl = clone.querySelector('.title-img');
+          if (titleEl) titleEl.textContent = section.title || '';
+
+          const overlayEl = clone.querySelector('.overlay-div');
+          if (overlayEl) {
+            overlayEl.style.opacity = '0';
+            overlayEl.style.cursor = 'pointer';
+            overlayEl.addEventListener('click', () => {
+              separateWorkDiv.style.display = 'block';
+              setTimeout(() => (separateWorkDiv.style.opacity = '1'), 100);
+              overlayWork.style.display = 'block';
+              setTimeout(() => (overlayWork.style.opacity = '1'), 100);
+              if (titleInrImg) titleInrImg.textContent = section.title || '';
+
+              imagesFlex.forEach(flex => {
+                flex.innerHTML = '';
+                section.images.forEach(imgObj => {
+                  const im = document.createElement('img');
+                  im.src = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
+                  im.alt = section.title || '';
+                  im.style.height = '40vh';
+                  im.style.objectFit = 'cover';
+                  im.style.marginRight = '1rem';
+                  flex.appendChild(im);
+                });
+              });
+            });
+          }
+
+          let img = clone.querySelector('img');
+          if (!img) {
+            img = document.createElement('img');
+            clone.prepend(img);
+          }
+          img.src = `${imgUrl}?w=900&auto=format&fit=crop`;
+          img.alt = section.title || '';
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+
+          clones.push(clone);
+        });
+      });
+
+      return clones;
+    }
+
+    // 🟢 Function to distribute clones evenly
+    function distribute(clones) {
+      usedParents.forEach(p => (p.innerHTML = ''));
+      let counter = 0;
+      clones.forEach(clone => {
+        const parent = usedParents[counter % usedParents.length];
+        parent.appendChild(clone);
+        counter++;
+      });
+    }
+
+    // 🟢 Load "All" on startup
+    const all = buildClones();
+    allClones.push(...all);
+    distribute(all);
+    container.style.display = 'none';
+    allChip.classList.add('selected');
+
+    // 🟢 Filter click handling — now builds directly from Sanity
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const chipIndex = Number(chip.dataset.index);
+        const filtered = buildClones(chipIndex);
+        distribute(filtered);
+
+        chips.forEach(c => c.classList.remove('selected'));
+        allChip.classList.remove('selected');
+        chip.classList.add('selected');
+      });
+    });
+
+    allChip.addEventListener('click', () => {
+      distribute(allClones);
+      chips.forEach(c => c.classList.remove('selected'));
+      allChip.classList.add('selected');
+    });
+
+    // 🟢 Close overlay
+    [overlayWork, wrkClose].forEach(el => {
+      el.addEventListener('click', () => {
+        separateWorkDiv.style.opacity = '0';
+        setTimeout(() => (separateWorkDiv.style.display = 'none'), 300);
+        overlayWork.style.opacity = '0';
+        setTimeout(() => (overlayWork.style.display = 'none'), 300);
+      });
+    });
+  } catch (err) {
+    console.error('❌ Sanity fetch error:', err);
+  }
 });
+
 
   </script>
 
