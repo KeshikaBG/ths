@@ -1208,8 +1208,7 @@ section.preloadedImages.forEach(img => observer.observe(img));
       });
     }
 
-    allClones.push(clone);
-if (workIndex % 2 === 0) distribute(allClones);
+  distribute(allClones);
 
     container.style.display = 'none';
     allChip.classList.add('selected');
