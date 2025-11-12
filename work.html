@@ -1246,11 +1246,10 @@ const client = createClient({
   apiVersion: '2023-01-01'
 });
 
-// Scroll setup
-let scrlContnr = null, scrlCntnt = null, cloneCntnt = null;
+// === Scroll behavior ===
+let scrlContnr, scrlCntnt, cloneCntnt;
 let scrlPos = 0, defltSpeed = 0.6, scrlSpeed = defltSpeed;
-let isDragging = false, startX = 0, lastX = 0, velocity = 0;
-let dirctn = -1, isRunning = false, momentumFrame;
+let isDragging = false, startX = 0, lastX = 0, velocity = 0, dirctn = -1, isRunning = false, momentumFrame;
 
 function isElemInVp(el) {
   const rect = el.getBoundingClientRect();
@@ -1269,7 +1268,6 @@ function moveContent() {
   cloneCntnt.style.transform = `translateX(${scrlPos}px)`;
   requestAnimationFrame(moveContent);
 }
-
 function startAnimation() { if (!isRunning) moveContent(); }
 function startDrag(e, touch = false) {
   isDragging = true; cancelMomentum();
@@ -1306,180 +1304,164 @@ function applyMomentum() {
 }
 function cancelMomentum() { if (momentumFrame) cancelAnimationFrame(momentumFrame); }
 
+// === Main logic ===
 document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20] {
-      heroTitle,
-      featuredSections[] {
-        title,
-        images[]{ asset->{ url } }
-      }
+  const container = document.querySelector('.work-img-wrpr-div');
+  const parents = document.querySelectorAll('.work-divs-wrpr');
+  const separateWorkDiv = document.querySelector('.separate-work-div');
+  const titleInrImg = separateWorkDiv.querySelector('.title-inr-img');
+  const imagesFlex = separateWorkDiv.querySelectorAll('.images-flex');
+  const overlayWork = document.querySelector('.overlay-work');
+  const wrkClose = document.querySelector('.wrk-close');
+  const allChip = document.querySelector('.wrk-chip-all');
+  const chipWrapper = document.querySelector('.work-chip-wrp');
+  const usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
+
+  async function fetchAllChips() {
+    return await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20]{ heroTitle }`);
+  }
+
+  async function fetchWork(index) {
+    return await client.fetch(`*[_type == "work"] | order(_createdAt asc)[${index}]{ 
+      heroTitle, 
+      featuredSections[]{ title, images[]{ asset->{ url } } } 
     }`);
+  }
 
-    const container = document.querySelector('.work-img-wrpr-div');
-    const parents = document.querySelectorAll('.work-divs-wrpr');
-    const separateWorkDiv = document.querySelector('.separate-work-div');
-    const titleInrImg = separateWorkDiv.querySelector('.title-inr-img');
-    const imagesFlex = separateWorkDiv.querySelectorAll('.images-flex');
-    const overlayWork = document.querySelector('.overlay-work');
-    const wrkClose = document.querySelector('.wrk-close');
-    const allChip = document.querySelector('.wrk-chip-all');
-    const chipWrapper = document.querySelector('.work-chip-wrp');
+  async function fetchAllWorks() {
+    return await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20]{
+      heroTitle, featuredSections[]{ title, images[]{ asset->{ url } } }
+    }`);
+  }
 
-    const usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
+  function preloadImage(url) {
+    const img = new Image();
+    img.src = url;
+    return img;
+  }
+
+  function distribute(clones) {
     usedParents.forEach(p => p.innerHTML = '');
-    chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(c => c.remove());
+    clones.forEach((clone, i) => usedParents[i % usedParents.length].appendChild(clone));
+  }
 
-    const allClones = [];
+  function createClone(section, workIndex) {
+    const clone = container.cloneNode(true);
+    clone.dataset.chipIndex = workIndex;
+    const titleEl = clone.querySelector('.title-img');
+    if (titleEl) titleEl.textContent = section.title || '';
 
-    // Create chips (1 → 17)
-    works.forEach((work, workIndex) => {
-      if (!work.heroTitle) return;
-      const chip = document.createElement('div');
-      chip.classList.add('wrk-chip');
-      chip.dataset.index = workIndex;
-      chip.innerHTML = `<div class="chip-text">${work.heroTitle}</div>`;
-      chipWrapper.appendChild(chip);
-    });
+    const imgUrl = section.images?.[0]?.asset?.url;
+    const img = clone.querySelector('img') || document.createElement('img');
+    img.src = `${imgUrl}?w=900&auto=format&fit=crop`;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    clone.prepend(img);
 
-    // Create clones for each work
-    works.forEach((work, workIndex) => {
-      work.featuredSections?.forEach(section => {
-        const images = section.images || [];
-        if (!images.length) return;
+    const overlayEl = clone.querySelector('.overlay-div');
+    if (overlayEl) {
+      overlayEl.addEventListener('click', () => {
+        separateWorkDiv.style.display = 'block';
+        overlayWork.style.display = 'block';
+        setTimeout(() => {
+          separateWorkDiv.style.opacity = '1';
+          overlayWork.style.opacity = '1';
+        }, 50);
+        if (titleInrImg) titleInrImg.textContent = section.title || '';
 
-        section.preloadedImages = images.map((imgObj) => {
-          const img = document.createElement('img');
-          const lowRes = `${imgObj.asset?.url}?w=60&blur=30&auto=format`;
-          const highRes = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
-
-          img.src = lowRes;
-          img.dataset.src = highRes;
-          img.alt = section.title || '';
-          img.style.height = '40vh';
-          img.style.width = 'auto';
-          img.style.objectFit = 'cover';
-          img.style.marginRight = '1rem';
-          img.style.filter = 'blur(10px)';
-
-          // Preload hi-res immediately
-          const preload = new Image();
-          preload.src = highRes;
-          preload.onload = () => {
-            img.src = highRes;
-            img.style.transition = 'filter 0.6s ease';
-            img.style.filter = 'blur(0px)';
-          };
-
-          return img;
+        imagesFlex.forEach(flex => {
+          flex.innerHTML = '';
+          section.images?.forEach(imgObj => {
+            const preImg = document.createElement('img');
+            preImg.src = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
+            preImg.style.height = '40vh';
+            preImg.style.width = 'auto';
+            preImg.style.objectFit = 'cover';
+            preImg.style.marginRight = '1rem';
+            flex.appendChild(preImg);
+          });
         });
 
-        const clone = container.cloneNode(true);
-        clone.dataset.chipIndex = workIndex;
-        clone.dataset.chipGroup = 'all';
-
-        const titleEl = clone.querySelector('.title-img');
-        if (titleEl) titleEl.textContent = section.title || '';
-
-        const overlayEl = clone.querySelector('.overlay-div');
-        if (overlayEl) {
-          overlayEl.style.opacity = '0';
-          overlayEl.addEventListener('click', () => {
-            separateWorkDiv.style.display = 'block';
-            overlayWork.style.display = 'block';
-            setTimeout(() => {
-              separateWorkDiv.style.opacity = '1';
-              overlayWork.style.opacity = '1';
-            }, 50);
-            if (titleInrImg) titleInrImg.textContent = section.title || '';
-
-            imagesFlex.forEach(flex => {
-              flex.innerHTML = '';
-              section.preloadedImages.forEach(preImg => {
-                const cloneImg = preImg.cloneNode(true);
-                flex.appendChild(cloneImg);
-              });
-            });
-
-            scrlContnr = document.querySelector('.images-flex-wrpr');
-            scrlCntnt = scrlContnr.querySelector('.images-flex');
-            const oldClone = scrlContnr.querySelector('.images-flex-clone');
-            if (oldClone) oldClone.remove();
-            cloneCntnt = scrlCntnt.cloneNode(true);
-            cloneCntnt.classList.add('images-flex-clone');
-            scrlContnr.appendChild(cloneCntnt);
-            scrlPos = 0;
-
-            scrlContnr.addEventListener('mousedown', e => startDrag(e));
-            scrlContnr.addEventListener('mousemove', e => moveDrag(e));
-            scrlContnr.addEventListener('mouseup', endDrag);
-            scrlContnr.addEventListener('mouseleave', () => {
-              if (isDragging) { isDragging = false; scrlContnr.style.cursor = "grab"; applyMomentum(); }
-              else startAnimation();
-            });
-            scrlContnr.addEventListener('touchstart', e => startDrag(e, true));
-            scrlContnr.addEventListener('touchmove', e => moveDrag(e, true));
-            scrlContnr.addEventListener('touchend', endDrag);
-            document.addEventListener('scroll', startAnimation);
-            startAnimation();
-          });
-        }
-
-        const imgUrl = images[0]?.asset?.url;
-        const img = clone.querySelector('img') || document.createElement('img');
-        img.src = imgUrl;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
-        clone.prepend(img);
-        allClones.push(clone);
-      });
-    });
-
-    // distribute to grid
-    function distribute(clones) {
-      usedParents.forEach(p => p.innerHTML = '');
-      clones.forEach((clone, i) => {
-        usedParents[i % usedParents.length].appendChild(clone);
+        scrlContnr = document.querySelector('.images-flex-wrpr');
+        scrlCntnt = scrlContnr.querySelector('.images-flex');
+        const oldClone = scrlContnr.querySelector('.images-flex-clone');
+        if (oldClone) oldClone.remove();
+        cloneCntnt = scrlCntnt.cloneNode(true);
+        cloneCntnt.classList.add('images-flex-clone');
+        scrlContnr.appendChild(cloneCntnt);
+        scrlPos = 0;
+        scrlContnr.addEventListener('mousedown', e => startDrag(e));
+        scrlContnr.addEventListener('mousemove', e => moveDrag(e));
+        scrlContnr.addEventListener('mouseup', endDrag);
+        scrlContnr.addEventListener('mouseleave', endDrag);
+        scrlContnr.addEventListener('touchstart', e => startDrag(e, true));
+        scrlContnr.addEventListener('touchmove', e => moveDrag(e, true));
+        scrlContnr.addEventListener('touchend', endDrag);
+        document.addEventListener('scroll', startAnimation);
+        startAnimation();
       });
     }
-
-    distribute(allClones);
-    container.style.display = 'none';
-    allChip.classList.add('selected');
-
-    const chips = document.querySelectorAll('.wrk-chip');
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        const chipIndex = Number(chip.dataset.index);
-        const filtered = allClones.filter(div => Number(div.dataset.chipIndex) === chipIndex);
-        distribute(filtered);
-        chips.forEach(c => c.classList.remove('selected'));
-        allChip.classList.remove('selected');
-        chip.classList.add('selected');
-      });
-    });
-
-    allChip.addEventListener('click', () => {
-      distribute(allClones);
-      chips.forEach(c => c.classList.remove('selected'));
-      allChip.classList.add('selected');
-    });
-
-    [overlayWork, wrkClose].forEach(el => {
-      el.addEventListener('click', () => {
-        separateWorkDiv.style.opacity = '0';
-        overlayWork.style.opacity = '0';
-        setTimeout(() => {
-          separateWorkDiv.style.display = 'none';
-          overlayWork.style.display = 'none';
-        }, 300);
-      });
-    });
-
-  } catch (err) {
-    console.error('❌ Sanity fetch error:', err);
+    return clone;
   }
+
+  // === INIT ===
+  const chipData = await fetchAllChips();
+  chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(c => c.remove());
+  chipData.forEach((work, i) => {
+    const chip = document.createElement('div');
+    chip.classList.add('wrk-chip');
+    chip.dataset.index = i + 1;
+    chip.innerHTML = `<div class="chip-text">${work.heroTitle}</div>`;
+    chipWrapper.appendChild(chip);
+  });
+  const chips = chipWrapper.querySelectorAll('.wrk-chip');
+
+  // === CHIP CLICK ===
+  chips.forEach(chip => {
+    chip.addEventListener('click', async () => {
+      chips.forEach(c => c.classList.remove('selected'));
+      allChip.classList.remove('selected');
+      chip.classList.add('selected');
+      const chipIndex = Number(chip.dataset.index);
+      const [work] = await fetchWork(chipIndex);
+      const clones = [];
+      work.featuredSections?.forEach(section => {
+        section.images?.forEach(imgObj => preloadImage(imgObj.asset?.url));
+        clones.push(createClone(section, chipIndex));
+      });
+      distribute(clones);
+    });
+  });
+
+  // === ALL CHIP ===
+  allChip.addEventListener('click', async () => {
+    chips.forEach(c => c.classList.remove('selected'));
+    allChip.classList.add('selected');
+    const works = await fetchAllWorks();
+    const allClones = [];
+    works.forEach((work, i) => {
+      work.featuredSections?.forEach(section => {
+        section.images?.forEach(imgObj => preloadImage(imgObj.asset?.url));
+        allClones.push(createClone(section, i));
+      });
+    });
+    distribute(allClones);
+  });
+
+  [overlayWork, wrkClose].forEach(el => {
+    el.addEventListener('click', () => {
+      separateWorkDiv.style.opacity = '0';
+      overlayWork.style.opacity = '0';
+      setTimeout(() => {
+        separateWorkDiv.style.display = 'none';
+        overlayWork.style.display = 'none';
+      }, 300);
+    });
+  });
+
+  // load "All" by default
+  allChip.click();
 });
 </script>
 
