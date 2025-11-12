@@ -1317,6 +1317,29 @@ if (!heroSwiperInitialized) {
         client.fetch(`*[_type == "home"] | order(_createdAt asc)[5] { heroImages[]{ asset->{ url, _type } } }`)
       ]);
       const featuredSections = featuredData?.featuredSections || [];
+      
+      // 💡 Duplicate dynamic chips inside hero page’s .chips-cont
+const chipsCont = document.querySelector('.chips-cont');
+if (chipsCont && featuredSections.length) {
+  // Clear existing chips except "all" if present
+  chipsCont.querySelectorAll('.wrk-chip').forEach(chip => chip.remove());
+
+  featuredSections.forEach((section, index) => {
+    if (!section.title) return;
+
+    const chip = document.createElement('div');
+    chip.classList.add('wrk-chip');
+    chip.dataset.index = index;
+
+    const chipText = document.createElement('div');
+    chipText.classList.add('chip-text');
+    chipText.textContent = section.title;
+
+    chip.appendChild(chipText);
+    chipsCont.appendChild(chip);
+  });
+}
+
       const abtImages = abtData?.heroImages || [];
       const osImages = osData?.heroImages || [];
       const vidImages = vidData?.heroImages || [];
