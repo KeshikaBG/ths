@@ -1086,14 +1086,12 @@ section.preloadedImages = images.map((imgObj, i) => {
   img.style.width = 'auto';
   img.style.objectFit = 'cover';
   img.style.marginRight = '1rem';
-  img.style.opacity = '0';
-  img.style.transition = 'opacity 0.5s ease';
   img.loading = i === 0 ? 'eager' : 'lazy';
-  img.onload = () => {
-    img.style.opacity = '1';
-  };
   return img;
 });
+
+        
+
 
 
         const imgUrl = images[0]?.asset?.url;
