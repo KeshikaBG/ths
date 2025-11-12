@@ -1106,6 +1106,30 @@ section.preloadedImages = images.map((imgObj, i) => {
 
 
 
+// 🧠 Lazy load only when visible
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      const src = img.dataset.src;
+      if (src && img.src !== src) {
+        img.src = src;
+        img.style.transition = 'filter 0.6s ease';
+        img.style.filter = 'blur(0px)';
+      }
+      observer.unobserve(img);
+    }
+  });
+}, { rootMargin: '150px' });
+
+// Start observing all images in this section
+section.preloadedImages.forEach(img => observer.observe(img));
+
+
+
+        
+
+
         const imgUrl = images[0]?.asset?.url;
         if (!imgUrl) return;
 
@@ -1184,7 +1208,9 @@ section.preloadedImages = images.map((imgObj, i) => {
       });
     }
 
-    distribute(allClones);
+    allClones.push(clone);
+if (workIndex % 2 === 0) distribute(allClones);
+
     container.style.display = 'none';
     allChip.classList.add('selected');
 
