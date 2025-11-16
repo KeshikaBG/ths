@@ -12,11 +12,7 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
     justify-content: space-between;
     align-items: center;
 }
-.w-layout-vflex {
-    flex-direction: column;
-    align-items: flex-start;
-    display: flex;
-}
+
 .inr-flex-faq {
     grid-column-gap: var(--px-sizes--10px);
     grid-row-gap: var(--px-sizes--10px);
@@ -24,11 +20,7 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
     align-self: flex-start;
     align-items: flex-start;
 }
-.w-layout-vflex {
-    flex-direction: column;
-    align-items: flex-start;
-    display: flex;
-}
+
 .faqs {
     grid-column-gap: var(--rem-sizes--1rem);
     grid-row-gap: var(--rem-sizes--1rem);
@@ -39,11 +31,7 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
     height: 50vh;
     overflow: auto;
 }
-.w-layout-hflex {
-    flex-direction: row;
-    align-items: flex-start;
-    display: flex;
-}
+
 .faq {
     padding: var(--rem-sizes--1rem);
     grid-column-gap: var(--rem-sizes--1rem);
