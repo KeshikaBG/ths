@@ -1339,7 +1339,38 @@ async function loadFAQs() {
   }
 }
 
+function initFAQAccordion() {
+  const faqCards = document.querySelectorAll('.faq');
 
+  if (!faqCards.length) return;
+
+  faqCards.forEach((card, index) => {
+    const ans = card.querySelector('.ans');
+
+    // Set initial state
+    if (index === 0) {
+      ans.classList.remove('close'); // first open
+    } else {
+      ans.classList.add('close'); // others closed
+    }
+
+    // Add click event
+    card.addEventListener('click', () => {
+      faqCards.forEach(f => {
+        const a = f.querySelector('.ans');
+        a.classList.add('close'); // close all
+      });
+
+      ans.classList.remove('close'); // open clicked
+    });
+  });
+}
+
+
+
+
+
+  
 
 
 
@@ -1558,7 +1589,9 @@ if (chipsCont && featuredSections.length) {
   document.addEventListener('DOMContentLoaded', () => {
     loadHeroSwiper();
     loadOtherSections();
-    loadFAQs();
+      loadFAQs().then(() => {
+    initFAQAccordion();
+  });
   });
 </script>
 
