@@ -1285,6 +1285,65 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error('❌ Hero Swiper error:', err);
     }
   }**/
+// ===========================
+// LOAD FAQ SECTION
+// ===========================
+async function loadFAQs() {
+  try {
+    // Fetch the FAQ page with its list
+    const faqData = await client.fetch(`
+      *[_type == "faqPage"][0]{
+        faqs[]{
+          question,
+          answer
+        }
+      }
+    `);
+
+    const faqs = faqData?.faqs || [];
+
+    const faqContainer = document.querySelector('.faqs');
+    const faqTemplate = document.querySelector('.faq');
+
+    if (!faqContainer || !faqTemplate) {
+      console.warn("FAQ container or template missing.");
+      return;
+    }
+
+    // Clear existing FAQ cards
+    faqContainer.innerHTML = "";
+
+    // Sanity Portable Text → HTML
+    const pt = await import("https://esm.sh/@portabletext/to-html");
+    const toHTML = pt.toHTML;
+
+    faqs.forEach((item) => {
+      const card = faqTemplate.cloneNode(true);
+
+      const quesEl = card.querySelector('.ques');
+      const ansEl  = card.querySelector('.ans');
+
+      // Insert question
+      if (quesEl) quesEl.textContent = item.question;
+
+      // Convert portable text → HTML
+      if (ansEl && item.answer) {
+        ansEl.innerHTML = toHTML(item.answer);
+      }
+
+      faqContainer.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error("❌ FAQ Error:", err);
+  }
+}
+
+
+
+
+
+  
 let heroSwiperInitialized = false;
 
 async function loadHeroSwiper() {
@@ -1499,6 +1558,7 @@ if (chipsCont && featuredSections.length) {
   document.addEventListener('DOMContentLoaded', () => {
     loadHeroSwiper();
     loadOtherSections();
+    loadFAQs();
   });
 </script>
 
