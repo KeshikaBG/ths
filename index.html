@@ -1346,25 +1346,32 @@ function initFAQAccordion() {
 
   faqCards.forEach((card, index) => {
     const ans = card.querySelector('.ans');
+    const arrow = card.querySelector('.arr-down');
 
-    // Set initial state
+    // Set initial states
     if (index === 0) {
-      ans.classList.remove('close'); // first open
+      ans.classList.remove('close');
+      arrow?.classList.add('up');
     } else {
-      ans.classList.add('close'); // others closed
+      ans.classList.add('close');
+      arrow?.classList.remove('up');
     }
 
-    // Add click event
+    // On click
     card.addEventListener('click', () => {
       faqCards.forEach(f => {
         const a = f.querySelector('.ans');
-        a.classList.add('close'); // close all
+        const ar = f.querySelector('.arr-down');
+        a.classList.add('close');        // close all
+        ar?.classList.remove('up');      // arrow down
       });
 
-      ans.classList.remove('close'); // open clicked
+      ans.classList.remove('close');      // open clicked
+      arrow?.classList.add('up');         // arrow up
     });
   });
 }
+
 
 
 
