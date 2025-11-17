@@ -523,17 +523,25 @@
     });
   </script>
   <style>
-    .images-flex img {
-      width: auto !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      max-width: none !important;
-      pointer-events: none !important;
-      user-select: none !important;
-      -webkit-user-drag: none !important;
-      border-radius: 10px !important;
-    }
 
+
+    
+.images-flex-wrpr {
+    align-self: stretch;
+    width: 100%;
+    height: 70% !important;
+}
+    
+.images-flex img {
+    width: 47% !important;
+    height: 60% !important;
+    object-fit: cover !important;
+    max-width: none !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+    border-radius: 10px !important;
+}
     .separate-work-div,
     .overlay-work {
       display: none;
@@ -577,6 +585,22 @@
     .wrk-chip-all.selected .chip-text {
       color: #ffffff;
     }
+
+    .h3.auto-width.title-inr-img {
+    left: 1rem !important;
+    top: 0%;
+    right: var(--rem-sizes--1rem) !important;
+    margin-top: 1rem !important;
+    text-align: left !important;
+    text-transform: uppercase;
+    align-self: center !important;
+    font-family: Comfortaa, sans-serif;
+    position: absolute;
+    bottom: auto;
+}
+
+
+    
   </style>
 </head>
 
