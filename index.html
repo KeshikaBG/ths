@@ -1341,36 +1341,70 @@ async function loadFAQs() {
 
 function initFAQAccordion() {
   const faqCards = document.querySelectorAll('.faq');
-
   if (!faqCards.length) return;
 
   faqCards.forEach((card, index) => {
     const ans = card.querySelector('.ans');
     const arrow = card.querySelector('.arr-down');
 
-    // Set initial states
+    // INITIAL STATE
     if (index === 0) {
-      ans.classList.remove('close');
-      arrow?.classList.add('up');
+      openFAQ(ans, arrow);
     } else {
-      ans.classList.add('close');
-      arrow?.classList.remove('up');
+      closeFAQ(ans, arrow);
     }
 
-    // On click
+    // CLICK HANDLER
     card.addEventListener('click', () => {
       faqCards.forEach(f => {
         const a = f.querySelector('.ans');
         const ar = f.querySelector('.arr-down');
-        a.classList.add('close');        // close all
-        ar?.classList.remove('up');      // arrow down
+        closeFAQ(a, ar);
       });
 
-      ans.classList.remove('close');      // open clicked
-      arrow?.classList.add('up');         // arrow up
+      openFAQ(ans, arrow);
     });
   });
+
+  // Functions
+  function openFAQ(ans, arrow) {
+    ans.classList.remove('close');
+    ans.classList.add('open');
+
+    // Measure full height
+    const fullHeight = ans.scrollHeight + "px";
+
+    // Apply animated height
+    ans.style.height = fullHeight;
+
+    // Correct arrow direction
+    arrow?.classList.add('up');
+
+    // After animation → allow natural height
+    ans.addEventListener('transitionend', () => {
+      if (ans.classList.contains('open')) {
+        ans.style.height = 'auto';
+      }
+    }, { once: true });
+  }
+
+  function closeFAQ(ans, arrow) {
+    ans.classList.remove('open');
+    ans.classList.add('close');
+
+    // Set height to current height first (if auto)
+    ans.style.height = ans.scrollHeight + "px";
+
+    // Force reflow
+    ans.offsetHeight;
+
+    // Animate to 0px
+    ans.style.height = "0px";
+
+    arrow?.classList.remove('up');
+  }
 }
+
 
 
 
