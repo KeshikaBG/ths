@@ -197,44 +197,48 @@
   margin-right: 0rem !important;
 }
 
-.lightbox {
-  display: none;
+/* Lightbox Overlay */
+.lightbox-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  z-index: 9999;
-
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.lightbox img {
-  max-width: 90%;
-  max-height: 90%;
-  object-fit: contain;
-  border-radius: 6px;
-}
-
-.lightbox.show {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
 }
 
-.lightbox-prev,
-.lightbox-next,
+.lightbox-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Lightbox Image */
+.lightbox-overlay img {
+  max-height: calc(100vh - 2rem);
+  width: auto;
+  border-radius: 10px;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Close Button */
 .lightbox-close {
-  position: absolute;
-  background: none;
-  border: none;
-  font-size: 3rem;
-  color: #fff;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+  color: white;
   cursor: pointer;
-  padding: 1rem;
+  user-select: none;
+  z-index: 10000;
 }
-
-.lightbox-prev { left: 20px; }
-.lightbox-next { right: 20px; }
-.lightbox-close { top: 20px; right: 20px; font-size: 3.5rem; }
 
   </style>
 
@@ -1308,6 +1312,39 @@
     } catch (err) {
       console.error('❌ Sanity fetch error:', err);
     }
+
+// LIGHTBOX SETUP
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImg");
+const lightboxClose = document.getElementById("lightboxClose");
+
+// Attach event listener to every loaded image
+function enableLightbox() {
+  const galleryImages = document.querySelectorAll(".work-img"); // change .work-img to your image class
+
+  galleryImages.forEach(img => {
+    img.style.cursor = "zoom-in";
+
+    img.addEventListener("click", () => {
+      lightboxImg.src = img.src;
+      lightbox.classList.add("active");
+    });
+  });
+}
+
+// Close events
+lightboxClose.addEventListener("click", () => {
+  lightbox.classList.remove("active");
+});
+
+lightbox.addEventListener("click", (e) => {
+  if (e.target === lightbox) lightbox.classList.remove("active");
+});
+// After completing all image inserts
+enableLightbox();
+
+
+    
   });
 </script>
 
@@ -1387,15 +1424,15 @@ function insertImageOrVideo(container, mediaArr, label = 'Media') {
     });
   </script>
 
-<div class="lightbox" id="lightbox">
-  <div class="lightbox-overlay"></div>
 
-  <img id="lightbox-img" />
 
-  <button class="lightbox-prev">‹</button>
-  <button class="lightbox-next">›</button>
-  <button class="lightbox-close">×</button>
+
+  
+<div id="lightbox" class="lightbox-overlay">
+  <span id="lightboxClose" class="lightbox-close">&times;</span>
+  <img id="lightboxImg" src="" alt="">
 </div>
+
 
   
 </body>
