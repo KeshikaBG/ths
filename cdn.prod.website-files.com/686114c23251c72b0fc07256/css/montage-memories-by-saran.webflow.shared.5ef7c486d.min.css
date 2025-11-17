@@ -14,9 +14,12 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
 }
 .b1.sandal.width-75.close {
     height: 0;
-    display: none;
     overflow: hidden;
 }
+.b1.sandal.width-75.ans.close {
+    margin-bottom: -1rem;
+}
+
 .faq-sec {
     background-color: var(--color--sandal);
     overflow: hidden;
