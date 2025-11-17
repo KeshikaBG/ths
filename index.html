@@ -1341,20 +1341,17 @@ async function loadFAQs() {
 
 function initFAQAccordion() {
   const faqCards = document.querySelectorAll('.faq');
-  if (!faqCards.length) return;
 
   faqCards.forEach((card, index) => {
     const ans = card.querySelector('.ans');
     const arrow = card.querySelector('.arr-down');
 
-    // INITIAL STATE
     if (index === 0) {
       openFAQ(ans, arrow);
     } else {
       closeFAQ(ans, arrow);
     }
 
-    // CLICK HANDLER
     card.addEventListener('click', () => {
       faqCards.forEach(f => {
         const a = f.querySelector('.ans');
@@ -1366,42 +1363,32 @@ function initFAQAccordion() {
     });
   });
 
-  // Functions
   function openFAQ(ans, arrow) {
-    ans.classList.remove('close');
     ans.classList.add('open');
-
-    // Measure full height
-    const fullHeight = ans.scrollHeight + "px";
-
-    // Apply animated height
-    ans.style.height = fullHeight;
-
-    // Correct arrow direction
     arrow?.classList.add('up');
 
-    // After animation → allow natural height
-    ans.addEventListener('transitionend', () => {
-      if (ans.classList.contains('open')) {
-        ans.style.height = 'auto';
-      }
-    }, { once: true });
+    // From height 0 to scrollHeight
+    ans.style.height = ans.scrollHeight + 'px';
+
+    // After transition ends, remove inline height so it adjusts automatically
+    ans.addEventListener('transitionend', function fix() {
+      ans.style.height = 'auto';
+      ans.removeEventListener('transitionend', fix);
+    });
   }
 
   function closeFAQ(ans, arrow) {
-    ans.classList.remove('open');
-    ans.classList.add('close');
+    arrow?.classList.remove('up');
 
-    // Set height to current height first (if auto)
-    ans.style.height = ans.scrollHeight + "px";
+    // Set height to current height (auto → px)
+    ans.style.height = ans.scrollHeight + 'px';
 
-    // Force reflow
+    // force repaint
     ans.offsetHeight;
 
-    // Animate to 0px
-    ans.style.height = "0px";
-
-    arrow?.classList.remove('up');
+    // Now animate to 0
+    ans.style.height = '0px';
+    ans.classList.remove('open');
   }
 }
 
