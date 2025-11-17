@@ -1155,28 +1155,9 @@ full.onload = () => {
               });
             });
 
-            scrlContnr = document.querySelector('.images-flex-wrpr');
-            scrlCntnt = scrlContnr.querySelector('.images-flex');
-            const oldClone = scrlContnr.querySelector('.images-flex-clone');
-            if (oldClone) oldClone.remove();
-            cloneCntnt = scrlCntnt.cloneNode(true);
-            cloneCntnt.classList.add('images-flex-clone');
-            scrlContnr.appendChild(cloneCntnt);
+ 
 
-            scrlPos = 0;
-            scrlContnr.addEventListener('mousedown', e => startDrag(e));
-            scrlContnr.addEventListener('mousemove', e => moveDrag(e));
-            scrlContnr.addEventListener('mouseup', endDrag);
-            scrlContnr.addEventListener('mouseleave', () => {
-              if (isDragging) { isDragging = false; scrlContnr.style.cursor = "grab"; applyMomentum(); }
-              else startAnimation();
-            });
-            scrlContnr.addEventListener('touchstart', e => startDrag(e, true));
-            scrlContnr.addEventListener('touchmove', e => moveDrag(e, true));
-            scrlContnr.addEventListener('touchend', endDrag);
-            scrlContnr.addEventListener('touchcancel', endDrag);
-            document.addEventListener('scroll', startAnimation);
-            startAnimation();
+
           });
         }
 
