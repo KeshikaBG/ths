@@ -1341,15 +1341,16 @@ async function loadFAQs() {
 
 function initFAQAccordion() {
   const faqCards = document.querySelectorAll('.faq');
+  if (!faqCards.length) return;
 
   faqCards.forEach((card, index) => {
     const ans = card.querySelector('.ans');
     const arrow = card.querySelector('.arr-down');
 
     if (index === 0) {
-      openFAQ(ans, arrow);
+      openFAQ(ans, arrow, true); // true = skip animation on first load
     } else {
-      closeFAQ(ans, arrow);
+      closeFAQ(ans, arrow, true); // skip animation for initial load
     }
 
     card.addEventListener('click', () => {
@@ -1363,32 +1364,56 @@ function initFAQAccordion() {
     });
   });
 
-  function openFAQ(ans, arrow) {
+  function openFAQ(ans, arrow, instant = false) {
+
     ans.classList.add('open');
+    ans.classList.remove('close');
     arrow?.classList.add('up');
 
-    // From height 0 to scrollHeight
-    ans.style.height = ans.scrollHeight + 'px';
+    // Clear existing inline heights
+    ans.style.height = 'auto';
+    const fullHeight = ans.scrollHeight + "px";
 
-    // After transition ends, remove inline height so it adjusts automatically
-    ans.addEventListener('transitionend', function fix() {
+    if (instant) {
       ans.style.height = 'auto';
-      ans.removeEventListener('transitionend', fix);
+      return;
+    }
+
+    // Step 1: Set to 0 to start animation
+    ans.style.height = "0px";
+
+    // Step 2: Wait for next frame before expanding
+    requestAnimationFrame(() => {
+      ans.style.height = fullHeight;
     });
+
+    // After animation ends, switch to auto
+    ans.addEventListener('transitionend', () => {
+      if (ans.classList.contains('open')) {
+        ans.style.height = "auto";
+      }
+    }, { once: true });
   }
 
-  function closeFAQ(ans, arrow) {
+  function closeFAQ(ans, arrow, instant = false) {
+
+    ans.classList.remove('open');
+    ans.classList.add('close');
     arrow?.classList.remove('up');
 
-    // Set height to current height (auto → px)
-    ans.style.height = ans.scrollHeight + 'px';
+    // For closing: ensure current height is fixed
+    ans.style.height = ans.scrollHeight + "px";
 
-    // force repaint
+    if (instant) {
+      ans.style.height = "0px";
+      return;
+    }
+
+    // Force reflow
     ans.offsetHeight;
 
-    // Now animate to 0
-    ans.style.height = '0px';
-    ans.classList.remove('open');
+    // Animate down
+    ans.style.height = "0px";
   }
 }
 
