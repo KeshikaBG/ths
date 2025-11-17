@@ -173,6 +173,66 @@
         inset: auto 0% 0% auto;
     }
 }
+
+
+
+
+
+
+
+
+    .images-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.images-flex img {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+    .lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 9999;
+
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.lightbox.show {
+  display: flex;
+}
+
+.lightbox-prev,
+.lightbox-next,
+.lightbox-close {
+  position: absolute;
+  background: none;
+  border: none;
+  font-size: 3rem;
+  color: #fff;
+  cursor: pointer;
+  padding: 1rem;
+}
+
+.lightbox-prev { left: 20px; }
+.lightbox-next { right: 20px; }
+.lightbox-close { top: 20px; right: 20px; font-size: 3.5rem; }
+
   </style>
 
 
@@ -962,8 +1022,276 @@
 
   
   
-
 <script type="module">
+import { createClient } from "https://esm.sh/@sanity/client";
+
+const client = createClient({
+  projectId: "n7jjk6nd",
+  dataset: "production",
+  useCdn: true,
+  apiVersion: "2023-01-01",
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const works = await client.fetch(`*[_type == "work"] | order(_createdAt asc)[1...20] {
+      heroTitle,
+      featuredSections[] {
+        title,
+        images[]{ asset->{ url } }
+      }
+    }`);
+
+    const container = document.querySelector(".work-img-wrpr-div");
+    const parents = document.querySelectorAll(".work-divs-wrpr");
+    const separateWorkDiv = document.querySelector(".separate-work-div");
+    const titleInrImg = separateWorkDiv.querySelector(".title-inr-img");
+    const imagesFlex = separateWorkDiv.querySelectorAll(".images-flex");
+    const overlayWork = document.querySelector(".overlay-work");
+    const wrkClose = document.querySelector(".wrk-close");
+    const allChip = document.querySelector(".wrk-chip-all");
+    const chipWrapper = document.querySelector(".work-chip-wrp");
+
+    let usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
+
+    usedParents.forEach((p) => (p.innerHTML = ""));
+
+    const allClones = [];
+
+    chipWrapper
+      .querySelectorAll(".wrk-chip:not(.wrk-chip-all)")
+      .forEach((chip) => chip.remove());
+
+    // CREATE FILTER CHIPS
+    works.forEach((work, index) => {
+      if (!work.heroTitle) return;
+
+      const chip = document.createElement("div");
+      chip.classList.add("wrk-chip");
+      chip.dataset.index = index;
+
+      const chipText = document.createElement("div");
+      chipText.classList.add("chip-text");
+      chipText.textContent = work.heroTitle;
+      chip.appendChild(chipText);
+
+      chipWrapper.appendChild(chip);
+    });
+
+    const chips = document.querySelectorAll(".wrk-chip");
+
+    // BUILD CLONES (GRID ITEMS)
+    works.forEach((work, workIndex) => {
+      work.featuredSections?.forEach((section) => {
+        const images = section.images || [];
+        if (!images.length) return;
+
+        // Preload images
+        section.preloadedImages = images.map((imgObj) => {
+          const low = `${imgObj.asset.url}?w=60&blur=30`;
+          const high = `${imgObj.asset.url}?w=1200&auto=format&q=80`;
+
+          const img = document.createElement("img");
+          img.src = low;
+          img.dataset.src = high;
+          img.loading = "lazy";
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.objectFit = "cover";
+
+          const full = new Image();
+          full.src = high;
+          full.onload = () => (img.src = high);
+
+          return img;
+        });
+
+        const imgUrl = images[0]?.asset?.url;
+        if (!imgUrl) return;
+
+        const clone = container.cloneNode(true);
+        clone.dataset.chipIndex = workIndex;
+        clone.dataset.chipGroup = "all";
+
+        const titleEl = clone.querySelector(".title-img");
+        if (titleEl) titleEl.textContent = section.title || "";
+
+        const overlayEl = clone.querySelector(".overlay-div");
+        if (overlayEl) {
+          overlayEl.style.opacity = "0";
+          overlayEl.style.cursor = "pointer";
+
+          overlayEl.addEventListener("click", () => {
+            openWorkPopup(section);
+          });
+        }
+
+        let img = clone.querySelector("img");
+        if (!img) {
+          img = document.createElement("img");
+          clone.prepend(img);
+        }
+
+        const low = `${imgUrl}?w=120&blur=30`;
+        const high = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
+
+        img.src = low;
+        img.dataset.src = high;
+        img.loading = "lazy";
+        img.style.objectFit = "cover";
+        img.style.filter = "blur(10px)";
+        img.style.transition = "filter 0.4s ease";
+
+        const preload = new Image();
+        preload.src = high;
+        preload.onload = () => {
+          img.src = high;
+          img.style.filter = "blur(0)";
+        };
+
+        allClones.push(clone);
+      });
+    });
+
+    // DISTRIBUTE GRID ITEMS
+    function distribute(clones) {
+      usedParents.forEach((p) => (p.innerHTML = ""));
+      let counter = 0;
+      clones.forEach((clone) => {
+        const parent = usedParents[counter % usedParents.length];
+        parent.appendChild(clone);
+        counter++;
+      });
+    }
+
+    // INITIAL LOAD
+    container.style.display = "none";
+    allChip.classList.add("selected");
+    distribute(allClones);
+
+    // FILTER CLICK
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const index = Number(chip.dataset.index);
+        const filtered = allClones.filter(
+          (div) => Number(div.dataset.chipIndex) === index
+        );
+        distribute(filtered);
+
+        chips.forEach((c) => c.classList.remove("selected"));
+        allChip.classList.remove("selected");
+        chip.classList.add("selected");
+      });
+    });
+
+    allChip.addEventListener("click", () => {
+      distribute(allClones);
+      chips.forEach((c) => c.classList.remove("selected"));
+      allChip.classList.add("selected");
+    });
+
+    overlayWork.addEventListener("click", closePopup);
+    wrkClose.addEventListener("click", closePopup);
+
+    function closePopup() {
+      separateWorkDiv.style.opacity = "0";
+      setTimeout(() => (separateWorkDiv.style.display = "none"), 300);
+      overlayWork.style.opacity = "0";
+      setTimeout(() => (overlayWork.style.display = "none"), 300);
+    }
+
+    // --------------------------------------
+    //          FULLSCREEN LIGHTBOX
+    // --------------------------------------
+
+    let lightboxImages = [];
+    let currentIndex = 0;
+
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+    const btnPrev = document.querySelector(".lightbox-prev");
+    const btnNext = document.querySelector(".lightbox-next");
+    const btnClose = document.querySelector(".lightbox-close");
+    const overlay = document.querySelector(".lightbox-overlay");
+
+    function openLightbox(index) {
+      currentIndex = index;
+      lightboxImg.src = lightboxImages[currentIndex];
+      lightbox.classList.add("show");
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("show");
+    }
+
+    function nextImg() {
+      currentIndex = (currentIndex + 1) % lightboxImages.length;
+      lightboxImg.src = lightboxImages[currentIndex];
+    }
+
+    function prevImg() {
+      currentIndex =
+        (currentIndex - 1 + lightboxImages.length) % lightboxImages.length;
+      lightboxImg.src = lightboxImages[currentIndex];
+    }
+
+    btnNext.onclick = nextImg;
+    btnPrev.onclick = prevImg;
+    btnClose.onclick = closeLightbox;
+    overlay.onclick = closeLightbox;
+
+    lightbox.addEventListener("touchstart", (e) => {
+      this.startX = e.touches[0].clientX;
+    });
+
+    lightbox.addEventListener("touchend", (e) => {
+      let dx = e.changedTouches[0].clientX - this.startX;
+      if (dx > 50) prevImg();
+      if (dx < -50) nextImg();
+    });
+
+    // --------------------------------------
+    //         OPEN WORK POPUP + IMAGES
+    // --------------------------------------
+
+    function openWorkPopup(section) {
+      separateWorkDiv.style.display = "block";
+      overlayWork.style.display = "block";
+
+      setTimeout(() => {
+        separateWorkDiv.style.opacity = "1";
+        overlayWork.style.opacity = "1";
+      }, 50);
+
+      if (titleInrImg) titleInrImg.textContent = section.title || "";
+
+      imagesFlex.forEach((flex) => {
+        flex.innerHTML = "";
+        section.preloadedImages.forEach((imgObj) => {
+          const cloneImg = imgObj.cloneNode(true);
+          cloneImg.style.cursor = "zoom-in";
+          flex.appendChild(cloneImg);
+        });
+      });
+
+      // SET LIGHTBOX IMAGES
+      lightboxImages = section.preloadedImages.map((img) => img.dataset.src);
+
+      // ATTACH CLICK TO OPEN LIGHTBOX
+      imagesFlex.forEach((flex) => {
+        const imgs = flex.querySelectorAll("img");
+        imgs.forEach((imageElem, i) => {
+          imageElem.addEventListener("click", () => openLightbox(i));
+        });
+      });
+    }
+  } catch (err) {
+    console.error("❌ Sanity fetch error:", err);
+  }
+});
+</script>
+
+<!--<script type="module">
    import { createClient } from 'https://esm.sh/@sanity/client';
     const client = createClient({
       projectId: 'n7jjk6nd',
@@ -1265,7 +1593,7 @@ preload.onload = () => {
     });
   } catch (err) { console.error('❌ Sanity fetch error:', err); }
 });
-</script>
+</script>-->
 
 
 
@@ -1341,5 +1669,17 @@ function insertImageOrVideo(container, mediaArr, label = 'Media') {
       } catch (err) { console.error('❌ Sanity fetch error:', err); }
     });
   </script>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-overlay"></div>
+
+  <img id="lightbox-img" />
+
+  <button class="lightbox-prev">‹</button>
+  <button class="lightbox-next">›</button>
+  <button class="lightbox-close">×</button>
+</div>
+
+  
 </body>
 </html>
