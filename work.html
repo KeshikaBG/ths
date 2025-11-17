@@ -1186,35 +1186,35 @@
             });
           }
 
-          /* -------- BLUR-UP IMAGE FOR CARD --------*/
-          let img = clone.querySelector('img');
-img.classList.add("work-img"); // REQUIRED for lightbox
+       /* -------- BLUR-UP IMAGE FOR CARD --------*/
+let img = clone.querySelector("img");
+if (!img) {
+  img = document.createElement("img");
+  clone.prepend(img);
+}
 
-          if (!img) {
-            img = document.createElement('img');
-            clone.prepend(img);
-          }
+img.classList.add("work-img");   // ⭐ required for lightbox
 
-          const lowRes = `${imgUrl}?w=120&blur=30&auto=format`;
-          const highRes = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
+const lowRes = `${imgUrl}?w=120&blur=30&auto=format`;
+const highRes = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
 
-          img.src = lowRes;
-          img.dataset.src = highRes;
-          img.alt = section.title || '';
-          img.loading = 'lazy';
+img.src = lowRes;
+img.dataset.src = highRes;
+img.alt = section.title || "";
+img.loading = "lazy";
 
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.objectFit = 'cover';
-          img.style.filter = 'blur(10px)';
-          img.style.transition = 'filter 0.4s ease';
+img.style.width = "100%";
+img.style.height = "100%";
+img.style.objectFit = "cover";
+img.style.filter = "blur(10px)";
+img.style.transition = "filter 0.4s ease";
 
-          const preload = new Image();
-          preload.src = highRes;
-          preload.onload = () => {
-            img.src = highRes;
-            img.style.filter = 'blur(0)';
-          };
+const preload = new Image();
+preload.src = highRes;
+preload.onload = () => {
+  img.src = highRes;
+  img.style.filter = "blur(0)";
+};
 
           allClones.push(clone);
         });
