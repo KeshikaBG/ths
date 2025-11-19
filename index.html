@@ -1604,13 +1604,15 @@ async function loadBlogs() {
       console.error("Blog wrapper or template missing!");
       return;
     }
+
+    // HIDE TEMPLATE
     template.style.display = "none";
 
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
-      card.style.display = "flex";
+      card.style.display = "flex";   // REQUIRED
 
-      // Set heading
+      // Set title
       const headingEl = card.querySelector(".heading");
       if (headingEl) headingEl.textContent = blog.title || "Untitled";
 
@@ -1618,13 +1620,38 @@ async function loadBlogs() {
       const paraEl = card.querySelector(".s-para");
       if (paraEl) paraEl.textContent = blog.shortDescription || "";
 
-      // Set background cover image
+      // Cover image styling
       const coverEl = card.querySelector(".blog-cover");
+      const overlayEl = card.querySelector(".overlay-div");
+
       if (coverEl && blog.coverImage?.asset?.url) {
         const imgUrl = `${blog.coverImage.asset.url}?w=900&auto=format`;
         coverEl.style.backgroundImage = `url('${imgUrl}')`;
         coverEl.style.backgroundSize = "cover";
         coverEl.style.backgroundPosition = "center";
+      }
+
+      // ---------- HOVER EFFECT ----------
+      if (coverEl && overlayEl) {
+        coverEl.addEventListener("mouseenter", () => {
+          overlayEl.classList.remove("opacity-0");
+        });
+
+        coverEl.addEventListener("mouseleave", () => {
+          overlayEl.classList.add("opacity-0");
+        });
+      }
+
+      // ---------- OPEN FULL BLOG ----------
+      const openBtn = card.querySelector(".overlay-div .btn");
+      const overlayWork = document.querySelector(".overlay-work");
+      const separateDiv = document.querySelector(".separate-work-div");
+
+      if (openBtn && overlayWork && separateDiv) {
+        openBtn.addEventListener("click", () => {
+          overlayWork.style.display = "block";
+          separateDiv.style.display = "flex";
+        });
       }
 
       container.appendChild(card);
@@ -1634,6 +1661,11 @@ async function loadBlogs() {
     console.error("❌ Sanity blog fetch error:", err);
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadBlogs();
+});
+
 
 
 
