@@ -1608,7 +1608,7 @@ async function loadBlogs() {
 
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
-      card.style.display = "block";
+      card.style.display = "flex";
 
       // Set heading
       const headingEl = card.querySelector(".heading");
