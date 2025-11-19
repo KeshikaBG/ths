@@ -1585,7 +1585,8 @@ if (!heroSwiperInitialized) {
 
 
 
-try {
+async function loadBlogs() {
+  try {
     const blogs = await client.fetch(`
       *[_type == "blog"] | order(_createdAt desc) {
         title,
@@ -1597,14 +1598,12 @@ try {
     `);
 
     const container = document.querySelector(".blogs-wrpr");
-    const template = document.querySelector(".blog-card");
+    const template = container.querySelector(".blog-card");
 
     if (!container || !template) {
       console.error("Blog wrapper or template missing!");
       return;
     }
-
-    //template.style.display = "none";
 
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
@@ -1633,7 +1632,7 @@ try {
   } catch (err) {
     console.error("❌ Sanity blog fetch error:", err);
   }
-
+}
 
 
 
@@ -1755,7 +1754,9 @@ if (chipsCont && featuredSections.length) {
     loadOtherSections();
       loadFAQs().then(() => {
     initFAQAccordion();
+        
   });
+    loadBlogs();
   });
 </script>
 
