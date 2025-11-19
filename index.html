@@ -1174,9 +1174,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             </a></div>
                     </div>
                     <div class="w-layout-hflex blog-inr-flex">
-                        <p stagger-animation="" text-split="" class="b1 caps black">&quot;How to Plan a Perfect Outdoor
+                        <p stagger-animation="" text-split="" class="b1 caps black heading">&quot;How to Plan a Perfect Outdoor
                             Pre-Wedding Shoot&quot;</p>
-                        <p stagger-animation="" text-split="" class="b2-black _14">From concept to execution, we make
+                        <p stagger-animation="" text-split="" class="b2-black _14 s-para">From concept to execution, we make
                             your brand impossible to ignore.</p>
                     </div>
                 </div>
@@ -1583,6 +1583,63 @@ if (!heroSwiperInitialized) {
 
 
 
+
+
+try {
+    const blogs = await client.fetch(`
+      *[_type == "blog"] | order(_createdAt desc) {
+        title,
+        shortDescription,
+        coverImage{
+          asset->{ url }
+        }
+      }
+    `);
+
+    const container = document.querySelector(".blogs-wrpr");
+    const template = document.querySelector(".blog-card");
+
+    if (!container || !template) {
+      console.error("Blog wrapper or template missing!");
+      return;
+    }
+
+    template.style.display = "none";
+
+    blogs.forEach(blog => {
+      const card = template.cloneNode(true);
+      card.style.display = "block";
+
+      // Set heading
+      const headingEl = card.querySelector(".heading");
+      if (headingEl) headingEl.textContent = blog.title || "Untitled";
+
+      // Set short description
+      const paraEl = card.querySelector(".s-para");
+      if (paraEl) paraEl.textContent = blog.shortDescription || "";
+
+      // Set background cover image
+      const coverEl = card.querySelector(".blog-cover");
+      if (coverEl && blog.coverImage?.asset?.url) {
+        const imgUrl = `${blog.coverImage.asset.url}?w=900&auto=format`;
+        coverEl.style.backgroundImage = `url('${imgUrl}')`;
+        coverEl.style.backgroundSize = "cover";
+        coverEl.style.backgroundPosition = "center";
+      }
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error("❌ Sanity blog fetch error:", err);
+  }
+
+
+
+
+
+
+  
   
   // ✅ Featured + Other Sections
   async function loadOtherSections() {
