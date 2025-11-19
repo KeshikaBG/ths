@@ -1604,6 +1604,7 @@ async function loadBlogs() {
       console.error("Blog wrapper or template missing!");
       return;
     }
+    template.style.display = "none";
 
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
