@@ -614,12 +614,14 @@ gsap.to(hdr, {
 
 /* Blog full overlay */
 .overlay-work {
+    display: block !important;
+    visibility: hidden;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.45s ease;
 }
 .overlay-work.active {
-  display: block !important;
+  visibility: visible;  
   opacity: 1 !important;
   pointer-events: auto;
 }
@@ -628,13 +630,14 @@ gsap.to(hdr, {
 .separate-work-div {
   opacity: 0;
   transform: translateY(20px);
+  visibility: hidden;
   transition: all 0.4s ease;
-  display: none;
+  display: flex;
 }
 .separate-work-div.active {
   opacity: 1;
   transform: translateY(0);
-  display: flex;
+  visibility: visible;
 }
 .wrk-close{
   cursor: pointer;
