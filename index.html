@@ -1640,21 +1640,20 @@ if (!heroSwiperInitialized) {
 
 async function loadBlogs() {
   try {
-const blogs = await client.fetch(`
-  *[_type == "blog"] | order(_createdAt desc) {
-    title,
-    slug,
-    shortDescription,
-    coverImage{
-      asset->{ url }
-    },
-    gallery[]{
-      asset->{ url }
-    },
-    content
-  }
-`);
-
+    const blogs = await client.fetch(`
+      *[_type == "blog"] | order(_createdAt desc) {
+        title,
+        slug,
+        shortDescription,
+        coverImage{
+          asset->{ url }
+        },
+        gallery[]{
+          asset->{ url }
+        },
+        content
+      }
+    `);
 
     const container = document.querySelector(".blogs-wrpr");
     const template = container.querySelector(".blog-card");
@@ -1667,15 +1666,20 @@ const blogs = await client.fetch(`
     template.style.display = "none";
 
     blogs.forEach(blog => {
+
+      // clone card
       const card = template.cloneNode(true);
       card.style.display = "flex";
 
+      // Insert TITLE
       const headingEl = card.querySelector(".heading");
       if (headingEl) headingEl.textContent = blog.title || "Untitled";
 
+      // Insert SHORT DESCRIPTION
       const paraEl = card.querySelector(".s-para");
       if (paraEl) paraEl.textContent = blog.shortDescription || "";
 
+      // Cover image
       const coverEl = card.querySelector(".blog-cover");
       const overlayEl = card.querySelector(".overlay-div");
 
@@ -1686,7 +1690,7 @@ const blogs = await client.fetch(`
         coverEl.style.backgroundPosition = "center";
       }
 
-      // Smooth hover overlay show/hide
+      // Hover overlay fade
       if (coverEl && overlayEl) {
         coverEl.addEventListener("mouseenter", () => {
           overlayEl.classList.remove("opacity-0");
@@ -1699,63 +1703,59 @@ const blogs = await client.fetch(`
         });
       }
 
+      // Elements for pop-up
       const openBtn = card.querySelector(".overlay-div .btn");
       const overlayWork = document.querySelector(".overlay-work");
       const separateDiv = document.querySelector(".separate-work-div");
       const closeBtn = document.querySelector(".wrk-close");
 
-      // DETAIL ELEMENTS
-      const titleArea = separateDiv.querySelector(".blog-title");
-      const shortDescArea = separateDiv.querySelector(".s-para");
-      const longContentArea = separateDiv.querySelector(".long-content");
-      const imagesWrpr = separateDiv.querySelector(".images-flex-wrpr");
+      const titleArea = document.querySelector(".separate-work-div .blog-title");
+      const shortDescArea = document.querySelector(".separate-work-div .s-para");
+      const longContentArea = document.querySelector(".separate-work-div .long-content");
+      const imagesWrpr = document.querySelector(".separate-work-div .images-flex-wrpr");
 
       if (openBtn && overlayWork && separateDiv) {
+
         openBtn.addEventListener("click", () => {
 
-          // Inject Title
-          if (titleArea) {
-            titleArea.textContent = blog.title || "Untitled";
-          }
+          // Insert details
+          if (titleArea) titleArea.textContent = blog.title || "";
+          if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
-          // Inject Short Description
-          if (shortDescArea) {
-            shortDescArea.textContent = blog.shortDescription || "";
-          }
-
-          // Inject Full Content
+          // Convert Portable Text → HTML
           if (longContentArea) {
-            longContentArea.textContent = blog.fullContent || "";
+            try {
+              longContentArea.innerHTML = portableTextToHtml(blog.content);
+            } catch (e) {
+              longContentArea.innerHTML = "<p>Content format error</p>";
+            }
           }
 
-          // Inject Images
+          // Insert gallery images
           if (imagesWrpr) {
-            imagesWrpr.innerHTML = ""; // clear old images first
+            imagesWrpr.innerHTML = "";
 
-            if (blog.images && blog.images.length > 0) {
-              blog.images.forEach(img => {
+            if (blog.gallery?.length > 0) {
+              blog.gallery.forEach(img => {
                 if (!img.asset?.url) return;
-
                 const el = document.createElement("img");
                 el.src = `${img.asset.url}?w=1400&auto=format`;
-                el.style.maxHeight = "100vh";
+                el.style.maxHeight = "calc(100vh - 2rem)";
                 el.style.width = "auto";
                 el.style.objectFit = "contain";
-
                 imagesWrpr.appendChild(el);
               });
-
             } else {
               imagesWrpr.innerHTML = "<p>No images available</p>";
             }
           }
 
-          // Open popup with smooth transition
+          // Open popup
           overlayWork.classList.add("active");
           separateDiv.classList.add("active");
         });
 
-        // Close icon click
+        // Close click
         if (closeBtn) {
           closeBtn.addEventListener("click", () => {
             overlayWork.classList.remove("active");
@@ -1763,7 +1763,7 @@ const blogs = await client.fetch(`
           });
         }
 
-        // Clicking overlay background closes pop-up
+        // Click on background closes
         overlayWork.addEventListener("click", (e) => {
           if (e.target === overlayWork) {
             overlayWork.classList.remove("active");
@@ -1772,6 +1772,7 @@ const blogs = await client.fetch(`
         });
       }
 
+      // Add card to page
       container.appendChild(card);
     });
 
@@ -1779,6 +1780,7 @@ const blogs = await client.fetch(`
     console.error("❌ Sanity blog fetch error:", err);
   }
 }
+
 
 
 
