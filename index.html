@@ -619,7 +619,7 @@ gsap.to(hdr, {
   transition: opacity 0.45s ease;
 }
 .overlay-work.active {
-  opacity: 1;
+  opacity: 1 !important;
   pointer-events: auto;
 }
 
@@ -635,7 +635,9 @@ gsap.to(hdr, {
   transform: translateY(0);
   display: flex;
 }
-
+.wrk-close{
+  cursor: pointer;
+}
 
 
 </style>
