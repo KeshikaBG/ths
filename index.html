@@ -1640,15 +1640,21 @@ if (!heroSwiperInitialized) {
 
 async function loadBlogs() {
   try {
-    const blogs = await client.fetch(`
-      *[_type == "blog"] | order(_createdAt desc) {
-        title,
-        shortDescription,
-        coverImage{
-          asset->{ url }
-        }
-      }
-    `);
+const blogs = await client.fetch(`
+  *[_type == "blog"] | order(_createdAt desc) {
+    title,
+    slug,
+    shortDescription,
+    coverImage{
+      asset->{ url }
+    },
+    gallery[]{
+      asset->{ url }
+    },
+    content
+  }
+`);
+
 
     const container = document.querySelector(".blogs-wrpr");
     const template = container.querySelector(".blog-card");
@@ -1674,13 +1680,13 @@ async function loadBlogs() {
       const overlayEl = card.querySelector(".overlay-div");
 
       if (coverEl && blog.coverImage?.asset?.url) {
-        const imgUrl = `${blog.coverImage.asset.url}?w=900&auto=format`;
+        const imgUrl = `${blog.coverImage.asset.url}?w=1000&auto=format`;
         coverEl.style.backgroundImage = `url('${imgUrl}')`;
         coverEl.style.backgroundSize = "cover";
         coverEl.style.backgroundPosition = "center";
       }
 
-      // Smooth hover fade for overlay-div
+      // Smooth hover overlay show/hide
       if (coverEl && overlayEl) {
         coverEl.addEventListener("mouseenter", () => {
           overlayEl.classList.remove("opacity-0");
@@ -1698,14 +1704,58 @@ async function loadBlogs() {
       const separateDiv = document.querySelector(".separate-work-div");
       const closeBtn = document.querySelector(".wrk-close");
 
+      // DETAIL ELEMENTS
+      const titleArea = document.querySelector(".separate-work-div .blog-title");
+      const shortDescArea = document.querySelector(".separate-work-div .s-para");
+      const longContentArea = document.querySelector(".separate-work-div .long-content");
+      const imagesWrpr = document.querySelector(".separate-work-div .images-flex-wrpr");
+
       if (openBtn && overlayWork && separateDiv) {
         openBtn.addEventListener("click", () => {
-          // smooth opening
+
+          // Inject Title
+          if (titleArea) {
+            titleArea.textContent = blog.title || "Untitled";
+          }
+
+          // Inject Short Description
+          if (shortDescArea) {
+            shortDescArea.textContent = blog.shortDescription || "";
+          }
+
+          // Inject Full Content
+          if (longContentArea) {
+            longContentArea.textContent = blog.fullContent || "";
+          }
+
+          // Inject Images
+          if (imagesWrpr) {
+            imagesWrpr.innerHTML = ""; // clear old images first
+
+            if (blog.images && blog.images.length > 0) {
+              blog.images.forEach(img => {
+                if (!img.asset?.url) return;
+
+                const el = document.createElement("img");
+                el.src = `${img.asset.url}?w=1400&auto=format`;
+                el.style.maxHeight = "100vh";
+                el.style.width = "auto";
+                el.style.objectFit = "contain";
+
+                imagesWrpr.appendChild(el);
+              });
+
+            } else {
+              imagesWrpr.innerHTML = "<p>No images available</p>";
+            }
+          }
+
+          // Open popup with smooth transition
           overlayWork.classList.add("active");
           separateDiv.classList.add("active");
         });
 
-        // Clicking close icon
+        // Close icon click
         if (closeBtn) {
           closeBtn.addEventListener("click", () => {
             overlayWork.classList.remove("active");
@@ -1713,7 +1763,7 @@ async function loadBlogs() {
           });
         }
 
-        // Clicking on overlay background closes
+        // Clicking overlay background closes pop-up
         overlayWork.addEventListener("click", (e) => {
           if (e.target === overlayWork) {
             overlayWork.classList.remove("active");
@@ -1729,6 +1779,7 @@ async function loadBlogs() {
     console.error("❌ Sanity blog fetch error:", err);
   }
 }
+
 
 
 
