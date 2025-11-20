@@ -1279,7 +1279,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-<script src="../cdn.jsdelivr.net/npm/@portabletext/to-html"></script>
 <script type="module">
   import { createClient } from 'https://esm.sh/@sanity/client';
   const client = createClient({
@@ -1638,6 +1637,9 @@ if (!heroSwiperInitialized) {
 
 
 
+
+  
+
 async function loadBlogs() {
   try {
     const blogs = await client.fetch(`
@@ -1722,14 +1724,22 @@ async function loadBlogs() {
           if (titleArea) titleArea.textContent = blog.title || "";
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
-          // Convert Portable Text → HTML
-          if (longContentArea) {
-            try {
-              longContentArea.innerHTML = portableTextToHtml(blog.content);
-            } catch (e) {
-              longContentArea.innerHTML = "<p>Content format error</p>";
-            }
-          }
+ if (longContentArea) {
+  try {
+    const plainText = blog.content
+      .map(block =>
+        block.children
+          ? block.children.map(child => child.text).join("")
+          : ""
+      )
+      .join("\n\n");
+
+    longContentArea.textContent = plainText;
+  } catch (e) {
+    longContentArea.textContent = "Content format error";
+  }
+}
+
 
           // Insert gallery images
           if (imagesWrpr) {
