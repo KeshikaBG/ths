@@ -599,7 +599,35 @@ gsap.to(hdr, {
 
 
 
+/* Overlay inside card */
+.overlay-div {
+  transition: opacity 0.35s ease;
+}
+.opacity-0 {
+  opacity: 0;
+  pointer-events: none;
+}
+.opacity-100 {
+  opacity: 1;
+  pointer-events: auto;
+}
+.overlay-work {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.overlay-work.active {
+  opacity: 1;
+  pointer-events: auto;
+}
 
+.separate-work-div {
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+.separate-work-div.active {
+  opacity: 1;
+}
 
 
 </style>
@@ -1605,22 +1633,18 @@ async function loadBlogs() {
       return;
     }
 
-    // HIDE TEMPLATE
     template.style.display = "none";
 
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
-      card.style.display = "flex";   // REQUIRED
+      card.style.display = "flex";
 
-      // Set title
       const headingEl = card.querySelector(".heading");
       if (headingEl) headingEl.textContent = blog.title || "Untitled";
 
-      // Set short description
       const paraEl = card.querySelector(".s-para");
       if (paraEl) paraEl.textContent = blog.shortDescription || "";
 
-      // Cover image styling
       const coverEl = card.querySelector(".blog-cover");
       const overlayEl = card.querySelector(".overlay-div");
 
@@ -1631,26 +1655,45 @@ async function loadBlogs() {
         coverEl.style.backgroundPosition = "center";
       }
 
-      // ---------- HOVER EFFECT ----------
+      // Smooth hover fade for overlay-div
       if (coverEl && overlayEl) {
         coverEl.addEventListener("mouseenter", () => {
           overlayEl.classList.remove("opacity-0");
+          overlayEl.classList.add("opacity-100");
         });
 
         coverEl.addEventListener("mouseleave", () => {
           overlayEl.classList.add("opacity-0");
+          overlayEl.classList.remove("opacity-100");
         });
       }
 
-      // ---------- OPEN FULL BLOG ----------
       const openBtn = card.querySelector(".overlay-div .btn");
       const overlayWork = document.querySelector(".overlay-work");
       const separateDiv = document.querySelector(".separate-work-div");
+      const closeBtn = document.querySelector(".wrk-close");
 
       if (openBtn && overlayWork && separateDiv) {
         openBtn.addEventListener("click", () => {
-          overlayWork.style.display = "block";
-          separateDiv.style.display = "flex";
+          // smooth opening
+          overlayWork.classList.add("active");
+          separateDiv.classList.add("active");
+        });
+
+        // Clicking close icon
+        if (closeBtn) {
+          closeBtn.addEventListener("click", () => {
+            overlayWork.classList.remove("active");
+            separateDiv.classList.remove("active");
+          });
+        }
+
+        // Clicking on overlay background closes
+        overlayWork.addEventListener("click", (e) => {
+          if (e.target === overlayWork) {
+            overlayWork.classList.remove("active");
+            separateDiv.classList.remove("active");
+          }
         });
       }
 
@@ -1661,6 +1704,7 @@ async function loadBlogs() {
     console.error("❌ Sanity blog fetch error:", err);
   }
 }
+
 
 
 
