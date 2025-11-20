@@ -611,6 +611,8 @@ gsap.to(hdr, {
   opacity: 1;
   pointer-events: auto;
 }
+
+/* Blog full overlay */
 .overlay-work {
   opacity: 0;
   pointer-events: none;
@@ -621,13 +623,19 @@ gsap.to(hdr, {
   pointer-events: auto;
 }
 
+/* The blog content inside */
 .separate-work-div {
   opacity: 0;
+  transform: translateY(20px);
   transition: all 0.4s ease;
+  display: none;
 }
 .separate-work-div.active {
   opacity: 1;
+  transform: translateY(0);
+  display: flex;
 }
+
 
 
 </style>
