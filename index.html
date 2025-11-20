@@ -1705,10 +1705,10 @@ const blogs = await client.fetch(`
       const closeBtn = document.querySelector(".wrk-close");
 
       // DETAIL ELEMENTS
-      const titleArea = document.querySelector(".separate-work-div .blog-title");
-      const shortDescArea = document.querySelector(".separate-work-div .s-para");
-      const longContentArea = document.querySelector(".separate-work-div .long-content");
-      const imagesWrpr = document.querySelector(".separate-work-div .images-flex-wrpr");
+      const titleArea = separateDiv.querySelector(".blog-title");
+      const shortDescArea = separateDiv.querySelector(".s-para");
+      const longContentArea = separateDiv.querySelector(".long-content");
+      const imagesWrpr = separateDiv.querySelector(".images-flex-wrpr");
 
       if (openBtn && overlayWork && separateDiv) {
         openBtn.addEventListener("click", () => {
