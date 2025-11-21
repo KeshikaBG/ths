@@ -1952,28 +1952,55 @@ async function loadBlogs() {
           if (titleArea) titleArea.textContent = blog.title || "";
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
-          // Render portable text -> HTML
-// Render simple text with line breaks
+// SIMPLE PARSER: supports paragraphs, bold, italic, bullets, numbers and newlines
 if (longContentArea) {
   try {
-    if (typeof blog.content === "string") {
-      longContentArea.innerHTML = blog.content.replace(/\n/g, "<br>");
-    } else if (Array.isArray(blog.content)) {
-      // if Sanity block array, join all children text simply
-      const joinedText = blog.content
-        .map(block =>
-          (block.children || []).map(c => c.text || "").join("")
-        )
-        .join("\n\n");
+    let html = "";
 
-      longContentArea.innerHTML = joinedText.replace(/\n/g, "<br>");
-    } else {
-      longContentArea.innerHTML = "<p>No content available</p>";
+    if (Array.isArray(blog.content)) {
+      blog.content.forEach(block => {
+        // if normal text block
+        if (block._type === "block") {
+
+          // get text from children with bold/italic
+          let text = (block.children || []).map(c => {
+            let t = c.text || "";
+
+            if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
+            if (c.marks?.includes("em")) t = `<em>${t}</em>`;
+
+            return t;
+          }).join("");
+
+          // if bullet / number list
+          if (block.listItem) {
+            const tag = block.level && block.level > 1 ? "ol" : "ul";
+            html += `<${tag}><li>${text}</li></${tag}>`;
+          } else {
+            // headings
+            if (/^h[1-6]$/.test(block.style))
+              html += `<${block.style}>${text}</${block.style}>`;
+            // blockquote
+            else if (block.style === "blockquote")
+              html += `<blockquote>${text}</blockquote>`;
+            else
+              html += `<p>${text}</p>`;
+          }
+
+        }
+      });
     }
+
+    // final cleanup: convert newlines to <br>
+    html = html.replace(/\n/g, "<br>");
+
+    longContentArea.innerHTML = html || "<p>No content available</p>";
+
   } catch (e) {
     longContentArea.innerHTML = "Content format error";
   }
 }
+
 
 
           // Gallery images (100% height, auto width, 5px radius)
