@@ -1634,66 +1634,71 @@ async function loadBlogs() {
       toHTML = null;
     }
 
-    function portableFallback(blocks) {
-      if (!Array.isArray(blocks)) return "";
-      const out = [];
-      let listBuffer = null;
+function portableFallback(blocks) {
+  if (!Array.isArray(blocks)) return "";
 
-      const flushList = () => {
-        if (!listBuffer) return;
-        const tag = listBuffer.type === "number" ? "ol" : "ul";
-        out.push(`<${tag}>${listBuffer.items.map(i => `<li>${i}</li>`).join("")}</${tag}>`);
-        listBuffer = null;
-      };
+  let html = "";
+  let listOpen = false;
+  let listType = "";
 
-      blocks.forEach(block => {
-        if (!block) return;
-        if (block._type === "block") {
-          if (block.listItem) {
-            if (!listBuffer) listBuffer = { type: block.listItem === "number" ? "number" : "bullet", items: [] };
-            const text = (block.children || []).map(c => c.text || "").join("");
-            listBuffer.items.push(escapeHtml(text));
-            return;
-          } else {
-            flushList();
-            const text = (block.children || []).map(c => {
-              let t = escapeHtml(c.text || "");
-              if (c.marks && c.marks.length) {
-                if (c.marks.includes("strong")) t = `<strong>${t}</strong>`;
-                if (c.marks.includes("em")) t = `<em>${t}</em>`;
-              }
-              return t;
-            }).join("");
-            const style = block.style || "normal";
-            if (/^h[1-6]$/.test(style)) {
-              out.push(`<${style}>${text}</${style}>`);
-            } else if (style === "blockquote") {
-              out.push(`<blockquote>${text}</blockquote>`);
-            } else {
-              out.push(`<p>${text}</p>`);
-            }
-            return;
-          }
-        } else if (block._type === "image" && block.asset?.url) {
-          flushList();
-          const url = escapeHtml(block.asset.url);
-          out.push(`<p><img src="${url}" alt="" style="max-width:100%;height:auto;border-radius:5px" /></p>`);
-        } else {
-          flushList();
-          out.push(`<pre>${escapeHtml(JSON.stringify(block))}</pre>`);
-        }
-      });
+  const closeList = () => {
+    if (listOpen) {
+      html += `</${listType}>`;
+      listOpen = false;
+    }
+  };
 
-      flushList();
-      return out.join("\n");
+  blocks.forEach(block => {
+    if (!block || block._type !== "block") return;
+
+    const isList = !!block.listItem;
+
+    // Text builder for spans
+    let text = (block.children || [])
+      .map(c => {
+        let t = escapeHtml(c.text || "");
+
+        // Preserve line breaks INSIDE a paragraph
+        t = t.replace(/\n/g, "<br>");
+
+        if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
+        if (c.marks?.includes("em")) t = `<em>${t}</em>`;
+        return t;
+      })
+      .join("");
+
+    // LIST HANDLING
+    if (isList) {
+      if (!listOpen || listType !== (block.listItem === "number" ? "ol" : "ul")) {
+        closeList();
+        listType = block.listItem === "number" ? "ol" : "ul";
+        html += `<${listType}>`;
+        listOpen = true;
+      }
+      html += `<li>${text}</li>`;
+      return;
+    } else {
+      closeList();
     }
 
-    function escapeHtml(str) {
-      if (typeof str !== "string") return "";
-      return str.replace(/[&<>"']/g, ch => {
-        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
-      });
+    // HEADINGS, QUOTES, PARAGRAPHS
+    if (/^h[1-6]$/.test(block.style)) {
+      html += `<${block.style}>${text}</${block.style}>`;
+    } else if (block.style === "blockquote") {
+      html += `<blockquote>${text}</blockquote>`;
+    } else {
+      html += `<p>${text}</p>`;
     }
+  });
+
+  closeList();
+  return html;
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+}
+
 
 
     blogs.forEach(blog => {
@@ -1749,31 +1754,38 @@ if (longContentArea) {
       blog.content.forEach(block => {
         if (block._type === "block") {
 
+          // process text children
           let text = (block.children || []).map(c => {
             let t = c.text || "";
-
             if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
             if (c.marks?.includes("em")) t = `<em>${t}</em>`;
-
             return t;
           }).join("");
 
+          // bullet/number lists
           if (block.listItem) {
-            const tag = block.level && block.level > 1 ? "ol" : "ul";
+            const tag = block.listItem === "number" ? "ol" : "ul";
             html += `<${tag}><li>${text}</li></${tag}>`;
-          } else {
-            if (/^h[1-6]$/.test(block.style))
-              html += `<${block.style}>${text}</${block.style}>`;
-            else if (block.style === "blockquote")
-              html += `<blockquote>${text}</blockquote>`;
-            else
-              html += `<p>${text}</p>`;
           }
 
+          // everything else → normal paragraph (same size)
+          else {
+            html += `<p>${text}</p>`;
+          }
+        }
+
+        // images inside rich text
+        else if (block._type === "image" && block.asset?.url) {
+          html += `
+            <p>
+              <img src="${block.asset.url}" style="max-width:100%;border-radius:6px" />
+            </p>
+          `;
         }
       });
     }
 
+    // Convert line breaks inside same block
     html = html.replace(/\n/g, "<br>");
 
     longContentArea.innerHTML = html || "<p>No content available</p>";
@@ -1782,6 +1794,7 @@ if (longContentArea) {
     longContentArea.innerHTML = "Content format error";
   }
 }
+
 
           if (imagesWrpr) {
             imagesWrpr.innerHTML = "";
