@@ -8,7 +8,10 @@
 <link rel="preconnect" href="https://cdn.sanity.io" crossorigin>
 
 <style>
-  
+  .long-content {
+  white-space: pre-line;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -1668,13 +1671,12 @@ async function loadBlogs() {
        
 if (longContentArea) {
   try {
-if (typeof blog.content === "string") {
-  const formatted = blog.content
-    .replace(/\n\n/g, "<p></p>")
-    .replace(/\n/g, "<br>");
+    let html = blogtoHTML(blog.content)
+  .replace(/(\r\n|\r|\n)/g, "<br>");
 
-  longContentArea.innerHTML = `<p>${formatted}</p>`;
-}
+longContentArea.innerHTML = `<p>${html}</p>`;
+
+
 
   } catch (e) {
     longContentArea.innerHTML = "Content format error";
