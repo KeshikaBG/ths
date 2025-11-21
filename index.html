@@ -1953,38 +1953,28 @@ async function loadBlogs() {
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
           // Render portable text -> HTML
-          if (longContentArea) {
-            try {
-              if (Array.isArray(blog.content) && blog.content.length) {
-                if (toHTML) {
-                  // use library if available
-                  longContentArea.innerHTML = toHTML(blog.content);
-                } else {
-                  // fallback renderer
-                  longContentArea.innerHTML = portableFallback(blog.content);
-                }
-              } else if (typeof blog.content === "string") {
-                longContentArea.textContent = blog.content;
-              } else {
-                longContentArea.innerHTML = "<p>No content available</p>";
-              }
-            } catch (err) {
-  console.error("Failed to render blog.content:", err);
-  // graceful fallback
+// Render simple text with line breaks
+if (longContentArea) {
   try {
-    const plainText = Array.isArray(blog.content)
-      ? blog.content
-          .map(b => (b.children || []).map(c => c.text || "").join(""))
-          .join("\n\n")
-      : String(blog.content || "");
+    if (typeof blog.content === "string") {
+      longContentArea.innerHTML = blog.content.replace(/\n/g, "<br>");
+    } else if (Array.isArray(blog.content)) {
+      // if Sanity block array, join all children text simply
+      const joinedText = blog.content
+        .map(block =>
+          (block.children || []).map(c => c.text || "").join("")
+        )
+        .join("\n\n");
 
-    longContentArea.innerHTML = plainText.replace(/\n/g, "<br>");
+      longContentArea.innerHTML = joinedText.replace(/\n/g, "<br>");
+    } else {
+      longContentArea.innerHTML = "<p>No content available</p>";
+    }
   } catch (e) {
-    longContentArea.textContent = "Content format error";
+    longContentArea.innerHTML = "Content format error";
   }
 }
 
-          }
 
           // Gallery images (100% height, auto width, 5px radius)
           if (imagesWrpr) {
