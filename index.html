@@ -1668,14 +1668,14 @@ async function loadBlogs() {
        
 if (longContentArea) {
   try {
-    if (blog.content) {
-      const raw = blogtoHTML(blog.content)
-  .replace(/\n\n/g, "<br><br>")     // double enter = blank line
-  .replace(/\n/g, "<br>");         // single enter = line break
+if (typeof blog.content === "string") {
+  const formatted = blog.content
+    .replace(/\n\n/g, "<p></p>")
+    .replace(/\n/g, "<br>");
 
-longContentArea.innerHTML = raw;
-;
-    }
+  longContentArea.innerHTML = `<p>${formatted}</p>`;
+}
+
   } catch (e) {
     longContentArea.innerHTML = "Content format error";
   }
