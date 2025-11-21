@@ -1720,45 +1720,41 @@ async function loadBlogs() {
 
         openBtn.addEventListener("click", () => {
 
-          // Insert details
-          if (titleArea) titleArea.textContent = blog.title || "";
-          if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
+// Insert details
+if (titleArea) titleArea.textContent = blog.title || "";
+if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
- if (longContentArea) {
+// FULL formatted Sanity content
+if (longContentArea) {
   try {
-    const plainText = blog.content
-      .map(block =>
-        block.children
-          ? block.children.map(child => child.text).join("")
-          : ""
-      )
-      .join("\n\n");
-
-    longContentArea.textContent = plainText;
+    longContentArea.innerHTML = toHTML(blog.content);
   } catch (e) {
-    longContentArea.textContent = "Content format error";
+    longContentArea.innerHTML = "<p>Content format error</p>";
   }
 }
 
+// Insert gallery
+if (imagesWrpr) {
+  imagesWrpr.innerHTML = "";
 
-          // Insert gallery images
-          if (imagesWrpr) {
-            imagesWrpr.innerHTML = "";
+  if (blog.gallery?.length > 0) {
+    blog.gallery.forEach(img => {
+      if (!img.asset?.url) return;
 
-            if (blog.gallery?.length > 0) {
-              blog.gallery.forEach(img => {
-                if (!img.asset?.url) return;
-                const el = document.createElement("img");
-                el.src = `${img.asset.url}?w=1400&auto=format`;
-                el.style.maxHeight = "calc(100vh - 2rem)";
-                el.style.width = "auto";
-                el.style.objectFit = "contain";
-                imagesWrpr.appendChild(el);
-              });
-            } else {
-              imagesWrpr.innerHTML = "<p>No images available</p>";
-            }
-          }
+      const el = document.createElement("img");
+      el.src = `${img.asset.url}?w=1400&auto=format`;
+
+      el.style.height = "100%";
+      el.style.width = "auto";
+      el.style.objectFit = "contain";
+      el.style.borderRadius = "5px";
+
+      imagesWrpr.appendChild(el);
+    });
+  } else {
+    imagesWrpr.innerHTML = "<p>No images available</p>";
+  }
+}
 
           // Open popup
           overlayWork.classList.add("active");
