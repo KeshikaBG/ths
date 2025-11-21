@@ -1625,79 +1625,14 @@ async function loadBlogs() {
 
     template.style.display = "none";
 
-    let toHTML = null;
-    try {
-      const pt = await import("https://esm.sh/@portabletext/to-html");
-      toHTML = pt.toHTML;
-    } catch (err) {
-      console.warn("PortableText import failed, falling back to simple renderer.", err);
-      toHTML = null;
-    }
+    const blogpt = await import("https://esm.sh/@portabletext/to-html");
+    const blogtoHTML = blogpt.toHTML;
 
-function portableFallback(blocks) {
-  if (!Array.isArray(blocks)) return "";
 
-  let html = "";
-  let listOpen = false;
-  let listType = "";
 
-  const closeList = () => {
-    if (listOpen) {
-      html += `</${listType}>`;
-      listOpen = false;
-    }
-  };
 
-  blocks.forEach(block => {
-    if (!block || block._type !== "block") return;
 
-    const isList = !!block.listItem;
-
-    // Text builder for spans
-    let text = (block.children || [])
-      .map(c => {
-        let t = escapeHtml(c.text || "");
-
-        // Preserve line breaks INSIDE a paragraph
-        t = t.replace(/\n/g, "<br>");
-
-        if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
-        if (c.marks?.includes("em")) t = `<em>${t}</em>`;
-        return t;
-      })
-      .join("");
-
-    // LIST HANDLING
-    if (isList) {
-      if (!listOpen || listType !== (block.listItem === "number" ? "ol" : "ul")) {
-        closeList();
-        listType = block.listItem === "number" ? "ol" : "ul";
-        html += `<${listType}>`;
-        listOpen = true;
-      }
-      html += `<li>${text}</li>`;
-      return;
-    } else {
-      closeList();
-    }
-
-    // HEADINGS, QUOTES, PARAGRAPHS
-    if (/^h[1-6]$/.test(block.style)) {
-      html += `<${block.style}>${text}</${block.style}>`;
-    } else if (block.style === "blockquote") {
-      html += `<blockquote>${text}</blockquote>`;
-    } else {
-      html += `<p>${text}</p>`;
-    }
-  });
-
-  closeList();
-  return html;
-}
-
-function escapeHtml(str) {
-  return str.replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
-}
+    
 
 
 
@@ -1746,55 +1681,21 @@ function escapeHtml(str) {
           if (titleArea) titleArea.textContent = blog.title || "";
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
+
+
+          
 if (longContentArea) {
   try {
-    let html = "";
-
-    if (Array.isArray(blog.content)) {
-      blog.content.forEach(block => {
-        if (block._type === "block") {
-
-          // process text children
-          let text = (block.children || []).map(c => {
-            let t = c.text || "";
-            if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
-            if (c.marks?.includes("em")) t = `<em>${t}</em>`;
-            return t;
-          }).join("");
-
-          // bullet/number lists
-          if (block.listItem) {
-            const tag = block.listItem === "number" ? "ol" : "ul";
-            html += `<${tag}><li>${text}</li></${tag}>`;
-          }
-
-          // everything else → normal paragraph (same size)
-          else {
-            html += `<p>${text}</p>`;
-          }
-        }
-
-        // images inside rich text
-        else if (block._type === "image" && block.asset?.url) {
-          html += `
-            <p>
-              <img src="${block.asset.url}" style="max-width:100%;border-radius:6px" />
-            </p>
-          `;
-        }
-      });
-    }
-
-    // Convert line breaks inside same block
-    html = html.replace(/\n/g, "<br>");
-
-    longContentArea.innerHTML = html || "<p>No content available</p>";
-
+      if (longContentArea && blog.content) {
+        longContentArea.innerHTML = blogtoHTML(blog.content);
+      }
   } catch (e) {
     longContentArea.innerHTML = "Content format error";
   }
 }
 
+
+          
 
           if (imagesWrpr) {
             imagesWrpr.innerHTML = "";
