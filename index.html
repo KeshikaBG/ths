@@ -10,7 +10,7 @@
 <style>
   
 html {
-  scroll-behavior: smooth; /* built-in smoothness */
+  scroll-behavior: smooth;
 }
 
   .w-webflow-badge {
@@ -236,7 +236,6 @@ ScrollTrigger.batch("[data-entry-anim]", {
   },
   once: true
 });
-// Batch scale animations
 ScrollTrigger.batch("[scale-anim]", {
   onEnter: batch => {
     gsap.fromTo(batch,
@@ -246,7 +245,6 @@ ScrollTrigger.batch("[scale-anim]", {
   },
   once: true
 });
-// Slide-up animations with container + child stagger
 document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex) => {
   const children = container.querySelectorAll(":scope > *");
   if (!children.length) return;
@@ -259,7 +257,7 @@ document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex)
         opacity: 1,
         duration: 0.8,
         ease: "power2.out",
-        delay: containerIndex * 0.3 + i * 0.15, // container stagger + child stagger
+        delay: containerIndex * 0.3 + i * 0.15,
         scrollTrigger: {
           trigger: child,
           start: "top 90%",
@@ -269,8 +267,6 @@ document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex)
     );
   });
 });
-
-  // Fade-in children in batch (excluding .overlay)
   document.querySelectorAll("[opacity-anim]").forEach(container => {
     const children = [...container.children].filter(el => !el.classList.contains("overlay"));
     if (children.length) {
@@ -280,7 +276,6 @@ document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex)
       });
     }
   });
-  // Fade + scale-in children in batch
   document.querySelectorAll("[scale-opacity-anim]").forEach(container => {
     const children = [...container.children];
     if (children.length) {
@@ -293,14 +288,12 @@ document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex)
       });
     }
   });
-  // Image fade scale
   ScrollTrigger.batch("[data-scale-img] img", {
     onEnter: batch => gsap.to(batch, {
       opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03
     }),
     once: true
   });
-  // Divider animations
   const animDvdr = (sel, axis) => {
     document.querySelectorAll(sel).forEach(dvdr => {
       gsap.fromTo(dvdr, { [axis]: 0 }, {
@@ -535,19 +528,19 @@ gsap.to(hdr, {
   transition: height 0.5s ease;
 }
 .nav-link-div .nav-links {
-  color: #c3c3c3 !important; /* default color */
-  transition: color 0.3s ease; /* smooth transition */
+  color: #c3c3c3 !important;
+  transition: color 0.3s ease;
 }
 
 .nav-link-div.w--current .nav-links,
 .nav-link-div:hover .nav-links {
-  color: #373737 !important; /* active or hover color */
+  color: #373737 !important;
 }
 
 
 
   .overlay {
-    position: fixed;           /* stays fixed relative to viewport */
+    position: fixed;
   top: 0;
   left: 0;
   width: 100vw !important;
@@ -558,7 +551,6 @@ gsap.to(hdr, {
     visibility: hidden;
   }
 @media screen and (max-width: 991px) {
-  /* Default hidden state */
   .nav-inr-wrp {
     opacity: 0 !important;
     visibility: hidden;
@@ -569,7 +561,7 @@ gsap.to(hdr, {
   }
 
   .overlay {
-    position: fixed;           /* stays fixed relative to viewport */
+    position: fixed;
   top: 0;
   left: 0;
   width: 100vw !important;
@@ -580,17 +572,16 @@ gsap.to(hdr, {
     visibility: hidden;
   }
 
-  /* Active (visible) state */
   .nav-inr-wrp.active {
     opacity: 1 !important;
     visibility: visible;
-    min-height: 35vh; /* set a value slightly larger than expected content */
+    min-height: 35vh;
     padding: 1rem;
   }
 
   .overlay.oveactive {
         display: block;
-      position: fixed;           /* stays fixed relative to viewport */
+      position: fixed;
   top: 0;
   left: 0;
   width: 100vw !important;
@@ -647,7 +638,6 @@ gsap.to(hdr, {
   cursor: pointer;
 }
 
-
 </style>
 
 
@@ -662,8 +652,8 @@ gsap.to(hdr, {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const menuBtn = document.querySelector(".menu");   // open button
-  const closeBtn = document.querySelector(".menu-close");   // close button
+  const menuBtn = document.querySelector(".menu");
+  const closeBtn = document.querySelector(".menu-close");
   const navWrap = document.querySelector(".nav-inr-wrp");
   const overlay = document.querySelector(".overlay");
   const head = document.querySelector(".header");
@@ -695,8 +685,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     closeBtn.addEventListener("click", closeMenu);
     overlay.addEventListener("click", closeMenu);
-
-    // ✅ Close menu when any link inside navWrap is clicked
     navWrap.querySelectorAll("a").forEach(link => {
       link.addEventListener("click", closeMenu);
     });
@@ -1328,8 +1316,6 @@ document.addEventListener("DOMContentLoaded", () => {
     applyMediaStyles(el, styleOpts);
     container.appendChild(el);
   }
-
-  
 /**async function loadHeroSwiper() {
     try {
       const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
@@ -1395,12 +1381,9 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error('❌ Hero Swiper error:', err);
     }
   }**/
-// ===========================
-// LOAD FAQ SECTION
-// ===========================
+
 async function loadFAQs() {
   try {
-    // Fetch the FAQ page with its list
     const faqData = await client.fetch(`
       *[_type == "faqPage"][0]{
         faqs[]{
@@ -1420,10 +1403,8 @@ async function loadFAQs() {
       return;
     }
 
-    // Clear existing FAQ cards
     faqContainer.innerHTML = "";
 
-    // Sanity Portable Text → HTML
     const pt = await import("https://esm.sh/@portabletext/to-html");
     const toHTML = pt.toHTML;
 
@@ -1433,10 +1414,7 @@ async function loadFAQs() {
       const quesEl = card.querySelector('.ques');
       const ansEl  = card.querySelector('.ans');
 
-      // Insert question
       if (quesEl) quesEl.textContent = item.question;
-
-      // Convert portable text → HTML
       if (ansEl && item.answer) {
         ansEl.innerHTML = toHTML(item.answer);
       }
@@ -1458,9 +1436,9 @@ function initFAQAccordion() {
     const arrow = card.querySelector('.arr-down');
 
     if (index === 0) {
-      openFAQ(ans, arrow, true); // true = skip animation on first load
+      openFAQ(ans, arrow, true);
     } else {
-      closeFAQ(ans, arrow, true); // skip animation for initial load
+      closeFAQ(ans, arrow, true);
     }
 
     card.addEventListener('click', () => {
@@ -1480,7 +1458,6 @@ function initFAQAccordion() {
     ans.classList.remove('close');
     arrow?.classList.add('up');
 
-    // Clear existing inline heights
     ans.style.height = 'auto';
     const fullHeight = ans.scrollHeight + "px";
 
@@ -1488,16 +1465,10 @@ function initFAQAccordion() {
       ans.style.height = 'auto';
       return;
     }
-
-    // Step 1: Set to 0 to start animation
     ans.style.height = "0px";
-
-    // Step 2: Wait for next frame before expanding
     requestAnimationFrame(() => {
       ans.style.height = fullHeight;
     });
-
-    // After animation ends, switch to auto
     ans.addEventListener('transitionend', () => {
       if (ans.classList.contains('open')) {
         ans.style.height = "auto";
@@ -1510,19 +1481,13 @@ function initFAQAccordion() {
     ans.classList.remove('open');
     ans.classList.add('close');
     arrow?.classList.remove('up');
-
-    // For closing: ensure current height is fixed
     ans.style.height = ans.scrollHeight + "px";
 
     if (instant) {
       ans.style.height = "0px";
       return;
     }
-
-    // Force reflow
     ans.offsetHeight;
-
-    // Animate down
     ans.style.height = "0px";
   }
 }
@@ -1531,9 +1496,6 @@ function initFAQAccordion() {
 
 
 
-
-
-  
 
 
 
@@ -1554,10 +1516,8 @@ async function loadHeroSwiper() {
     const slideTemplate = heroContainer.querySelector('.swiper-slide');
     if (!swiperWrapper || !slideTemplate) return;
 
-    // ✅ Clear existing slides
     swiperWrapper.innerHTML = '';
 
-    // ✅ Create all slides at once
     const loadPromises = images.map((imgData, index) => {
       return new Promise((resolve) => {
         const slide = slideTemplate.cloneNode(true);
@@ -1571,7 +1531,6 @@ async function loadHeroSwiper() {
         img.onload = resolve;
         img.onerror = resolve;
 
-        // Optional overlay if you had it before
         const overlay = document.createElement('div');
         Object.assign(overlay.style, {
           position: 'absolute',
@@ -1589,7 +1548,6 @@ async function loadHeroSwiper() {
       });
     });
 
-    // ✅ Wait for all images to load before initializing swiper
     await Promise.all(loadPromises);
 
 if (!heroSwiperInitialized) {
@@ -1615,7 +1573,6 @@ if (!heroSwiperInitialized) {
       init(swiperInstance) {
         swiperInstance.wrapperEl.style.transitionTimingFunction =
           'cubic-bezier(0.65, 0, 0.35, 1)';
-        // Wait for browser to settle
         setTimeout(() => swiperInstance.autoplay.start(), 400);
       },
       setTransition(swiperInstance) {
@@ -1631,7 +1588,6 @@ if (!heroSwiperInitialized) {
     t = setTimeout(() => swiper.update(), 180);
   });
 }
-
   } catch (err) {
     console.error('❌ Hero Swiper error:', err);
   }
@@ -1649,7 +1605,6 @@ if (!heroSwiperInitialized) {
   
 async function loadBlogs() {
   try {
-    // Fetch blogs
     const blogs = await client.fetch(`
       *[_type == "blog"] | order(_createdAt desc) {
         title,
@@ -1669,10 +1624,8 @@ async function loadBlogs() {
       return;
     }
 
-    // hide template
     template.style.display = "none";
 
-    // Try to import portable text renderer once
     let toHTML = null;
     try {
       const pt = await import("https://esm.sh/@portabletext/to-html");
@@ -1682,11 +1635,10 @@ async function loadBlogs() {
       toHTML = null;
     }
 
-    // Fallback renderer: minimal HTML generator for Sanity blocks
     function portableFallback(blocks) {
       if (!Array.isArray(blocks)) return "";
       const out = [];
-      let listBuffer = null; // {type: 'bullet'|'number', items: []}
+      let listBuffer = null;
 
       const flushList = () => {
         if (!listBuffer) return;
@@ -1698,20 +1650,16 @@ async function loadBlogs() {
       blocks.forEach(block => {
         if (!block) return;
         if (block._type === "block") {
-          // handle list items
           if (block.listItem) {
             if (!listBuffer) listBuffer = { type: block.listItem === "number" ? "number" : "bullet", items: [] };
             const text = (block.children || []).map(c => c.text || "").join("");
             listBuffer.items.push(escapeHtml(text));
             return;
           } else {
-            // normal block - flush any list buffer first
             flushList();
             const text = (block.children || []).map(c => {
               let t = escapeHtml(c.text || "");
-              // minimal inline marks: strong / em
               if (c.marks && c.marks.length) {
-                // we don't resolve mark defs here; handle common marks names strong/em
                 if (c.marks.includes("strong")) t = `<strong>${t}</strong>`;
                 if (c.marks.includes("em")) t = `<em>${t}</em>`;
               }
@@ -1728,12 +1676,10 @@ async function loadBlogs() {
             return;
           }
         } else if (block._type === "image" && block.asset?.url) {
-          // flush list then add image
           flushList();
           const url = escapeHtml(block.asset.url);
           out.push(`<p><img src="${url}" alt="" style="max-width:100%;height:auto;border-radius:5px" /></p>`);
         } else {
-          // unknown block type -> stringify somewhat
           flushList();
           out.push(`<pre>${escapeHtml(JSON.stringify(block))}</pre>`);
         }
@@ -1750,24 +1696,17 @@ async function loadBlogs() {
       });
     }
 
-    // Clear any existing generated cards
-    // (if you want to preserve template only, don't clear everything; here we append)
-    // container.innerHTML = ""; // uncomment if you want to clear everything
 
     blogs.forEach(blog => {
-      // clone template
       const card = template.cloneNode(true);
-      card.style.display = "flex"; // your requested display
+      card.style.display = "flex";
 
-      // TITLE
       const headingEl = card.querySelector(".heading");
       if (headingEl) headingEl.textContent = blog.title || "Untitled";
 
-      // SHORT DESCRIPTION
       const paraEl = card.querySelector(".s-para");
       if (paraEl) paraEl.textContent = blog.shortDescription || "";
 
-      // COVER image
       const coverEl = card.querySelector(".blog-cover");
       const overlayEl = card.querySelector(".overlay-div");
       if (coverEl && blog.coverImage?.asset?.url) {
@@ -1777,7 +1716,6 @@ async function loadBlogs() {
         coverEl.style.backgroundPosition = "center";
       }
 
-      // overlay hover transitions
       if (coverEl && overlayEl) {
         coverEl.addEventListener("mouseenter", () => {
           overlayEl.classList.remove("opacity-0");
@@ -1789,7 +1727,6 @@ async function loadBlogs() {
         });
       }
 
-      // popup references
       const openBtn = card.querySelector(".overlay-div .btn");
       const overlayWork = document.querySelector(".overlay-work");
       const separateDiv = document.querySelector(".separate-work-div");
@@ -1802,21 +1739,17 @@ async function loadBlogs() {
 
       if (openBtn && overlayWork && separateDiv) {
         openBtn.addEventListener("click", () => {
-          // Fill popup fields
           if (titleArea) titleArea.textContent = blog.title || "";
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
-// SIMPLE PARSER: supports paragraphs, bold, italic, bullets, numbers and newlines
 if (longContentArea) {
   try {
     let html = "";
 
     if (Array.isArray(blog.content)) {
       blog.content.forEach(block => {
-        // if normal text block
         if (block._type === "block") {
 
-          // get text from children with bold/italic
           let text = (block.children || []).map(c => {
             let t = c.text || "";
 
@@ -1826,15 +1759,12 @@ if (longContentArea) {
             return t;
           }).join("");
 
-          // if bullet / number list
           if (block.listItem) {
             const tag = block.level && block.level > 1 ? "ol" : "ul";
             html += `<${tag}><li>${text}</li></${tag}>`;
           } else {
-            // headings
             if (/^h[1-6]$/.test(block.style))
               html += `<${block.style}>${text}</${block.style}>`;
-            // blockquote
             else if (block.style === "blockquote")
               html += `<blockquote>${text}</blockquote>`;
             else
@@ -1845,7 +1775,6 @@ if (longContentArea) {
       });
     }
 
-    // final cleanup: convert newlines to <br>
     html = html.replace(/\n/g, "<br>");
 
     longContentArea.innerHTML = html || "<p>No content available</p>";
@@ -1855,9 +1784,6 @@ if (longContentArea) {
   }
 }
 
-
-
-          // Gallery images (100% height, auto width, 5px radius)
           if (imagesWrpr) {
             imagesWrpr.innerHTML = "";
             if (Array.isArray(blog.gallery) && blog.gallery.length) {
@@ -1876,12 +1802,10 @@ if (longContentArea) {
             }
           }
 
-          // show popup smoothly (your CSS .active handles transitions)
           overlayWork.classList.add("active");
           separateDiv.classList.add("active");
         });
 
-        // close handlers
         if (closeBtn) {
           closeBtn.addEventListener("click", () => {
             overlayWork.classList.remove("active");
@@ -1895,8 +1819,6 @@ if (longContentArea) {
           }
         });
       }
-
-      // append card
       container.appendChild(card);
     });
 
@@ -1933,10 +1855,8 @@ if (longContentArea) {
       ]);
       const featuredSections = featuredData?.featuredSections || [];
       
-      // 💡 Duplicate dynamic chips inside hero page’s .chips-cont
 const chipsCont = document.querySelector('.chips-cont');
 if (chipsCont && featuredSections.length) {
-  // Clear existing chips except "all" if present
   chipsCont.querySelectorAll('.wrk-chip').forEach(chip => chip.remove());
 
   featuredSections.forEach((section, index) => {
@@ -1960,8 +1880,6 @@ if (chipsCont && featuredSections.length) {
       const vidImages = vidData?.heroImages || [];
       const contImages = contData?.heroImages || [];
       const munImages = munData?.heroImages || [];
-
-      // Chips & Featured Section Images
       const chips = document.querySelectorAll('.wrk-chip');
       const imgDivs = document.querySelectorAll('.wrk-img-div');
       const divsPerGroup = 4;
@@ -1997,7 +1915,7 @@ if (chipsCont && featuredSections.length) {
           });
         });
       }
-      // Munchkin Swiper
+
       const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
       const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
       if (swiperWrapper && slideTemplate && munImages.length) {
@@ -2030,10 +1948,9 @@ if (chipsCont && featuredSections.length) {
   document.addEventListener('DOMContentLoaded', () => {
     loadHeroSwiper();
     loadOtherSections();
-      loadFAQs().then(() => {
-    initFAQAccordion();
-        
-  });
+    loadFAQs().then(() => {
+     initFAQAccordion();  
+    });
     loadBlogs();
   });
 </script>
