@@ -1969,16 +1969,21 @@ async function loadBlogs() {
                 longContentArea.innerHTML = "<p>No content available</p>";
               }
             } catch (err) {
-              console.error("Failed to render blog.content:", err);
-              // graceful fallback
-              try {
-                longContentArea.textContent = Array.isArray(blog.content)
-                  ? blog.content.map(b => (b.children || []).map(c => c.text || "").join("")).join("\n\n")
-                  : String(blog.content || "");
-              } catch (e) {
-                longContentArea.textContent = "Content format error";
-              }
-            }
+  console.error("Failed to render blog.content:", err);
+  // graceful fallback
+  try {
+    const plainText = Array.isArray(blog.content)
+      ? blog.content
+          .map(b => (b.children || []).map(c => c.text || "").join(""))
+          .join("\n\n")
+      : String(blog.content || "");
+
+    longContentArea.innerHTML = plainText.replace(/\n/g, "<br>");
+  } catch (e) {
+    longContentArea.textContent = "Content format error";
+  }
+}
+
           }
 
           // Gallery images (100% height, auto width, 5px radius)
