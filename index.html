@@ -1602,7 +1602,6 @@ if (!heroSwiperInitialized) {
 
 
 
-  
 async function loadBlogs() {
   try {
     const blogs = await client.fetch(`
@@ -1626,105 +1625,77 @@ async function loadBlogs() {
 
     template.style.display = "none";
 
-    //---------------------------------------------------
-    // PORTABLE FALLBACK RENDERER
-    //---------------------------------------------------
-    function escapeHtml(str) {
-      if (typeof str !== "string") return "";
-      return str.replace(/[&<>"']/g, m => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      }[m]));
+    let toHTML = null;
+    try {
+      const pt = await import("https://esm.sh/@portabletext/to-html");
+      toHTML = pt.toHTML;
+    } catch (err) {
+      console.warn("PortableText import failed, falling back to simple renderer.", err);
+      toHTML = null;
     }
 
     function portableFallback(blocks) {
       if (!Array.isArray(blocks)) return "";
+      const out = [];
+      let listBuffer = null;
 
-      let html = "";
-      let listOpen = false;
-      let listType = "";
-
-      const closeList = () => {
-        if (listOpen) {
-          html += `</${listType}>`;
-          listOpen = false;
-        }
+      const flushList = () => {
+        if (!listBuffer) return;
+        const tag = listBuffer.type === "number" ? "ol" : "ul";
+        out.push(`<${tag}>${listBuffer.items.map(i => `<li>${i}</li>`).join("")}</${tag}>`);
+        listBuffer = null;
       };
 
       blocks.forEach(block => {
         if (!block) return;
-
-        //---------------------------------------------------
-        // IMAGE INSIDE CONTENT
-        //---------------------------------------------------
-        if (block._type === "image" && block.asset?.url) {
-          closeList();
-          html += `
-            <p style="margin:10px 0;">
-              <img src="${block.asset.url}" style="max-width:100%;border-radius:6px;" />
-            </p>
-          `;
-          return;
-        }
-
-        //---------------------------------------------------
-        // NORMAL TEXT BLOCK
-        //---------------------------------------------------
         if (block._type === "block") {
-          const isList = !!block.listItem;
-
-          let text = (block.children || [])
-            .map(c => {
-              let t = escapeHtml(c.text || "");
-              t = t.replace(/\n/g, "<br>");
-              if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
-              if (c.marks?.includes("em")) t = `<em>${t}</em>`;
-              return t;
-            })
-            .join("");
-
-          //---------------------------------------------------
-          // LIST HANDLING
-          //---------------------------------------------------
-          if (isList) {
-            const newType = block.listItem === "number" ? "ol" : "ul";
-
-            if (!listOpen || newType !== listType) {
-              closeList();
-              listType = newType;
-              html += `<${listType}>`;
-              listOpen = true;
-            }
-
-            html += `<li>${text}</li>`;
+          if (block.listItem) {
+            if (!listBuffer) listBuffer = { type: block.listItem === "number" ? "number" : "bullet", items: [] };
+            const text = (block.children || []).map(c => c.text || "").join("");
+            listBuffer.items.push(escapeHtml(text));
             return;
           } else {
-            closeList();
+            flushList();
+            const text = (block.children || []).map(c => {
+              let t = escapeHtml(c.text || "");
+              if (c.marks && c.marks.length) {
+                if (c.marks.includes("strong")) t = `<strong>${t}</strong>`;
+                if (c.marks.includes("em")) t = `<em>${t}</em>`;
+              }
+              return t;
+            }).join("");
+            const style = block.style || "normal";
+            if (/^h[1-6]$/.test(style)) {
+              out.push(`<${style}>${text}</${style}>`);
+            } else if (style === "blockquote") {
+              out.push(`<blockquote>${text}</blockquote>`);
+            } else {
+              out.push(`<p>${text}</p>`);
+            }
+            return;
           }
-
-          //---------------------------------------------------
-          // HEADINGS / BLOCKQUOTE / PARAGRAPHS
-          //---------------------------------------------------
-          if (/^h[1-6]$/.test(block.style)) {
-            html += `<${block.style}>${text}</${block.style}>`;
-          } else if (block.style === "blockquote") {
-            html += `<blockquote>${text}</blockquote>`;
-          } else {
-            html += `<p>${text}</p>`;
-          }
+        } else if (block._type === "image" && block.asset?.url) {
+          flushList();
+          const url = escapeHtml(block.asset.url);
+          out.push(`<p><img src="${url}" alt="" style="max-width:100%;height:auto;border-radius:5px" /></p>`);
+        } else {
+          flushList();
+          out.push(`<pre>${escapeHtml(JSON.stringify(block))}</pre>`);
         }
       });
 
-      closeList();
-      return html;
+      flushList();
+      return out.join("\n");
     }
 
-    //---------------------------------------------------
-    // BUILD BLOG CARDS
-    //---------------------------------------------------
+    function escapeHtml(str) {
+      if (typeof str !== "string") return "";
+      return str.replace(/[&<>"']/g, ch => {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
+      });
+    }
+
+
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
       card.style.display = "flex";
@@ -1737,10 +1708,6 @@ async function loadBlogs() {
 
       const coverEl = card.querySelector(".blog-cover");
       const overlayEl = card.querySelector(".overlay-div");
-
-      //---------------------------------------------------
-      // COVER IMAGE
-      //---------------------------------------------------
       if (coverEl && blog.coverImage?.asset?.url) {
         const imgUrl = `${blog.coverImage.asset.url}?w=1000&auto=format`;
         coverEl.style.backgroundImage = `url('${imgUrl}')`;
@@ -1748,9 +1715,6 @@ async function loadBlogs() {
         coverEl.style.backgroundPosition = "center";
       }
 
-      //---------------------------------------------------
-      // HOVER EFFECT
-      //---------------------------------------------------
       if (coverEl && overlayEl) {
         coverEl.addEventListener("mouseenter", () => {
           overlayEl.classList.remove("opacity-0");
@@ -1762,42 +1726,65 @@ async function loadBlogs() {
         });
       }
 
-      //---------------------------------------------------
-      // MODAL LOGIC
-      //---------------------------------------------------
       const openBtn = card.querySelector(".overlay-div .btn");
       const overlayWork = document.querySelector(".overlay-work");
       const separateDiv = document.querySelector(".separate-work-div");
-      const closeBtn = separateDiv?.querySelector(".wrk-close");
+      const closeBtn = document.querySelector(".wrk-close");
 
-      const titleArea = separateDiv?.querySelector(".blog-title");
-      const shortDescArea = separateDiv?.querySelector(".s-para");
-      const longContentArea = separateDiv?.querySelector(".long-content");
-      const imagesWrpr = separateDiv?.querySelector(".images-flex-wrpr");
+      const titleArea = document.querySelector(".separate-work-div .blog-title");
+      const shortDescArea = document.querySelector(".separate-work-div .s-para");
+      const longContentArea = document.querySelector(".separate-work-div .long-content");
+      const imagesWrpr = document.querySelector(".separate-work-div .images-flex-wrpr");
 
       if (openBtn && overlayWork && separateDiv) {
         openBtn.addEventListener("click", () => {
-
           if (titleArea) titleArea.textContent = blog.title || "";
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
-          //---------------------------------------------------
-          // RENDER FULL BLOG CONTENT
-          //---------------------------------------------------
-          if (longContentArea) {
-            try {
-              longContentArea.innerHTML = portableFallback(blog.content);
-            } catch {
-              longContentArea.innerHTML = "<p>Content format error</p>";
-            }
+if (longContentArea) {
+  try {
+    let html = "";
+
+    if (Array.isArray(blog.content)) {
+      blog.content.forEach(block => {
+        if (block._type === "block") {
+
+          let text = (block.children || []).map(c => {
+            let t = c.text || "";
+
+            if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
+            if (c.marks?.includes("em")) t = `<em>${t}</em>`;
+
+            return t;
+          }).join("");
+
+          if (block.listItem) {
+            const tag = block.level && block.level > 1 ? "ol" : "ul";
+            html += `<${tag}><li>${text}</li></${tag}>`;
+          } else {
+            if (/^h[1-6]$/.test(block.style))
+              html += `<${block.style}>${text}</${block.style}>`;
+            else if (block.style === "blockquote")
+              html += `<blockquote>${text}</blockquote>`;
+            else
+              html += `<p>${text}</p>`;
           }
 
-          //---------------------------------------------------
-          // GALLERY IMAGES
-          //---------------------------------------------------
+        }
+      });
+    }
+
+    html = html.replace(/\n/g, "<br>");
+
+    longContentArea.innerHTML = html || "<p>No content available</p>";
+
+  } catch (e) {
+    longContentArea.innerHTML = "Content format error";
+  }
+}
+
           if (imagesWrpr) {
             imagesWrpr.innerHTML = "";
-
             if (Array.isArray(blog.gallery) && blog.gallery.length) {
               blog.gallery.forEach(img => {
                 if (!img?.asset?.url) return;
@@ -1818,16 +1805,12 @@ async function loadBlogs() {
           separateDiv.classList.add("active");
         });
 
-        //---------------------------------------------------
-        // CLOSE BUTTON
-        //---------------------------------------------------
         if (closeBtn) {
           closeBtn.addEventListener("click", () => {
             overlayWork.classList.remove("active");
             separateDiv.classList.remove("active");
           });
         }
-
         overlayWork.addEventListener("click", (e) => {
           if (e.target === overlayWork) {
             overlayWork.classList.remove("active");
@@ -1835,7 +1818,6 @@ async function loadBlogs() {
           }
         });
       }
-
       container.appendChild(card);
     });
 
