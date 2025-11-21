@@ -1612,27 +1612,15 @@ async function loadBlogs() {
         content
       }
     `);
-
     const container = document.querySelector(".blogs-wrpr");
     const template = container?.querySelector(".blog-card");
-
     if (!container || !template) {
       console.error("Blog wrapper or template missing!");
       return;
     }
-
     template.style.display = "none";
-
     const blogpt = await import("https://esm.sh/@portabletext/to-html");
     const blogtoHTML = blogpt.toHTML;
-
-
-
-
-
-    
-
-
 
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
@@ -1640,7 +1628,6 @@ async function loadBlogs() {
 
       const headingEl = card.querySelector(".heading");
       if (headingEl) headingEl.textContent = blog.title || "Untitled";
-
       const paraEl = card.querySelector(".s-para");
       if (paraEl) paraEl.textContent = blog.shortDescription || "";
 
@@ -1678,22 +1665,18 @@ async function loadBlogs() {
         openBtn.addEventListener("click", () => {
           if (titleArea) titleArea.textContent = blog.title || "";
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
-
-
-
-          
+       
 if (longContentArea) {
   try {
-      if (longContentArea && blog.content) {
-        longContentArea.innerHTML = blogtoHTML(blog.content);
-      }
+    if (blog.content) {
+      const html = blogtoHTML(blog.content);
+      longContentArea.innerHTML = `<div style="white-space:pre-line">${html}</div>`;
+    }
   } catch (e) {
     longContentArea.innerHTML = "Content format error";
   }
 }
-
-
-          
+  
 
           if (imagesWrpr) {
             imagesWrpr.innerHTML = "";
@@ -1712,11 +1695,9 @@ if (longContentArea) {
               imagesWrpr.innerHTML = "<p>No images available</p>";
             }
           }
-
           overlayWork.classList.add("active");
           separateDiv.classList.add("active");
         });
-
         if (closeBtn) {
           closeBtn.addEventListener("click", () => {
             overlayWork.classList.remove("active");
@@ -1732,7 +1713,6 @@ if (longContentArea) {
       }
       container.appendChild(card);
     });
-
   } catch (err) {
     console.error("❌ Sanity blog fetch error:", err);
   }
