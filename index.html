@@ -1674,7 +1674,7 @@ if (longContentArea) {
     let html = blogtoHTML(blog.content)
   .replace(/(\r\n|\r|\n)/g, "<br>");
 
-longContentArea.innerHTML = `<p>${html}</p>`;
+longContentArea.innerHTML = html;
 
 
 
