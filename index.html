@@ -1671,8 +1671,11 @@ async function loadBlogs() {
        
 if (longContentArea) {
   try {
-    let html = blogtoHTML(blog.content)
-  .replace(/(\r\n|\r|\n)/g, "<br>");
+
+let html = blogtoHTML(blog.content);
+
+// handle empty lines
+html = html.replace(/<p><\/p>/g, '<br><br>');
 
 longContentArea.innerHTML = html;
 
