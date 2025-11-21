@@ -1639,7 +1639,7 @@ if (!heroSwiperInitialized) {
 
 
   
-
+/**
 async function loadBlogs() {
   try {
     const blogs = await client.fetch(`
@@ -1785,7 +1785,246 @@ if (imagesWrpr) {
   } catch (err) {
     console.error("❌ Sanity blog fetch error:", err);
   }
+}**/
+
+
+  // Put this where you have access to `client` (same module/script)
+async function loadBlogs() {
+  try {
+    // Fetch blogs
+    const blogs = await client.fetch(`
+      *[_type == "blog"] | order(_createdAt desc) {
+        title,
+        slug,
+        shortDescription,
+        coverImage{ asset->{ url } },
+        gallery[]{ asset->{ url } },
+        content
+      }
+    `);
+
+    const container = document.querySelector(".blogs-wrpr");
+    const template = container?.querySelector(".blog-card");
+
+    if (!container || !template) {
+      console.error("Blog wrapper or template missing!");
+      return;
+    }
+
+    // hide template
+    template.style.display = "none";
+
+    // Try to import portable text renderer once
+    let toHTML = null;
+    try {
+      const pt = await import("https://esm.sh/@portabletext/to-html");
+      toHTML = pt.toHTML;
+    } catch (err) {
+      console.warn("PortableText import failed, falling back to simple renderer.", err);
+      toHTML = null;
+    }
+
+    // Fallback renderer: minimal HTML generator for Sanity blocks
+    function portableFallback(blocks) {
+      if (!Array.isArray(blocks)) return "";
+      const out = [];
+      let listBuffer = null; // {type: 'bullet'|'number', items: []}
+
+      const flushList = () => {
+        if (!listBuffer) return;
+        const tag = listBuffer.type === "number" ? "ol" : "ul";
+        out.push(`<${tag}>${listBuffer.items.map(i => `<li>${i}</li>`).join("")}</${tag}>`);
+        listBuffer = null;
+      };
+
+      blocks.forEach(block => {
+        if (!block) return;
+        if (block._type === "block") {
+          // handle list items
+          if (block.listItem) {
+            if (!listBuffer) listBuffer = { type: block.listItem === "number" ? "number" : "bullet", items: [] };
+            const text = (block.children || []).map(c => c.text || "").join("");
+            listBuffer.items.push(escapeHtml(text));
+            return;
+          } else {
+            // normal block - flush any list buffer first
+            flushList();
+            const text = (block.children || []).map(c => {
+              let t = escapeHtml(c.text || "");
+              // minimal inline marks: strong / em
+              if (c.marks && c.marks.length) {
+                // we don't resolve mark defs here; handle common marks names strong/em
+                if (c.marks.includes("strong")) t = `<strong>${t}</strong>`;
+                if (c.marks.includes("em")) t = `<em>${t}</em>`;
+              }
+              return t;
+            }).join("");
+            const style = block.style || "normal";
+            if (/^h[1-6]$/.test(style)) {
+              out.push(`<${style}>${text}</${style}>`);
+            } else if (style === "blockquote") {
+              out.push(`<blockquote>${text}</blockquote>`);
+            } else {
+              out.push(`<p>${text}</p>`);
+            }
+            return;
+          }
+        } else if (block._type === "image" && block.asset?.url) {
+          // flush list then add image
+          flushList();
+          const url = escapeHtml(block.asset.url);
+          out.push(`<p><img src="${url}" alt="" style="max-width:100%;height:auto;border-radius:5px" /></p>`);
+        } else {
+          // unknown block type -> stringify somewhat
+          flushList();
+          out.push(`<pre>${escapeHtml(JSON.stringify(block))}</pre>`);
+        }
+      });
+
+      flushList();
+      return out.join("\n");
+    }
+
+    function escapeHtml(str) {
+      if (typeof str !== "string") return "";
+      return str.replace(/[&<>"']/g, ch => {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
+      });
+    }
+
+    // Clear any existing generated cards
+    // (if you want to preserve template only, don't clear everything; here we append)
+    // container.innerHTML = ""; // uncomment if you want to clear everything
+
+    blogs.forEach(blog => {
+      // clone template
+      const card = template.cloneNode(true);
+      card.style.display = "flex"; // your requested display
+
+      // TITLE
+      const headingEl = card.querySelector(".heading");
+      if (headingEl) headingEl.textContent = blog.title || "Untitled";
+
+      // SHORT DESCRIPTION
+      const paraEl = card.querySelector(".s-para");
+      if (paraEl) paraEl.textContent = blog.shortDescription || "";
+
+      // COVER image
+      const coverEl = card.querySelector(".blog-cover");
+      const overlayEl = card.querySelector(".overlay-div");
+      if (coverEl && blog.coverImage?.asset?.url) {
+        const imgUrl = `${blog.coverImage.asset.url}?w=1000&auto=format`;
+        coverEl.style.backgroundImage = `url('${imgUrl}')`;
+        coverEl.style.backgroundSize = "cover";
+        coverEl.style.backgroundPosition = "center";
+      }
+
+      // overlay hover transitions
+      if (coverEl && overlayEl) {
+        coverEl.addEventListener("mouseenter", () => {
+          overlayEl.classList.remove("opacity-0");
+          overlayEl.classList.add("opacity-100");
+        });
+        coverEl.addEventListener("mouseleave", () => {
+          overlayEl.classList.add("opacity-0");
+          overlayEl.classList.remove("opacity-100");
+        });
+      }
+
+      // popup references
+      const openBtn = card.querySelector(".overlay-div .btn");
+      const overlayWork = document.querySelector(".overlay-work");
+      const separateDiv = document.querySelector(".separate-work-div");
+      const closeBtn = document.querySelector(".wrk-close");
+
+      const titleArea = document.querySelector(".separate-work-div .blog-title");
+      const shortDescArea = document.querySelector(".separate-work-div .s-para");
+      const longContentArea = document.querySelector(".separate-work-div .long-content");
+      const imagesWrpr = document.querySelector(".separate-work-div .images-flex-wrpr");
+
+      if (openBtn && overlayWork && separateDiv) {
+        openBtn.addEventListener("click", () => {
+          // Fill popup fields
+          if (titleArea) titleArea.textContent = blog.title || "";
+          if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
+
+          // Render portable text -> HTML
+          if (longContentArea) {
+            try {
+              if (Array.isArray(blog.content) && blog.content.length) {
+                if (toHTML) {
+                  // use library if available
+                  longContentArea.innerHTML = toHTML(blog.content);
+                } else {
+                  // fallback renderer
+                  longContentArea.innerHTML = portableFallback(blog.content);
+                }
+              } else if (typeof blog.content === "string") {
+                longContentArea.textContent = blog.content;
+              } else {
+                longContentArea.innerHTML = "<p>No content available</p>";
+              }
+            } catch (err) {
+              console.error("Failed to render blog.content:", err);
+              // graceful fallback
+              try {
+                longContentArea.textContent = Array.isArray(blog.content)
+                  ? blog.content.map(b => (b.children || []).map(c => c.text || "").join("")).join("\n\n")
+                  : String(blog.content || "");
+              } catch (e) {
+                longContentArea.textContent = "Content format error";
+              }
+            }
+          }
+
+          // Gallery images (100% height, auto width, 5px radius)
+          if (imagesWrpr) {
+            imagesWrpr.innerHTML = "";
+            if (Array.isArray(blog.gallery) && blog.gallery.length) {
+              blog.gallery.forEach(img => {
+                if (!img?.asset?.url) return;
+                const el = document.createElement("img");
+                el.src = `${img.asset.url}?w=1400&auto=format`;
+                el.style.height = "100%";
+                el.style.width = "auto";
+                el.style.objectFit = "contain";
+                el.style.borderRadius = "5px";
+                imagesWrpr.appendChild(el);
+              });
+            } else {
+              imagesWrpr.innerHTML = "<p>No images available</p>";
+            }
+          }
+
+          // show popup smoothly (your CSS .active handles transitions)
+          overlayWork.classList.add("active");
+          separateDiv.classList.add("active");
+        });
+
+        // close handlers
+        if (closeBtn) {
+          closeBtn.addEventListener("click", () => {
+            overlayWork.classList.remove("active");
+            separateDiv.classList.remove("active");
+          });
+        }
+        overlayWork.addEventListener("click", (e) => {
+          if (e.target === overlayWork) {
+            overlayWork.classList.remove("active");
+            separateDiv.classList.remove("active");
+          }
+        });
+      }
+
+      // append card
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error("❌ Sanity blog fetch error:", err);
+  }
 }
+
 
 
 
