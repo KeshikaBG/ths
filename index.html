@@ -1742,6 +1742,8 @@ async function loadBlogs() {
           if (titleArea) titleArea.textContent = blog.title || "";
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
+
+          
 if (longContentArea) {
   try {
     let html = "";
@@ -1750,31 +1752,38 @@ if (longContentArea) {
       blog.content.forEach(block => {
         if (block._type === "block") {
 
+          // process text children
           let text = (block.children || []).map(c => {
             let t = c.text || "";
-
             if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
             if (c.marks?.includes("em")) t = `<em>${t}</em>`;
-
             return t;
           }).join("");
 
+          // bullet/number lists
           if (block.listItem) {
-            const tag = block.level && block.level > 1 ? "ol" : "ul";
+            const tag = block.listItem === "number" ? "ol" : "ul";
             html += `<${tag}><li>${text}</li></${tag}>`;
-          } else {
-            if (/^h[1-6]$/.test(block.style))
-              html += `<${block.style}>${text}</${block.style}>`;
-            else if (block.style === "blockquote")
-              html += `<blockquote>${text}</blockquote>`;
-            else
-              html += `<p>${text}</p>`;
           }
 
+          // everything else → normal paragraph (same size)
+          else {
+            html += `<p>${text}</p>`;
+          }
+        }
+
+        // images inside rich text
+        else if (block._type === "image" && block.asset?.url) {
+          html += `
+            <p>
+              <img src="${block.asset.url}" style="max-width:100%;border-radius:6px" />
+            </p>
+          `;
         }
       });
     }
 
+    // Convert line breaks inside same block
     html = html.replace(/\n/g, "<br>");
 
     longContentArea.innerHTML = html || "<p>No content available</p>";
@@ -1783,6 +1792,8 @@ if (longContentArea) {
     longContentArea.innerHTML = "Content format error";
   }
 }
+
+          
 
           if (imagesWrpr) {
             imagesWrpr.innerHTML = "";
