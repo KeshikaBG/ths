@@ -1626,82 +1626,105 @@ async function loadBlogs() {
 
     template.style.display = "none";
 
-    let toHTML = null;
-    try {
-      const pt = await import("https://esm.sh/@portabletext/to-html");
-      toHTML = pt.toHTML;
-    } catch (err) {
-      console.warn("PortableText import failed, falling back to simple renderer.", err);
-      toHTML = null;
+    //---------------------------------------------------
+    // PORTABLE FALLBACK RENDERER
+    //---------------------------------------------------
+    function escapeHtml(str) {
+      if (typeof str !== "string") return "";
+      return str.replace(/[&<>"']/g, m => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[m]));
     }
 
-function portableFallback(blocks) {
-  if (!Array.isArray(blocks)) return "";
+    function portableFallback(blocks) {
+      if (!Array.isArray(blocks)) return "";
 
-  let html = "";
-  let listOpen = false;
-  let listType = "";
+      let html = "";
+      let listOpen = false;
+      let listType = "";
 
-  const closeList = () => {
-    if (listOpen) {
-      html += `</${listType}>`;
-      listOpen = false;
-    }
-  };
+      const closeList = () => {
+        if (listOpen) {
+          html += `</${listType}>`;
+          listOpen = false;
+        }
+      };
 
-  blocks.forEach(block => {
-    if (!block || block._type !== "block") return;
+      blocks.forEach(block => {
+        if (!block) return;
 
-    const isList = !!block.listItem;
+        //---------------------------------------------------
+        // IMAGE INSIDE CONTENT
+        //---------------------------------------------------
+        if (block._type === "image" && block.asset?.url) {
+          closeList();
+          html += `
+            <p style="margin:10px 0;">
+              <img src="${block.asset.url}" style="max-width:100%;border-radius:6px;" />
+            </p>
+          `;
+          return;
+        }
 
-    // Text builder for spans
-    let text = (block.children || [])
-      .map(c => {
-        let t = escapeHtml(c.text || "");
+        //---------------------------------------------------
+        // NORMAL TEXT BLOCK
+        //---------------------------------------------------
+        if (block._type === "block") {
+          const isList = !!block.listItem;
 
-        // Preserve line breaks INSIDE a paragraph
-        t = t.replace(/\n/g, "<br>");
+          let text = (block.children || [])
+            .map(c => {
+              let t = escapeHtml(c.text || "");
+              t = t.replace(/\n/g, "<br>");
+              if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
+              if (c.marks?.includes("em")) t = `<em>${t}</em>`;
+              return t;
+            })
+            .join("");
 
-        if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
-        if (c.marks?.includes("em")) t = `<em>${t}</em>`;
-        return t;
-      })
-      .join("");
+          //---------------------------------------------------
+          // LIST HANDLING
+          //---------------------------------------------------
+          if (isList) {
+            const newType = block.listItem === "number" ? "ol" : "ul";
 
-    // LIST HANDLING
-    if (isList) {
-      if (!listOpen || listType !== (block.listItem === "number" ? "ol" : "ul")) {
-        closeList();
-        listType = block.listItem === "number" ? "ol" : "ul";
-        html += `<${listType}>`;
-        listOpen = true;
-      }
-      html += `<li>${text}</li>`;
-      return;
-    } else {
+            if (!listOpen || newType !== listType) {
+              closeList();
+              listType = newType;
+              html += `<${listType}>`;
+              listOpen = true;
+            }
+
+            html += `<li>${text}</li>`;
+            return;
+          } else {
+            closeList();
+          }
+
+          //---------------------------------------------------
+          // HEADINGS / BLOCKQUOTE / PARAGRAPHS
+          //---------------------------------------------------
+          if (/^h[1-6]$/.test(block.style)) {
+            html += `<${block.style}>${text}</${block.style}>`;
+          } else if (block.style === "blockquote") {
+            html += `<blockquote>${text}</blockquote>`;
+          } else {
+            html += `<p>${text}</p>`;
+          }
+        }
+      });
+
       closeList();
+      return html;
     }
 
-    // HEADINGS, QUOTES, PARAGRAPHS
-    if (/^h[1-6]$/.test(block.style)) {
-      html += `<${block.style}>${text}</${block.style}>`;
-    } else if (block.style === "blockquote") {
-      html += `<blockquote>${text}</blockquote>`;
-    } else {
-      html += `<p>${text}</p>`;
-    }
-  });
-
-  closeList();
-  return html;
-}
-
-function escapeHtml(str) {
-  return str.replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
-}
-
-
-
+    //---------------------------------------------------
+    // BUILD BLOG CARDS
+    //---------------------------------------------------
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
       card.style.display = "flex";
@@ -1714,6 +1737,10 @@ function escapeHtml(str) {
 
       const coverEl = card.querySelector(".blog-cover");
       const overlayEl = card.querySelector(".overlay-div");
+
+      //---------------------------------------------------
+      // COVER IMAGE
+      //---------------------------------------------------
       if (coverEl && blog.coverImage?.asset?.url) {
         const imgUrl = `${blog.coverImage.asset.url}?w=1000&auto=format`;
         coverEl.style.backgroundImage = `url('${imgUrl}')`;
@@ -1721,6 +1748,9 @@ function escapeHtml(str) {
         coverEl.style.backgroundPosition = "center";
       }
 
+      //---------------------------------------------------
+      // HOVER EFFECT
+      //---------------------------------------------------
       if (coverEl && overlayEl) {
         coverEl.addEventListener("mouseenter", () => {
           overlayEl.classList.remove("opacity-0");
@@ -1732,76 +1762,42 @@ function escapeHtml(str) {
         });
       }
 
+      //---------------------------------------------------
+      // MODAL LOGIC
+      //---------------------------------------------------
       const openBtn = card.querySelector(".overlay-div .btn");
       const overlayWork = document.querySelector(".overlay-work");
       const separateDiv = document.querySelector(".separate-work-div");
-      const closeBtn = document.querySelector(".wrk-close");
+      const closeBtn = separateDiv?.querySelector(".wrk-close");
 
-      const titleArea = document.querySelector(".separate-work-div .blog-title");
-      const shortDescArea = document.querySelector(".separate-work-div .s-para");
-      const longContentArea = document.querySelector(".separate-work-div .long-content");
-      const imagesWrpr = document.querySelector(".separate-work-div .images-flex-wrpr");
+      const titleArea = separateDiv?.querySelector(".blog-title");
+      const shortDescArea = separateDiv?.querySelector(".s-para");
+      const longContentArea = separateDiv?.querySelector(".long-content");
+      const imagesWrpr = separateDiv?.querySelector(".images-flex-wrpr");
 
       if (openBtn && overlayWork && separateDiv) {
         openBtn.addEventListener("click", () => {
+
           if (titleArea) titleArea.textContent = blog.title || "";
           if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
-
-          
-if (longContentArea) {
-  try {
-    let html = "";
-
-    if (Array.isArray(blog.content)) {
-      blog.content.forEach(block => {
-        if (block._type === "block") {
-
-          // process text children
-          let text = (block.children || []).map(c => {
-            let t = c.text || "";
-            if (c.marks?.includes("strong")) t = `<strong>${t}</strong>`;
-            if (c.marks?.includes("em")) t = `<em>${t}</em>`;
-            return t;
-          }).join("");
-
-          // bullet/number lists
-          if (block.listItem) {
-            const tag = block.listItem === "number" ? "ol" : "ul";
-            html += `<${tag}><li>${text}</li></${tag}>`;
+          //---------------------------------------------------
+          // RENDER FULL BLOG CONTENT
+          //---------------------------------------------------
+          if (longContentArea) {
+            try {
+              longContentArea.innerHTML = portableFallback(blog.content);
+            } catch {
+              longContentArea.innerHTML = "<p>Content format error</p>";
+            }
           }
 
-          // everything else → normal paragraph (same size)
-          else {
-            html += `<p>${text}</p>`;
-          }
-        }
-
-        // images inside rich text
-        else if (block._type === "image" && block.asset?.url) {
-          html += `
-            <p>
-              <img src="${block.asset.url}" style="max-width:100%;border-radius:6px" />
-            </p>
-          `;
-        }
-      });
-    }
-
-    // Convert line breaks inside same block
-    html = html.replace(/\n/g, "<br>");
-
-    longContentArea.innerHTML = html || "<p>No content available</p>";
-
-  } catch (e) {
-    longContentArea.innerHTML = "Content format error";
-  }
-}
-
-          
-
+          //---------------------------------------------------
+          // GALLERY IMAGES
+          //---------------------------------------------------
           if (imagesWrpr) {
             imagesWrpr.innerHTML = "";
+
             if (Array.isArray(blog.gallery) && blog.gallery.length) {
               blog.gallery.forEach(img => {
                 if (!img?.asset?.url) return;
@@ -1822,12 +1818,16 @@ if (longContentArea) {
           separateDiv.classList.add("active");
         });
 
+        //---------------------------------------------------
+        // CLOSE BUTTON
+        //---------------------------------------------------
         if (closeBtn) {
           closeBtn.addEventListener("click", () => {
             overlayWork.classList.remove("active");
             separateDiv.classList.remove("active");
           });
         }
+
         overlayWork.addEventListener("click", (e) => {
           if (e.target === overlayWork) {
             overlayWork.classList.remove("active");
@@ -1835,6 +1835,7 @@ if (longContentArea) {
           }
         });
       }
+
       container.appendChild(card);
     });
 
