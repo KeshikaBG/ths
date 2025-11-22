@@ -1129,6 +1129,53 @@ document.addEventListener("DOMContentLoaded", () => {
     applyMediaStyles(el, styleOpts);
     container.appendChild(el);
   }
+  
+
+
+
+
+
+  
+
+
+
+
+async function loadTestimonials() {
+  try {
+    const testData = await client.fetch(`
+      *[_type == "testPage"][0]{
+        tests[]{
+          reviewer,
+          review
+        }
+      }
+    `);
+
+    if (!testData?.tests?.length) { console.warn("No testimonials found"); return; }
+    
+    const swiper = document.querySelector(".testimonial-swiper");
+    if (!swiper) return;
+    const wrapper = swiper.querySelector(".swiper-wrapper.white");
+    if (!wrapper) return;
+    const template = wrapper.querySelector(".swiper-slide.test");
+    if (!template) {
+      console.error("Template testimonial card missing (.swiper-slide.test)");
+      return;
+    }
+    template.style.display = "none";
+    testData.tests.forEach(t => {
+      const card = template.cloneNode(true);
+      card.style.display = "flex";
+      const reviewText = card.querySelector(".b1.ch");
+      const reviewerName = card.querySelector(".s1");
+      if (reviewText) reviewText.textContent = t.review || "";
+      if (reviewerName) reviewerName.textContent = t.reviewer || "";
+      wrapper.appendChild(card);
+    });
+  } catch (err) { console.error("Sanity fetch error:", err); }
+}
+
+
 /**async function loadHeroSwiper() {
     try {
       const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
@@ -1304,52 +1351,6 @@ function initFAQAccordion() {
     ans.style.height = "0px";
   }
 }
-
-
-
-
-
-
-  
-
-
-
-
-async function loadTestimonials() {
-  try {
-    const testData = await client.fetch(`
-      *[_type == "testPage"][0]{
-        tests[]{
-          reviewer,
-          review
-        }
-      }
-    `);
-
-    if (!testData?.tests?.length) { console.warn("No testimonials found"); return; }
-    
-    const swiper = document.querySelector(".testimonial-swiper");
-    if (!swiper) return;
-    const wrapper = swiper.querySelector(".swiper-wrapper.white");
-    if (!wrapper) return;
-    const template = wrapper.querySelector(".swiper-slide.test");
-    if (!template) {
-      console.error("Template testimonial card missing (.swiper-slide.test)");
-      return;
-    }
-    template.style.display = "none";
-    testData.tests.forEach(t => {
-      const card = template.cloneNode(true);
-      card.style.display = "block";
-      const reviewText = card.querySelector(".b1.ch");
-      const reviewerName = card.querySelector(".s1");
-      if (reviewText) reviewText.textContent = t.review || "";
-      if (reviewerName) reviewerName.textContent = t.reviewer || "";
-      wrapper.appendChild(card);
-    });
-  } catch (err) { console.error("Sanity fetch error:", err); }
-}
-
 
 
   
