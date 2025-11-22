@@ -292,7 +292,6 @@
         },
         once: true
       });
-      // Batch scale animations
       ScrollTrigger.batch("[scale-anim]", {
         onEnter: batch => {
           gsap.fromTo(batch,
@@ -302,7 +301,6 @@
         },
         once: true
       });
-      // Slide-up animations with container + child stagger
       document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex) => {
         const children = container.querySelectorAll(":scope > *");
         if (!children.length) return;
@@ -315,7 +313,7 @@
               opacity: 1,
               duration: 0.8,
               ease: "power2.out",
-              delay: containerIndex * 0.3 + i * 0.15, // container stagger + child stagger
+              delay: containerIndex * 0.3 + i * 0.15,
               scrollTrigger: {
                 trigger: child,
                 start: "top 90%",
@@ -326,7 +324,6 @@
         });
       });
 
-      // Fade-in children in batch (excluding .overlay)
       document.querySelectorAll("[opacity-anim]").forEach(container => {
         const children = [...container.children].filter(el => !el.classList.contains("overlay"));
         if (children.length) {
@@ -336,7 +333,6 @@
           });
         }
       });
-      // Fade + scale-in children in batch
       document.querySelectorAll("[scale-opacity-anim]").forEach(container => {
         const children = [...container.children];
         if (children.length) {
@@ -349,14 +345,10 @@
           });
         }
       });
-      // Image fade scale
       ScrollTrigger.batch("[data-scale-img] img", {
-        onEnter: batch => gsap.to(batch, {
-          opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03
-        }),
+        onEnter: batch => gsap.to(batch, { opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03 }),
         once: true
       });
-      // Divider animations
       const animDvdr = (sel, axis) => {
         document.querySelectorAll(sel).forEach(dvdr => {
           gsap.fromTo(dvdr, { [axis]: 0 }, {
@@ -578,15 +570,12 @@
 
           .nav-link-div .nav-links {
             color: #c3c3c3 !important;
-            /* default color */
             transition: color 0.3s ease;
-            /* smooth transition */
           }
 
           .nav-link-div.w--current .nav-links,
           .nav-link-div:hover .nav-links {
             color: #373737 !important;
-            /* active or hover color */
           }
 
 
@@ -598,7 +587,6 @@
 
           .overlay {
             position: fixed;
-            /* stays fixed relative to viewport */
             top: 0;
             left: 0;
             width: 100vw !important;
@@ -611,8 +599,6 @@
           }
 
           @media screen and (max-width: 991px) {
-
-            /* Default hidden state */
             .nav-inr-wrp {
               opacity: 0 !important;
               visibility: hidden;
@@ -621,11 +607,8 @@
               overflow: hidden;
               transition: opacity 0.4s ease, max-height 0.4s ease, padding 0.4s ease;
             }
-
-
             .overlay {
               position: fixed;
-              /* stays fixed relative to viewport */
               top: 0;
               left: 0;
               width: 100vw !important;
@@ -635,22 +618,17 @@
               z-index: -1 !important;
               visibility: hidden;
             }
-
-            /* Active (visible) state */
             .nav-inr-wrp.active {
               opacity: 1 !important;
               visibility: visible;
               min-height: 35vh;
-              /* set a value slightly larger than expected content */
               padding: 1rem;
             }
-
             .overlay.oveactive {
               display: block;
               opacity: 1 !important;
               visibility: visible;
               z-index: 9996;
-
             }
           }
         </style>
@@ -662,13 +640,10 @@
 
 
 
-
-
-
         <script>
           document.addEventListener("DOMContentLoaded", () => {
-            const menuBtn = document.querySelector(".menu");   // open button
-            const closeBtn = document.querySelector(".menu-close");   // close button
+            const menuBtn = document.querySelector(".menu");
+            const closeBtn = document.querySelector(".menu-close");
             const navWrap = document.querySelector(".nav-inr-wrp");
             const overlay = document.querySelector(".overlay");
             const head = document.querySelector(".header");
@@ -701,7 +676,6 @@
               closeBtn.addEventListener("click", closeMenu);
               overlay.addEventListener("click", closeMenu);
 
-              // ✅ Close menu when any link inside navWrap is clicked
               navWrap.querySelectorAll("a").forEach(link => {
                 link.addEventListener("click", closeMenu);
               });
@@ -712,16 +686,20 @@
       <div class="w-layout-hflex abt-hero-div">
         <div class="w-layout-vflex abt-hero-flex">
           <div class="w-layout-vflex hero-inr-flex">
-            <div data-delay="0.3" text-split="" stagger-animation="" class="caption-black">[ About us ]</div>
-            <h1 data-delay="0.5" text-split="" stagger-animation="" class="h1 black">About the happening story</h1>
+            <div data-delay="0.3" text-split="" stagger-animation="" class="caption-black">[ About the Founder & The Happening Story ]</div>
+            <h1 data-delay="0.5" text-split="" stagger-animation="" class="h1 black">Meet the Founder — Sarankarthick Santhi</h1>
           </div>
           <div class="w-layout-grid work-main-flex abt">
             <div data-entry-anim="" id="w-node-ccfae169-bd3a-49f0-98b0-a04bf35c45f5-e9ac4aa3"
               class="w-layout-hflex abt-info">
               <div class="w-layout-vflex abt-inr-div">
-                <p data-delay="0.7" text-split="" stagger-animation="" class="b2-black">Founded in 2020, The Happening
+                <p data-delay="0.7" text-split="" stagger-animation="" class="b2-black">
+                  
+                  
+                  Founded in 2020, The Happening
                   Story is built on a love for timeless storytelling. <br /><br />We&#x27;ve documented more than 300
-                  weddings, each with our signature style—real moments, unfiltered emotions, and cinematic finesse.</p>
+                  weddings, each with our signature style—real moments, unfiltered emotions, and cinematic finesse.
+                </p>
               </div>
               <div scale-opacity-anim="" class="abt-img-wrp"></div>
             </div>
