@@ -727,15 +727,12 @@
 
         .nav-link-div .nav-links {
           color: #c3c3c3 !important;
-          /* default color */
           transition: color 0.3s ease;
-          /* smooth transition */
         }
 
         .nav-link-div.w--current .nav-links,
         .nav-link-div:hover .nav-links {
           color: #373737 !important;
-          /* active or hover color */
         }
 
 
@@ -746,7 +743,6 @@
 
         .overlay {
           position: fixed;
-          /* stays fixed relative to viewport */
           top: 0;
           left: 0;
           width: 100vw !important;
@@ -758,8 +754,6 @@
         }
 
         @media screen and (max-width: 991px) {
-
-          /* Default hidden state */
           .nav-inr-wrp {
             opacity: 0 !important;
             visibility: hidden;
@@ -771,7 +765,6 @@
 
           .overlay {
             position: fixed;
-            /* stays fixed relative to viewport */
             top: 0;
             left: 0;
             width: 100vw !important;
@@ -782,19 +775,16 @@
             visibility: hidden;
           }
 
-          /* Active (visible) state */
           .nav-inr-wrp.active {
             opacity: 1 !important;
             visibility: visible;
             min-height: 35vh;
-            /* set a value slightly larger than expected content */
             padding: 1rem;
           }
 
           .overlay.oveactive {
             display: block;
             position: fixed;
-            /* stays fixed relative to viewport */
             top: 0;
             left: 0;
             width: 100vw !important;
@@ -822,8 +812,8 @@
 
       <script>
         document.addEventListener("DOMContentLoaded", () => {
-          const menuBtn = document.querySelector(".menu");   // open button
-          const closeBtn = document.querySelector(".menu-close");   // close button
+          const menuBtn = document.querySelector(".menu");
+          const closeBtn = document.querySelector(".menu-close");
           const navWrap = document.querySelector(".nav-inr-wrp");
           const overlay = document.querySelector(".overlay");
           const head = document.querySelector(".header");
@@ -856,7 +846,6 @@
             closeBtn.addEventListener("click", closeMenu);
             overlay.addEventListener("click", closeMenu);
 
-            // ✅ Close menu when any link inside navWrap is clicked
             navWrap.querySelectorAll("a").forEach(link => {
               link.addEventListener("click", closeMenu);
             });
@@ -873,12 +862,12 @@
         </div>
         <div class="w-layout-vflex hero-main-texts-div">
           <div class="w-layout-vflex hero-inr-flex">
-            <div data-delay="0.3" text-split="" stagger-animation="" class="caption">[ Work ]</div>
-            <h1 data-delay="0.5" text-split="" stagger-animation="" class="h1">Where Every Frame Tells a Story</h1>
+            <div data-delay="0.3" text-split="" stagger-animation="" class="caption">[ Our Work ]</div>
+            <h1 data-delay="0.5" text-split="" stagger-animation="" class="h1">Where every frame holds a feeling.</h1>
           </div>
           <div class="vertical-line"></div>
-          <p data-delay="0.7" text-split="" stagger-animation="" class="b2 ch">A curated selection of moments that moved
-            us and the people we photographed.</p>
+          <p data-delay="0.7" text-split="" stagger-animation="" class="b2 ch">A curated collection of love, laughter, and fleeting moments — captured with heart, crafted with precision, and preserved to remind you why we do what we do.
+</p>
         </div>
       </div>
     </div>
@@ -888,7 +877,7 @@
       <div class="w-layout-vflex wrk-div">
         <div class="w-layout-grid wrk-flex">
           <p stagger-animation="" text-split="" id="w-node-_4e4b8c25-cafd-8186-81ef-7ec6b0bea0f6-ce6c35d9"
-            class="sh1 right">Portfolio Highlights</p>
+            class="sh1 right">Our Showcase</p>
           <div opacity-anim="" id="w-node-_84b4f7aa-1542-d043-da00-8fe799c023ff-ce6c35d9"
             class="w-layout-hflex work-chip-wrp">
             <div class="wrk-chip-all selected">
