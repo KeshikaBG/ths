@@ -1703,12 +1703,14 @@ if (overlayWork && separateDiv) {
     }
 
     overlayWork.classList.add("active");
-    separateDiv.classList.add("active");
+    separateDiv.classList.add("active");   
+  };
 
+  if (openBtn) openBtn.addEventListener("click", openPopup);
+  if (overlayEl) overlayEl.addEventListener("click", openPopup);
 
-
-    
-    const preventScroll = (e) => e.preventDefault();
+  
+const preventScroll = (e) => e.preventDefault();
 
 const disablePageScroll = () => {
   document.addEventListener("wheel", preventScroll, { passive: false });
@@ -1720,14 +1722,7 @@ const enablePageScroll = () => {
   document.removeEventListener("touchmove", preventScroll);
 };
 
-
-
-    
-  };
-
-  if (openBtn) openBtn.addEventListener("click", openPopup);
-  if (overlayEl) overlayEl.addEventListener("click", openPopup);
-
+  
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       overlayWork.classList.remove("active");
