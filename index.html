@@ -1705,7 +1705,24 @@ if (overlayWork && separateDiv) {
     overlayWork.classList.add("active");
     separateDiv.classList.add("active");
 
-    document.body.style.overflow = "hidden";
+
+
+    
+    const preventScroll = (e) => e.preventDefault();
+
+const disablePageScroll = () => {
+  document.addEventListener("wheel", preventScroll, { passive: false });
+  document.addEventListener("touchmove", preventScroll, { passive: false });
+};
+
+const enablePageScroll = () => {
+  document.removeEventListener("wheel", preventScroll);
+  document.removeEventListener("touchmove", preventScroll);
+};
+
+
+
+    
   };
 
   if (openBtn) openBtn.addEventListener("click", openPopup);
@@ -1715,7 +1732,7 @@ if (overlayWork && separateDiv) {
     closeBtn.addEventListener("click", () => {
       overlayWork.classList.remove("active");
       separateDiv.classList.remove("active");
-      document.body.style.overflow = "";
+      disablePageScroll();
     });
   }
 
@@ -1723,7 +1740,7 @@ if (overlayWork && separateDiv) {
     if (e.target === overlayWork) {
       overlayWork.classList.remove("active");
       separateDiv.classList.remove("active");
-      document.body.style.overflow = "";
+      enablePageScroll();
     }
   });
 }
