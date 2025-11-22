@@ -15,7 +15,7 @@
 
   <style>
     html {
-  scroll-behavior: smooth; /* built-in smoothness */
+  scroll-behavior: smooth;
 }
       .w-webflow-badge {
   display: none !important;
@@ -293,7 +293,6 @@
         },
         once: true
       });
-      // Batch scale animations
       ScrollTrigger.batch("[scale-anim]", {
         onEnter: batch => {
           gsap.fromTo(batch,
@@ -303,7 +302,6 @@
         },
         once: true
       });
-      // Slide-up animations with container + child stagger
       document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex) => {
         const children = container.querySelectorAll(":scope > *");
         if (!children.length) return;
@@ -316,7 +314,7 @@
               opacity: 1,
               duration: 0.8,
               ease: "power2.out",
-              delay: containerIndex * 0.3 + i * 0.15, // container stagger + child stagger
+              delay: containerIndex * 0.3 + i * 0.15,
               scrollTrigger: {
                 trigger: child,
                 start: "top 90%",
@@ -326,8 +324,6 @@
           );
         });
       });
-
-      // Fade-in children in batch (excluding .overlay)
       document.querySelectorAll("[opacity-anim]").forEach(container => {
         const children = [...container.children].filter(el => !el.classList.contains("overlay"));
         if (children.length) {
@@ -337,7 +333,6 @@
           });
         }
       });
-      // Fade + scale-in children in batch
       document.querySelectorAll("[scale-opacity-anim]").forEach(container => {
         const children = [...container.children];
         if (children.length) {
@@ -350,14 +345,12 @@
           });
         }
       });
-      // Image fade scale
       ScrollTrigger.batch("[data-scale-img] img", {
         onEnter: batch => gsap.to(batch, {
           opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03
         }),
         once: true
       });
-      // Divider animations
       const animDvdr = (sel, axis) => {
         document.querySelectorAll(sel).forEach(dvdr => {
           gsap.fromTo(dvdr, { [axis]: 0 }, {
@@ -588,8 +581,6 @@
           filter: invert(100%);
         }
 
-
-
         .nav-wrp {
           height: 0vh;
           transition: height 0.5s ease;
@@ -597,15 +588,12 @@
 
         .nav-link-div .nav-links {
           color: #c3c3c3 !important;
-          /* default color */
           transition: color 0.3s ease;
-          /* smooth transition */
         }
 
         .nav-link-div.w--current .nav-links,
         .nav-link-div:hover .nav-links {
           color: #373737 !important;
-          /* active or hover color */
         }
 
 
@@ -616,7 +604,6 @@
 
         .overlay {
           position: fixed;
-          /* stays fixed relative to viewport */
           top: 0;
           left: 0;
           width: 100vw !important;
@@ -628,8 +615,6 @@
         }
 
         @media screen and (max-width: 991px) {
-
-          /* Default hidden state */
           .nav-inr-wrp {
             opacity: 0 !important;
             visibility: hidden;
@@ -641,7 +626,6 @@
 
           .overlay {
             position: fixed;
-            /* stays fixed relative to viewport */
             top: 0;
             left: 0;
             width: 100vw !important;
@@ -652,19 +636,16 @@
             visibility: hidden;
           }
 
-          /* Active (visible) state */
           .nav-inr-wrp.active {
             opacity: 1 !important;
             visibility: visible;
             min-height: 35vh;
-            /* set a value slightly larger than expected content */
             padding: 1rem;
           }
 
           .overlay.oveactive {
             display: block;
             position: fixed;
-            /* stays fixed relative to viewport */
             top: 0;
             left: 0;
             width: 100vw !important;
@@ -688,8 +669,8 @@
 
       <script>
         document.addEventListener("DOMContentLoaded", () => {
-          const menuBtn = document.querySelector(".menu");   // open button
-          const closeBtn = document.querySelector(".menu-close");   // close button
+          const menuBtn = document.querySelector(".menu");
+          const closeBtn = document.querySelector(".menu-close");
           const navWrap = document.querySelector(".nav-inr-wrp");
           const overlay = document.querySelector(".overlay");
           const head = document.querySelector(".header");
@@ -722,7 +703,6 @@
             closeBtn.addEventListener("click", closeMenu);
             overlay.addEventListener("click", closeMenu);
 
-            // ✅ Close menu when any link inside navWrap is clicked
             navWrap.querySelectorAll("a").forEach(link => {
               link.addEventListener("click", closeMenu);
             });
@@ -765,12 +745,12 @@
         <div data-entry-anim="" class="w-layout-hflex swiper grey"></div>
         <div class="w-layout-vflex hero-main-texts-div">
           <div class="w-layout-vflex hero-inr-flex">
-            <div data-delay="0.3" text-split="" stagger-animation="" class="caption">[ Video gallery ]</div>
-            <h1 data-delay="0.5" text-split="" stagger-animation="" class="h1">Cinematic Perspectives</h1>
+            <div data-delay="0.3" text-split="" stagger-animation="" class="caption">[ Our Films ]</div>
+            <h1 data-delay="0.5" text-split="" stagger-animation="" class="h1">Stories in Motion</h1>
           </div>
           <div class="vertical-line"></div>
-          <p data-delay="0.7" text-split="" stagger-animation="" class="b2 ch">Films that carry emotion, energy, and
-            truth, exactly as it happened.</p>
+          <p data-delay="0.7" text-split="" stagger-animation="" class="b2 ch">A heartfelt collection of films that capture life, love, and emotion — just as they unfolded. Every film is crafted with a cinematic touch rooted in Coimbatore’s creative energy.
+</p>
         </div>
       </div>
     </div>
@@ -780,7 +760,7 @@
       <div class="w-layout-vflex wrk-div">
         <div class="w-layout-grid work-main-flex">
           <p stagger-animation="" text-split="" id="w-node-b1a5002f-ad58-eefe-8576-c55876e39805-979f05b9" class="sh1">
-            Stories Told in Motion</p>
+            Moments in Motion</p>
           <div id="w-node-b1a5002f-ad58-eefe-8576-c55876e39823-979f05b9" class="w-layout-hflex wrk-grid">
             <div id="w-node-b1a5002f-ad58-eefe-8576-c55876e39824-979f05b9" class="w-layout-vflex vid-outer-wrp">
               <div data-entry-anim="" class="video-wrp"></div>
@@ -796,11 +776,10 @@
       <div data-entry-anim="" class="contact-div">
         <div class="w-layout-vflex contact-main-div">
           <div class="w-layout-vflex inr-flex">
-            <div data-delay="0.2" text-split="" stagger-animation="" class="caption">[ contact ]</div>
-            <h2 data-delay="0.3" text-split="" stagger-animation="" class="h2 white">Ready to Capture Your Special
-              Moments? Reach Out to US</h2>
+            <div data-delay="0.2" text-split="" stagger-animation="" class="caption">[ Reach Out ]</div>
+            <h2 data-delay="0.3" text-split="" stagger-animation="" class="h2 white">“Let’s create something beautiful together. Contact us today.”</h2>
           </div><a href="contact.html" class="btn w-inline-block">
-            <div class="btn-txt">Contact us</div>
+            <div class="btn-txt">Work With Us</div>
             <div class="btn-arr w-embed"><svg width="16" height="11" viewBox="0 0 16 11" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
