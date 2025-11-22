@@ -289,7 +289,6 @@
         },
         once: true
       });
-      // Batch scale animations
       ScrollTrigger.batch("[scale-anim]", {
         onEnter: batch => {
           gsap.fromTo(batch,
@@ -299,7 +298,6 @@
         },
         once: true
       });
-      // Slide-up animations with container + child stagger
       document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex) => {
         const children = container.querySelectorAll(":scope > *");
         if (!children.length) return;
@@ -312,7 +310,7 @@
               opacity: 1,
               duration: 0.8,
               ease: "power2.out",
-              delay: containerIndex * 0.3 + i * 0.15, // container stagger + child stagger
+              delay: containerIndex * 0.3 + i * 0.15,
               scrollTrigger: {
                 trigger: child,
                 start: "top 90%",
@@ -323,7 +321,6 @@
         });
       });
 
-      // Fade-in children in batch (excluding .overlay)
       document.querySelectorAll("[opacity-anim]").forEach(container => {
         const children = [...container.children].filter(el => !el.classList.contains("overlay"));
         if (children.length) {
@@ -333,7 +330,6 @@
           });
         }
       });
-      // Fade + scale-in children in batch
       document.querySelectorAll("[scale-opacity-anim]").forEach(container => {
         const children = [...container.children];
         if (children.length) {
@@ -346,14 +342,12 @@
           });
         }
       });
-      // Image fade scale
       ScrollTrigger.batch("[data-scale-img] img", {
         onEnter: batch => gsap.to(batch, {
           opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03
         }),
         once: true
       });
-      // Divider animations
       const animDvdr = (sel, axis) => {
         document.querySelectorAll(sel).forEach(dvdr => {
           gsap.fromTo(dvdr, { [axis]: 0 }, {
@@ -671,15 +665,12 @@
 
           .nav-link-div .nav-links {
             color: #c3c3c3 !important;
-            /* default color */
             transition: color 0.3s ease;
-            /* smooth transition */
           }
 
           .nav-link-div.w--current .nav-links,
           .nav-link-div:hover .nav-links {
             color: #373737 !important;
-            /* active or hover color */
           }
 
 
@@ -696,7 +687,6 @@
 
           .overlay {
             position: fixed;
-            /* stays fixed relative to viewport */
             top: 0;
             left: 0;
             width: 100vw !important;
@@ -708,8 +698,6 @@
           }
 
           @media screen and (max-width: 991px) {
-
-            /* Default hidden state */
             .nav-inr-wrp {
               opacity: 0 !important;
               visibility: hidden;
@@ -722,7 +710,6 @@
 
             .overlay {
               position: fixed;
-              /* stays fixed relative to viewport */
               top: 0;
               left: 0;
               width: 100vw !important;
@@ -733,12 +720,10 @@
               visibility: hidden;
             }
 
-            /* Active (visible) state */
             .nav-inr-wrp.active {
               opacity: 1 !important;
               visibility: visible;
               min-height: 35vh;
-              /* set a value slightly larger than expected content */
               padding: 1rem;
             }
 
@@ -764,8 +749,8 @@
         <script>
 
           document.addEventListener("DOMContentLoaded", () => {
-            const menuBtn = document.querySelector(".menu");   // open button
-            const closeBtn = document.querySelector(".menu-close");   // close button
+            const menuBtn = document.querySelector(".menu");
+            const closeBtn = document.querySelector(".menu-close");
             const navWrap = document.querySelector(".nav-inr-wrp");
             const overlay = document.querySelector(".overlay");
             const head = document.querySelector(".header");
@@ -798,7 +783,6 @@
               closeBtn.addEventListener("click", closeMenu);
               overlay.addEventListener("click", closeMenu);
 
-              // ✅ Close menu when any link inside navWrap is clicked
               navWrap.querySelectorAll("a").forEach(link => {
                 link.addEventListener("click", closeMenu);
               });
@@ -809,10 +793,9 @@
       <div class="w-layout-hflex octane-hero-div">
         <div class="w-layout-vflex abt-hero-flex">
           <div class="w-layout-vflex hero-inr-flex">
-            <div data-delay="0.3" text-split="" stagger-animation="" class="caption-black">[ A SPACE OF VISUAL STORIES ]
+            <div data-delay="0.3" text-split="" stagger-animation="" class="caption-black">[ A SPACE FOR CREATIVITY ]
             </div>
-            <h1 data-delay="" text-split="" stagger-animation="" class="h1 black ch2">Octane Space A Creative Studio for
-              Timeless Stories</h1>
+            <h1 data-delay="" text-split="" stagger-animation="" class="h1 black ch2">Octane Space — Where Vision Meets Storytelling.</h1>
           </div>
           <div class="w-layout-hflex os-swiper">
             <div scale-opacity-anim="" class="w-layout-hflex swiper-wrapper white">
@@ -823,11 +806,10 @@
               <div class="w-layout-vflex swiper-slide os"></div>
             </div>
           </div>
-          <p stagger-animation="" text-split="" class="p1 width1">Welcome to Octane Space, the heart of The Happening
-            Story — a vibrant, well-equipped photography and videography studio in Coimbatore, designed to bring your
-            visual stories to life.<br /><br />Whether you&#x27;re here for a portrait shoot, a pre-wedding indoor
-            session, or a product/commercial shoot, Octane Space is crafted to deliver comfort, creativity, and control
-            — all under one roof.</p>
+          <p stagger-animation="" text-split="" class="p1 width1">
+          A modern studio crafted for creators, dreamers, and storytellers.
+          Welcome to Octane Space, the creative heart of The Happening Story — a fully equipped, contemporary studio based in Coimbatore, designed to turn imagination into imagery. From portraits and pre-wedding sessions to product shoots and commercial productions, every corner of Octane Space is built for comfort, creativity, and flawless execution in an inspiring environment.
+          </p>
         </div>
       </div>
     </div>
@@ -863,7 +845,7 @@
   <section class="del-sec">
     <div class="w-layout-blockcontainer del-cont w-container">
       <div class="w-layout-vflex del-div">
-        <h2 stagger-animation="" text-split="" class="h2 black ch">What We Offer at Octane Space</h2>
+        <h2 stagger-animation="" text-split="" class="h2 black ch">What Awaits You at Octane Space</h2>
         <div data-entry-anim="" class="camera-ill oct w-embed"><svg width="171" height="128" viewBox="0 0 171 128"
             fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -901,35 +883,35 @@
           <div id="w-node-f9de8887-c0dd-f89f-df3a-cc29f47ff83b-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Fully air-conditioned indoor studio</p>
+              <p stagger-animation="" text-split="" class="b1 caps black">Fully air-conditioned creative studio</p>
               <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 01 ]</p>
             </div>
           </div>
           <div id="w-node-_79435bf5-ad1d-0326-66c1-04f178ccfb68-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Customizable backdrops &amp; props</p>
+              <p stagger-animation="" text-split="" class="b1 caps black">Custom-designed backdrops & props</p>
               <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 02 ]</p>
             </div>
           </div>
           <div id="w-node-f5c24b1e-a944-dc2c-55bb-cd6a92b0e01d-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Professional lighting setups</p>
+              <p stagger-animation="" text-split="" class="b1 caps black">Advanced professional lighting systems</p>
               <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 03 ]</p>
             </div>
           </div>
           <div id="w-node-e8c936b9-5a27-008e-f132-1d2fb2900a32-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Dressing &amp; makeup area</p>
+              <p stagger-animation="" text-split="" class="b1 caps black">Private dressing & makeup suite</p>
               <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 04 ]</p>
             </div>
           </div>
           <div id="w-node-_3a932a19-3209-9674-1d0a-7a8ff9c41efa-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Client preview lounge</p>
+              <p stagger-animation="" text-split="" class="b1 caps black">Comfortable client viewing lounge</p>
               <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 05 ]</p>
             </div>
           </div>
@@ -940,15 +922,14 @@
   <section class="sess-sec">
     <div class="w-layout-blockcontainer sess-cont w-container">
       <div class="w-layout-vflex sess-flex">
-        <h2 stagger-animation="" text-split="" class="h2 white">Ideal for the <br />Following Sessions</h2>
+        <h2 stagger-animation="" text-split="" class="h2 white">Perfect for Your Next Session</h2>
         <div class="hori-scroll-div sticky">
           <div slide-up-anim="" class="w-layout-hflex sess-cards-wrp">
             <div class="w-layout-vflex sess-card">
               <div class="w-layout-vflex sess-cnt-wrp">
                 <div class="caption">[ 01 ]</div>
                 <p class="b1 caps">Portraits</p>
-                <p class="s1 white">From clean headshots to expressive personal portraits, Octane Space offers the
-                  perfect controlled lighting and backdrop setup to bring your vision to life.</p>
+                <p class="s1 white">From sharp corporate headshots to expressive personal portraits, Octane Space offers precise lighting and versatile backdrops to bring out your most confident self.</p>
               </div>
               <div class="sess-img-wrp"></div>
             </div>
@@ -956,8 +937,7 @@
               <div class="w-layout-vflex sess-cnt-wrp">
                 <div class="caption">[ 02 ]</div>
                 <p class="b1 caps">Maternity Shoots</p>
-                <p class="s1 white">Our studio provides a calm, comfortable setting for beautifully styled maternity
-                  sessions that honor this special chapter with softness and grace.</p>
+                <p class="s1 white">Celebrate this beautiful chapter of life in a serene, thoughtfully styled studio where every frame captures the grace and warmth of motherhood.</p>
               </div>
               <div class="sess-img-wrp"></div>
             </div>
@@ -965,8 +945,7 @@
               <div class="w-layout-vflex sess-cnt-wrp">
                 <div class="caption">[ 03 ]</div>
                 <p class="b1 caps">Product Photography</p>
-                <p class="s1 white">With modular backdrops, professional lighting, and ample shooting space, Octane
-                  Space is fully equipped for crisp, high-quality product photography.</p>
+                <p class="s1 white">With modular backdrops, precision lighting, and spacious setups, Octane Space ensures high-quality product visuals with clarity, detail, and impact.</p>
               </div>
               <div class="sess-img-wrp"></div>
             </div>
@@ -974,8 +953,7 @@
               <div class="w-layout-vflex sess-cnt-wrp">
                 <div class="caption">[ 04 ]</div>
                 <p class="b1 caps">Creative Mini Sessions</p>
-                <p class="s1 white">Looking to run a quick, themed, or stylized shoot? Octane Space is ideal for mini
-                  sessions that are efficient, artistic, and full of personality.</p>
+                <p class="s1 white">Ideal for quick, stylized, or themed photoshoots — mini sessions at Octane Space are efficient, fun, and creatively rich.</p>
               </div>
               <div class="sess-img-wrp"></div>
             </div>
@@ -1032,10 +1010,9 @@
                 d="M14 0C10.2007 0 9.723 0.0175 8.23025 0.084C6.7375 0.154 5.72075 0.3885 4.83 0.735C3.89523 1.08557 3.04875 1.63695 2.35025 2.35025C1.63695 3.04875 1.08557 3.89523 0.735 4.83C0.3885 5.719 0.15225 6.7375 0.084 8.225C0.0175 9.72125 0 10.1973 0 14.0018C0 17.8028 0.0175 18.2788 0.084 19.7715C0.154 21.2625 0.3885 22.2792 0.735 23.17C1.09375 24.0905 1.5715 24.871 2.35025 25.6497C3.12725 26.4285 3.90775 26.908 4.82825 27.265C5.72075 27.6115 6.73575 27.8477 8.22675 27.916C9.72125 27.9825 10.1972 28 14 28C17.8028 28 18.277 27.9825 19.7715 27.916C21.2608 27.846 22.281 27.6115 23.1718 27.265C24.1059 26.9142 24.9518 26.3628 25.6497 25.6497C26.4285 24.871 26.9062 24.0905 27.265 23.17C27.6097 22.2792 27.846 21.2625 27.916 19.7715C27.9825 18.2788 28 17.8028 28 14C28 10.1972 27.9825 9.72125 27.916 8.22675C27.846 6.7375 27.6097 5.719 27.265 4.83C26.9144 3.89523 26.3631 3.04875 25.6497 2.35025C24.9513 1.63695 24.1048 1.08557 23.17 0.735C22.2775 0.3885 21.259 0.15225 19.7697 0.084C18.2752 0.0175 17.801 0 13.9965 0H14ZM12.7452 2.5235H14.0018C17.7398 2.5235 18.1825 2.53575 19.6577 2.604C21.0227 2.66525 21.7647 2.8945 22.2582 3.08525C22.911 3.339 23.3782 3.6435 23.8682 4.1335C24.3582 4.6235 24.661 5.089 24.9148 5.7435C25.1073 6.23525 25.3348 6.97725 25.396 8.34225C25.4643 9.8175 25.4783 10.2603 25.4783 13.9965C25.4783 17.7328 25.4643 18.1772 25.396 19.6525C25.3348 21.0175 25.1055 21.7578 24.9148 22.2513C24.6887 22.8583 24.3307 23.4076 23.8665 23.8595C23.3765 24.3495 22.911 24.6523 22.2565 24.906C21.7665 25.0985 21.0245 25.326 19.6577 25.389C18.1825 25.4555 17.7398 25.4713 14.0018 25.4713C10.2638 25.4713 9.81925 25.4555 8.344 25.389C6.979 25.326 6.23875 25.0985 5.74525 24.906C5.13771 24.6807 4.5878 24.3233 4.13525 23.8595C3.67023 23.4073 3.31157 22.8574 3.08525 22.2495C2.8945 21.7577 2.66525 21.0158 2.604 19.6508C2.5375 18.1755 2.5235 17.7327 2.5235 13.993C2.5235 10.2532 2.5375 9.814 2.604 8.33875C2.667 6.97375 2.8945 6.23175 3.087 5.73825C3.34075 5.0855 3.64525 4.61825 4.13525 4.12825C4.62525 3.63825 5.09075 3.3355 5.74525 3.08175C6.23875 2.88925 6.979 2.66175 8.344 2.59875C9.6355 2.53925 10.136 2.52175 12.7452 2.52V2.5235ZM21.4742 4.8475C21.2536 4.8475 21.0352 4.89095 20.8313 4.97538C20.6275 5.05981 20.4423 5.18356 20.2863 5.33956C20.1303 5.49556 20.0066 5.68076 19.9221 5.88459C19.8377 6.08842 19.7942 6.30688 19.7942 6.5275C19.7942 6.74812 19.8377 6.96658 19.9221 7.17041C20.0066 7.37423 20.1303 7.55944 20.2863 7.71544C20.4423 7.87144 20.6275 7.99519 20.8313 8.07962C21.0352 8.16405 21.2536 8.2075 21.4742 8.2075C21.9198 8.2075 22.3471 8.0305 22.6622 7.71544C22.9773 7.40038 23.1542 6.97306 23.1542 6.5275C23.1542 6.08194 22.9773 5.65462 22.6622 5.33956C22.3471 5.0245 21.9198 4.8475 21.4742 4.8475ZM14.0018 6.811C13.0481 6.79612 12.1011 6.9711 11.2157 7.32575C10.3304 7.68039 9.5244 8.20762 8.84476 8.87674C8.16513 9.54586 7.62539 10.3435 7.25697 11.2232C6.88856 12.1029 6.69883 13.0471 6.69883 14.0009C6.69883 14.9546 6.88856 15.8988 7.25697 16.7785C7.62539 17.6583 8.16513 18.4559 8.84476 19.125C9.5244 19.7941 10.3304 20.3214 11.2157 20.676C12.1011 21.0306 13.0481 21.2056 14.0018 21.1908C15.8892 21.1613 17.6894 20.3908 19.0137 19.0457C20.338 17.7005 21.0803 15.8886 21.0803 14.0009C21.0803 12.1132 20.338 10.3012 19.0137 8.95606C17.6894 7.6109 15.8892 6.84045 14.0018 6.811ZM14.0018 9.33275C14.6147 9.33275 15.2216 9.45347 15.7878 9.68802C16.3541 9.92257 16.8686 10.2664 17.302 10.6998C17.7354 11.1332 18.0792 11.6477 18.3137 12.2139C18.5483 12.7802 18.669 13.3871 18.669 14C18.669 14.6129 18.5483 15.2198 18.3137 15.7861C18.0792 16.3523 17.7354 16.8668 17.302 17.3002C16.8686 17.7336 16.3541 18.0774 15.7878 18.312C15.2216 18.5465 14.6147 18.6672 14.0018 18.6672C12.7639 18.6672 11.5768 18.1755 10.7015 17.3002C9.82623 16.425 9.3345 15.2378 9.3345 14C9.3345 12.7622 9.82623 11.575 10.7015 10.6998C11.5768 9.82448 12.7639 9.33275 14.0018 9.33275Z"
                 fill="#373737" />
             </svg></div>
-          <h3 stagger-animation="" text-split="" class="h3 center">Follow the Journey on Instagram</h3>
+          <h3 stagger-animation="" text-split="" class="h3 center">Catch Every Moment — Join Us on Instagram!</h3>
           <div class="vertical-line black"></div>
-          <p stagger-animation="" text-split="" class="b2-black ch center">Every frame tells a story. Follow us on
-            Instagram and experience moments as they unfold.</p>
+          <p stagger-animation="" text-split="" class="b2-black ch center">Every frame has a story. Follow us to watch ideas, moments, and creations come alive.</p>
         </div>
       </div>
     </div>
@@ -1046,11 +1023,10 @@
         <div id="w-node-_4c567294-330e-df0b-e670-fdcf1e942cde-94be42a9" class="w-layout-vflex book-wrp1">
           <div class="w-layout-vflex inr-flex2">
             <div stagger-animation="" text-split="" class="caption-black">[ Book Octane space ]</div>
-            <p stagger-animation="" text-split="" class="sh1 right">Start Your Booking</p>
+            <p stagger-animation="" text-split="" class="sh1 right">Reserve Your Spot Today</p>
           </div>
           <div class="w-layout-vflex book-outer-flex">
-            <p stagger-animation="" text-split="" class="b2-black ch">Available on rental basis for photographers,
-              brands, and creators.<br /><br />DM us to book Octane Space today!</p>
+            <p stagger-animation="" text-split="" class="b2-black ch">Available for photographers, brands, creators, and production teams.<br /><br />Send us a DM to secure your session at Octane Space, Coimbatore!</p>
             <div slide-up-anim="" class="w-layout-vflex book-flex">
               <div class="w-layout-vflex book-link-flex">
                 <p class="b2-black ch dull">WhatsApp:</p><a href="https://wa.me/9384446512" class="b2-black ch">+91
@@ -1235,18 +1211,17 @@
 
 
           <script>
-            const form = document.getElementById('enquiryForm'); // make sure your <form> has this ID
+            const form = document.getElementById('enquiryForm');
             const submitButton = document.getElementById('submit');
             const scriptURL = "https://script.google.com/macros/s/AKfycbzP_llV-NPpysqk1uHOGDI5IH2lRwUo1-qCyKmax6aB_0BOlCF1-fAa_B4CS7jBIJG1hA/exec";
             const errorWrp = document.querySelector('.error-wrp');
-            const whatsappNumber = '919384446512'; // Your WhatsApp number
+            const whatsappNumber = '919384446512';
 
             submitButton.addEventListener('click', function (e) {
               e.preventDefault();
               errorWrp.style.display = "none";
               errorWrp.innerHTML = "";
 
-              // Clear previous errors
               document.querySelectorAll('.err-state-div').forEach(div => div.textContent = '');
 
               let hasError = false;
@@ -1263,13 +1238,11 @@
               const date = dateInput.value.trim();
               const message = messageInput.value.trim();
 
-              // Validate required fields
               if (!name) { showError(nameInput, 'Name is required'); hasError = true; }
               if (!email || !validateEmail(email)) { showError(emailInput, 'Valid email is required'); hasError = true; }
               if (!phone || !validatePhone(phone)) { showError(phoneInput, 'Valid phone number is required'); hasError = true; }
               if (!date) { showError(dateInput, 'Date is required'); hasError = true; }
 
-              // Validate start time
               const startHour = document.querySelector('select[name="startTimeHour"]')?.value || '';
               const startMinute = document.querySelector('select[name="startTimeMinute"]')?.value || '';
               const startAMPM = document.querySelector('select[name="startTimeAMPM"]')?.value || '';
@@ -1281,7 +1254,6 @@
                 hasError = true;
               }
 
-              // Validate end time
               const endHour = document.querySelector('select[name="endTimeHour"]')?.value || '';
               const endMinute = document.querySelector('select[name="endTimeMinute"]')?.value || '';
               const endAMPM = document.querySelector('select[name="endTimeAMPM"]')?.value || '';
@@ -1295,7 +1267,6 @@
 
               if (hasError) return;
 
-              // Prepare data for Google Sheets
               const data = {
                 fullName: name,
                 email: email,
@@ -1303,10 +1274,9 @@
                 date: date,
                 startTime: startTime,
                 endTime: endTime,
-                about: message // optional
+                about: message
               };
 
-              // Send to Google Sheets
               fetch(scriptURL, {
                 method: 'POST',
                 body: JSON.stringify(data)
@@ -1316,9 +1286,8 @@
                   if (res.status === "success") {
                     alert(res.message || "Enquiry submitted successfully!");
 
-                    if (form) form.reset(); // reset form if exists
+                    if (form) form.reset();
 
-                    // --- WhatsApp Message ---
                     const whatsappMessage =
                       `Octane Space Booking Inquiry\n\n` +
                       `Name: ${name}\n` +
@@ -1343,7 +1312,6 @@
 
             });
 
-            // Helper functions
             function showError(inputElement, message) {
               const errorDiv = inputElement.closest('.input-wrapper')?.querySelector('.err-state-div');
               if (errorDiv) errorDiv.textContent = message;
