@@ -16,7 +16,7 @@
 
   <style>
     html {
-  scroll-behavior: smooth; /* built-in smoothness */
+  scroll-behavior: smooth;
 }
       .w-webflow-badge {
   display: none !important;
@@ -348,7 +348,6 @@
         },
         once: true
       });
-      // Batch scale animations
       ScrollTrigger.batch("[scale-anim]", {
         onEnter: batch => {
           gsap.fromTo(batch,
@@ -358,7 +357,6 @@
         },
         once: true
       });
-      // Slide-up animations with container + child stagger
       document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex) => {
         const children = container.querySelectorAll(":scope > *");
         if (!children.length) return;
@@ -371,7 +369,7 @@
               opacity: 1,
               duration: 0.8,
               ease: "power2.out",
-              delay: containerIndex * 0.3 + i * 0.15, // container stagger + child stagger
+              delay: containerIndex * 0.3 + i * 0.15,
               scrollTrigger: {
                 trigger: child,
                 start: "top 90%",
@@ -382,7 +380,6 @@
         });
       });
 
-      // Fade-in children in batch (excluding .overlay)
       document.querySelectorAll("[opacity-anim]").forEach(container => {
         const children = [...container.children].filter(el => !el.classList.contains("overlay"));
         if (children.length) {
@@ -392,7 +389,6 @@
           });
         }
       });
-      // Fade + scale-in children in batch
       document.querySelectorAll("[scale-opacity-anim]").forEach(container => {
         const children = [...container.children];
         if (children.length) {
@@ -405,14 +401,12 @@
           });
         }
       });
-      // Image fade scale
       ScrollTrigger.batch("[data-scale-img] img", {
         onEnter: batch => gsap.to(batch, {
           opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03
         }),
         once: true
       });
-      // Divider animations
       const animDvdr = (sel, axis) => {
         document.querySelectorAll(sel).forEach(dvdr => {
           gsap.fromTo(dvdr, { [axis]: 0 }, {
@@ -931,11 +925,10 @@
       <div data-entry-anim="" class="contact-div">
         <div class="w-layout-vflex contact-main-div">
           <div class="w-layout-vflex inr-flex">
-            <div data-delay="0.2" text-split="" stagger-animation="" class="caption">[ contact ]</div>
-            <h2 data-delay="0.3" text-split="" stagger-animation="" class="h2 white">Ready to Capture Your Special
-              Moments? Reach Out to US</h2>
+            <div data-delay="0.2" text-split="" stagger-animation="" class="caption">[ Reach Out ]</div>
+            <h2 data-delay="0.3" text-split="" stagger-animation="" class="h2 white">“Let’s create something beautiful together. Contact us today.”</h2>
           </div><a href="contact.html" class="btn w-inline-block">
-            <div class="btn-txt">Contact us</div>
+            <div class="btn-txt">Work With Us</div>
             <div class="btn-arr w-embed"><svg width="16" height="11" viewBox="0 0 16 11" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
