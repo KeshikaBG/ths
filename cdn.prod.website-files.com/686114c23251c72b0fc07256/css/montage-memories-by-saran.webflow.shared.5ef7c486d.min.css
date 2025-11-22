@@ -292,7 +292,7 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
 }
 @media screen and (max-width: 991px) {
     .images-flex-wrpr {
-        margin-top: 0rem;
+        margin-top: 0rem !important;
     }
 }
 
