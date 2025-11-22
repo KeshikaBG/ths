@@ -1666,63 +1666,69 @@ async function loadBlogs() {
       const shortDescArea = document.querySelector(".separate-work-div .s-para");
       const longContentArea = document.querySelector(".separate-work-div .long-content");
       const imagesWrpr = document.querySelector(".separate-work-div .images-flex-wrpr");
+      
 
-      if (openBtn && overlayWork && separateDiv) {
-        openBtn.addEventListener("click", () => {
-          if (titleArea) titleArea.textContent = blog.title || "";
-          if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
-       
-if (longContentArea) {
-  try {
+if (overlayWork && separateDiv) {
 
-let html = blogtoHTML(blog.content);
+  const openPopup = () => {
+    if (titleArea) titleArea.textContent = blog.title || "";
+    if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
 
-// handle empty lines
-html = html.replace(/<p><\/p>/g, '<br><br>');
-
-longContentArea.innerHTML = html;
-
-
-
-  } catch (e) {
-    longContentArea.innerHTML = "Content format error";
-  }
-}
-  
-
-          if (imagesWrpr) {
-            imagesWrpr.innerHTML = "";
-            if (Array.isArray(blog.gallery) && blog.gallery.length) {
-              blog.gallery.forEach(img => {
-                if (!img?.asset?.url) return;
-                const el = document.createElement("img");
-                el.src = `${img.asset.url}?w=1400&auto=format`;
-                el.style.height = "100%";
-                el.style.width = "auto";
-                el.style.objectFit = "contain";
-                el.style.borderRadius = "5px";
-                imagesWrpr.appendChild(el);
-              });
-            } else {
-              imagesWrpr.innerHTML = "<p>No images available</p>";
-            }
-          }
-          overlayWork.classList.add("active");
-          separateDiv.classList.add("active");
-        });
-        if (closeBtn) {
-          closeBtn.addEventListener("click", () => {
-            overlayWork.classList.remove("active");
-            separateDiv.classList.remove("active");
-          });
-        }
-        overlayWork.addEventListener("click", (e) => {
-          if (e.target === overlayWork) {
-            overlayWork.classList.remove("active");
-            separateDiv.classList.remove("active");
-          }
-        });
+    if (longContentArea) {
+      try {
+        let html = blogtoHTML(blog.content);
+        html = html.replace(/<p><\/p>/g, '<br><br>');
+        longContentArea.innerHTML = html;
+      } catch (e) {
+        longContentArea.innerHTML = "Content format error";
       }
+    }
+
+    if (imagesWrpr) {
+      imagesWrpr.innerHTML = "";
+      if (Array.isArray(blog.gallery) && blog.gallery.length) {
+        blog.gallery.forEach(img => {
+          if (!img?.asset?.url) return;
+          const el = document.createElement("img");
+          el.src = `${img.asset.url}?w=1400&auto=format`;
+          el.style.height = "100%";
+          el.style.width = "auto";
+          el.style.objectFit = "contain";
+          el.style.borderRadius = "5px";
+          imagesWrpr.appendChild(el);
+        });
+      } else {
+        imagesWrpr.innerHTML = "<p>No images available</p>";
+      }
+    }
+
+    overlayWork.classList.add("active");
+    separateDiv.classList.add("active");
+
+    document.body.style.overflow = "hidden";
+  };
+
+  if (openBtn) openBtn.addEventListener("click", openPopup);
+  if (overlayEl) overlayEl.addEventListener("click", openPopup);
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      overlayWork.classList.remove("active");
+      separateDiv.classList.remove("active");
+      document.body.style.overflow = "";
+    });
+  }
+
+  overlayWork.addEventListener("click", (e) => {
+    if (e.target === overlayWork) {
+      overlayWork.classList.remove("active");
+      separateDiv.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  });
+}
+
+      
       container.appendChild(card);
     });
   } catch (err) {
