@@ -1703,46 +1703,37 @@ if (overlayWork && separateDiv) {
     }
 
     overlayWork.classList.add("active");
-    separateDiv.classList.add("active");   
+    separateDiv.classList.add("active");
+
+    // Disable scrolling
+    document.body.style.overflow = "hidden";
   };
 
+  // Open on button click
   if (openBtn) openBtn.addEventListener("click", openPopup);
+
+  // Open when clicking overlay-div
   if (overlayEl) overlayEl.addEventListener("click", openPopup);
 
-  
-let scrollTop = 0;
-
-const freezePage = () => {
-  scrollTop = window.scrollY;
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${scrollTop}px`;
-  document.body.style.width = "100%";
-};
-
-const unfreezePage = () => {
-  document.body.style.position = "";
-  document.body.style.top = "";
-  window.scrollTo(0, scrollTop);
-};
-
-
-  
+  // Close button
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       overlayWork.classList.remove("active");
       separateDiv.classList.remove("active");
-freezePage();
+      document.body.style.overflow = "";
     });
   }
 
+  // Click outside to close
   overlayWork.addEventListener("click", (e) => {
     if (e.target === overlayWork) {
       overlayWork.classList.remove("active");
       separateDiv.classList.remove("active");
-unfreezePage();
+      document.body.style.overflow = "";
     }
   });
 }
+
 
       
       container.appendChild(card);
