@@ -1151,29 +1151,58 @@ async function loadTestimonials() {
       }
     `);
 
-    if (!testData?.tests?.length) { console.warn("No testimonials found"); return; }
-    
+    if (!testData?.tests?.length) { 
+      console.warn("No testimonials found"); 
+      return; 
+    }
+
     const swiper = document.querySelector(".testimonial-swiper");
     if (!swiper) return;
+
     const wrapper = swiper.querySelector(".swiper-wrapper.white");
     if (!wrapper) return;
+
     const template = wrapper.querySelector(".swiper-slide.test");
     if (!template) {
       console.error("Template testimonial card missing (.swiper-slide.test)");
       return;
     }
+
     template.style.display = "none";
+
+    // Import PortableText → HTML converter
+    const pt = await import("https://esm.sh/@portabletext/to-html");
+    const toHTML = pt.toHTML;
+
     testData.tests.forEach(t => {
       const card = template.cloneNode(true);
       card.style.display = "flex";
+
       const reviewText = card.querySelector(".b1.ch");
       const reviewerName = card.querySelector(".s1");
-      if (reviewText) reviewText.textContent = t.review || "";
+
+      // Handle Portable Text conversion
+      if (reviewText) {
+        try {
+          let html = toHTML(t.review || []);
+          // Replace empty <p></p> with spacing (optional)
+          html = html.replace(/<p><\/p>/g, "<br><br>");
+          reviewText.innerHTML = html;
+        } catch (e) {
+          reviewText.textContent = "Format issue";
+        }
+      }
+
       if (reviewerName) reviewerName.textContent = t.reviewer || "";
+
       wrapper.appendChild(card);
     });
-  } catch (err) { console.error("Sanity fetch error:", err); }
+
+  } catch (err) { 
+    console.error("Sanity fetch error:", err); 
+  }
 }
+
 
 
 /**async function loadHeroSwiper() {
