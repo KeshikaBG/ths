@@ -1710,24 +1710,28 @@ if (overlayWork && separateDiv) {
   if (overlayEl) overlayEl.addEventListener("click", openPopup);
 
   
-const preventScroll = (e) => e.preventDefault();
+let scrollTop = 0;
 
-const disablePageScroll = () => {
-  document.addEventListener("wheel", preventScroll, { passive: false });
-  document.addEventListener("touchmove", preventScroll, { passive: false });
+const freezePage = () => {
+  scrollTop = window.scrollY;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollTop}px`;
+  document.body.style.width = "100%";
 };
 
-const enablePageScroll = () => {
-  document.removeEventListener("wheel", preventScroll);
-  document.removeEventListener("touchmove", preventScroll);
+const unfreezePage = () => {
+  document.body.style.position = "";
+  document.body.style.top = "";
+  window.scrollTo(0, scrollTop);
 };
+
 
   
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       overlayWork.classList.remove("active");
       separateDiv.classList.remove("active");
-      disablePageScroll();
+freezePage();
     });
   }
 
@@ -1735,7 +1739,7 @@ const enablePageScroll = () => {
     if (e.target === overlayWork) {
       overlayWork.classList.remove("active");
       separateDiv.classList.remove("active");
-      enablePageScroll();
+unfreezePage();
     }
   });
 }
