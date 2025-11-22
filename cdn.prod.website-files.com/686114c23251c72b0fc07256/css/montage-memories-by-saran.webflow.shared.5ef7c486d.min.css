@@ -192,6 +192,7 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
     align-items: center;
     position: absolute;
     inset: 0%;
+    cursor: pointer;
 }
 
 .btn.white {
