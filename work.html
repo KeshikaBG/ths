@@ -1181,7 +1181,8 @@ if (!img) {
 img.classList.add("work-img");   // ⭐ required for lightbox
 
 const lowRes = `${imgUrl}?w=120&blur=30&auto=format`;
-const highRes = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
+//const highRes = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
+const highRes = `${imgUrl}?w=900&fit=crop&auto=format&q=75`;
 
 img.src = lowRes;
 img.dataset.src = highRes;
@@ -1216,7 +1217,6 @@ preload.onload = () => {
           counter++;
         });
       }
-
       distribute(allClones);
 enableLightbox();
 
@@ -1232,18 +1232,15 @@ enableLightbox();
               if (highRes) {
                 const preload = new Image();
                 preload.src = highRes;
-
                 preload.onload = () => {
                   img.src = highRes;
                   img.classList.add('loaded');
                 };
-
                 obs.unobserve(img);
               }
             }
           });
         }, { rootMargin: '50px' });
-
         imgs.forEach(img => observer.observe(img));
       }
 
@@ -1278,15 +1275,12 @@ enableLightbox();
         el.addEventListener('click', () => {
           separateWorkDiv.style.opacity = '0';
           setTimeout(() => (separateWorkDiv.style.display = 'none'), 300);
-
           overlayWork.style.opacity = '0';
           setTimeout(() => (overlayWork.style.display = 'none'), 300);
         });
       });
 
-    } catch (err) {
-      console.error('❌ Sanity fetch error:', err);
-    }
+    } catch (err) { console.error('❌ Sanity fetch error:', err); }
 
 // ------------------- LIGHTBOX SETUP -------------------
 const lightbox = document.getElementById("lightbox");
@@ -1303,25 +1297,18 @@ function enableLightbox() {
       lightboxImg.src = img.src;
       lightbox.classList.add("active");
 
-      // 100vh - 2rem height
       lightboxImg.style.height = "calc(100vh - 2rem)";
       lightboxImg.style.width = "auto";
       lightboxImg.style.objectFit = "contain";
     });
   });
 }
-
-// Close events
 lightboxClose.addEventListener("click", () => {
   lightbox.classList.remove("active");
 });
 lightbox.addEventListener("click", (e) => {
   if (e.target === lightbox) lightbox.classList.remove("active");
 });
-
-
-
-
     
   });
 </script>
@@ -1358,11 +1345,9 @@ lightbox.addEventListener("click", (e) => {
     heroImages[] { asset->{ url, _type } }
   }`)
         ]);
-
         const contImages = contData?.heroImages || [];
         const heroSections = heroData?.featuredSections || [];
         const heroImages = heroSections[0]?.images || [];
-
         const contImgDiv = document.querySelector('.contact-div');
         const heroImgDiv = document.querySelector('.swiper');
         function applyImageStyles(el, { absolute = false } = {}) {
@@ -1387,15 +1372,9 @@ function insertImageOrVideo(container, mediaArr, label = 'Media') {
       img.loading = "lazy";
       applyImageStyles(img);
       container.appendChild(img);
-
-    } else {
-      console.warn(`⚠️ Unknown asset type in ${label}`);
-    }
-  } else {
-    console.warn(`⚠️ No ${label} found or container missing.`);
-  }
+    } else {console.warn(`⚠️ Unknown asset type in ${label}`);}
+  } else {console.warn(`⚠️ No ${label} found or container missing.`);}
 }
-
         insertImageOrVideo(heroImgDiv, heroImages, 'Hero Media');
         insertImageOrVideo(contImgDiv, contImages, 'Contact Media');
       } catch (err) { console.error('❌ Sanity fetch error:', err); }
