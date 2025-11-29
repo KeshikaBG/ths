@@ -392,13 +392,13 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
 }
 @media screen and (max-width: 767px) {
     .bene-flex {
-        flex-flow: column!important;
+        flex-flow: column;
     }
 }
 @media screen and (max-width: 479px) {
     .benefits-wrap.home {
-        grid-template-rows: auto auto auto auto auto;
-        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto auto !important;
+        grid-template-columns: 1fr !important;
     }
 }
 @media screen and (max-width: 991px) {
