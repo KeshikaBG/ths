@@ -1095,8 +1095,8 @@
             const img = document.createElement('img');
 
             const lowRes = `${imgObj.asset?.url}?w=60&blur=30&auto=format`;
-            const highRes = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
-
+            //const highRes = `${imgObj.asset?.url}?w=900&auto=format&fit=crop`;
+const highRes = `${imgObj.asset?.url}?auto=format&fit=crop`;
             img.src = lowRes;
             img.dataset.src = highRes;
             img.alt = section.title || '';
@@ -1182,8 +1182,8 @@ img.classList.add("work-img");   // ⭐ required for lightbox
 
 const lowRes = `${imgUrl}?w=120&blur=30&auto=format`;
 //const highRes = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
-const highRes = `${imgUrl}?w=900&fit=crop&auto=format&q=75`;
-
+//const highRes = `${imgUrl}?w=900&fit=crop&auto=format&q=75`;
+const highRes = `${imgUrl}?fit=crop&auto=format&q=75`;
 img.src = lowRes;
 img.dataset.src = highRes;
 img.alt = section.title || "";
