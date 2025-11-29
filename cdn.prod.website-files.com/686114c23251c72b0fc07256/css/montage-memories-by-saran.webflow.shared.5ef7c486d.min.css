@@ -426,13 +426,17 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
         grid-area: 5 / 1 / 6 / 2!important;
     }
 }
+.mission-line.gradient.neg-mrg {
+    margin-left: -1rem !important;
+}
+.neg-mrg {
+    margin-left: -1rem !important;
+}
 .mission-line.gradient {
     width: 2px;
     margin-left: 2px !important;
 }
-.mission-line.gradient.neg-mrg {
-    margin-left: -1rem;
-}
+
 
 
 
