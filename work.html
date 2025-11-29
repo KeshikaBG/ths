@@ -1183,7 +1183,7 @@ img.classList.add("work-img");   // ⭐ required for lightbox
 const lowRes = `${imgUrl}?w=120&blur=30&auto=format`;
 //const highRes = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
 //const highRes = `${imgUrl}?w=900&fit=crop&auto=format&q=75`;
-const highRes = `${imgUrl}?fit=crop&auto=format&q=75`;
+const highRes = `${imgUrl}?w=1400&fit=crop&auto=format&q=75`;
 img.src = lowRes;
 img.dataset.src = highRes;
 img.alt = section.title || "";
@@ -1309,13 +1309,8 @@ lightboxClose.addEventListener("click", () => {
 lightbox.addEventListener("click", (e) => {
   if (e.target === lightbox) lightbox.classList.remove("active");
 });
-    
   });
 </script>
-
-
-
-
 
 
 
@@ -1382,15 +1377,11 @@ function insertImageOrVideo(container, mediaArr, label = 'Media') {
   </script>
 
 
-
-
 <div id="lightbox" class="lightbox">
   <img id="lightboxImg" />
   <div id="lightboxClose">×</div>
 </div>
 
 
-
-  
 </body>
 </html>
