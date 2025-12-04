@@ -342,6 +342,22 @@
           );
         });
       });
+// Opacity animation for element itself (no children)
+document.querySelectorAll("[self-opacity-anim]").forEach(el => {
+  gsap.fromTo(el,
+    { opacity: 0 },
+    {
+      opacity: 1,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        once: true
+      }
+    }
+  );
+});
 
       document.querySelectorAll("[opacity-anim]").forEach(container => {
         const children = [...container.children].filter(el => !el.classList.contains("overlay"));
@@ -1002,9 +1018,12 @@ A mature, recognized, and future-ready brand that stands the test of time.
             </style>
           </div>
         </div>
-        <p stagger-animation="" text-split="" class="b2 ch">Each project reflects vision, creativity, and progress.
+        
+        <p self-opacity-anim=""
+          class="b2 ch">Each project reflects vision, creativity, and progress.
 Explore the brands we’ve elevated from concept to market success.
 </p>
+        /*stagger-animation="" text-split="" */
       </div>
     </div>
   </section>
