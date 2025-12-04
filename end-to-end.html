@@ -12,11 +12,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 
 
-  <style>
-      .w-webflow-badge {
+<style>
+.w-webflow-badge {
   display: none !important;
 }
-    .mission-line.gradient.neg-mrg {
+.mission-line.gradient.neg-mrg {
     margin-left: -1rem !important;
 }
 .neg-mrg {
@@ -91,17 +91,14 @@
         transform: translateX(0);
         opacity: 1;
       }
-
       30% {
         transform: translateX(100%);
         opacity: 0;
       }
-
       60% {
         transform: translateX(-100%);
         opacity: 0;
       }
-
       100% {
         transform: translateX(0);
         opacity: 1;
@@ -113,51 +110,42 @@
         transform: translateY(0);
         opacity: 1;
       }
-
       30% {
         transform: translateY(-100%);
         opacity: 0;
       }
-
       60% {
         transform: translateY(100%);
         opacity: 0;
       }
-
       100% {
         transform: translateY(0);
         opacity: 1;
       }
     }
-
     a.s1 {
       color: #373737;
       transition: color 0.3s ease;
     }
-
     a.s1:hover {
       color: #9b9b9b;
     }
-
     .loader {
       position: fixed;
       inset: 0;
       background: #ffffff;
       z-index: 9999;
     }
-
     [text-split],
     [scale-opacity-anim]>*,
     [opacity-anim]>*:not(.overlay) {
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-
     [scale-opacity-anim]>* {
       scale: 0;
       transition: scale 0.3s ease;
     }
-
     .nav-line {
       position: absolute;
       left: 0;
@@ -167,7 +155,6 @@
       transform-origin: center center;
       transform: scaleX(0);
     }
-
     .vertical-line {
       transform-origin: center center;
       transform: scaleY(0);
@@ -178,7 +165,6 @@
         inset: auto 0% 0% auto;
     }
 }
-
     @media screen and (max-width: 479px) {
     .e2e-img-wrp2 {
         bottom: 4rem !important;
@@ -342,7 +328,6 @@
           );
         });
       });
-// Opacity animation for element itself (no children)
 document.querySelectorAll("[self-opacity-anim]").forEach(el => {
   gsap.fromTo(el,
     { opacity: 0 },
@@ -637,12 +622,10 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
           transition: margin 0.3s ease;
         }
       }
-
       .mm-logo {
         transition: filter 0.3s ease;
         filter: invert(0%);
       }
-
       .header.scrolled .mm-logo {
         filter: invert(100%);
       }
@@ -653,12 +636,10 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
         height: 0vh;
         transition: height 0.5s ease;
       }
-
       .nav-link-div .nav-links {
         color: #9b9b9b !important;
         transition: color 0.3s ease;
       }
-
       .nav-link-div.w--current .nav-links,
       .nav-link-div:hover .nav-links {
         color: #ffffff !important;
@@ -706,10 +687,6 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
         }
       }
     </style>
-
-
-
-
 
 
 
@@ -766,9 +743,8 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
     <div class="w-layout-blockcontainer e2e-hero-cont w-container">
       <div class="w-layout-vflex flex-block-2">
         <div class="code-embed-12 w-embed">
+          
           <style>
-            
-
             .gradient-line {
               display: inline-block;
               width: 40px;
@@ -776,6 +752,7 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
               background: linear-gradient(135deg, #bd2125, #fbe49e);
             }
           </style>
+          
           <h1 stagger-animation text-split data-delay="0.2" class="h1">
             <span class="word">End<span class="gradient-line"></span></span><span class="word">to<span
                 class="gradient-line"></span></span><span class="word">end</span>
@@ -937,13 +914,11 @@ A mature, recognized, and future-ready brand that stands the test of time.
               .m-mm-swiper {
                 align-items: center;
               }
-
               .m-mm-swiper .swiper-wrapper {
                 align-items: center;
                 transition: transform 0.4s ease;
                 will-change: transform;
               }
-
               .m-mm-swiper .swiper-slide {
                 flex-shrink: 0;
                 transition: height 0.4s ease, opacity 0.4s ease;
@@ -954,17 +929,14 @@ A mature, recognized, and future-ready brand that stands the test of time.
                 .m-mm-swiper .swiper-wrapper {
                   height: 14vw;
                 }
-
                 .m-mm-swiper .swiper-slide {
                   height: 14vw;
                   opacity: 20%;
                 }
-
                 .m-mm-swiper .swiper-slide.swiper-slide-active {
                   height: 22vw;
                   opacity: 100%;
                 }
-
                 .m-mm-swiper .swiper-slide.swiper-slide-next,
                 .m-mm-swiper .swiper-slide.swiper-slide-prev {
                   height: 18vw;
@@ -976,17 +948,14 @@ A mature, recognized, and future-ready brand that stands the test of time.
                 .m-mm-swiper .swiper-wrapper {
                   height: 32vw;
                 }
-
                 .m-mm-swiper .swiper-slide {
                   height: 32vw;
                   opacity: 20%;
                 }
-
                 .m-mm-swiper .swiper-slide.swiper-slide-active {
                   height: 48vw;
                   opacity: 100%;
                 }
-
                 .m-mm-swiper .swiper-slide.swiper-slide-next,
                 .m-mm-swiper .swiper-slide.swiper-slide-prev {
                   height: 40vw;
@@ -998,17 +967,14 @@ A mature, recognized, and future-ready brand that stands the test of time.
                 .m-mm-swiper .swiper-wrapper {
                   height: 48vw;
                 }
-
                 .m-mm-swiper .swiper-slide {
                   height: 48vw;
                   opacity: 20%;
                 }
-
                 .m-mm-swiper .swiper-slide.swiper-slide-active {
                   height: 64vw;
                   opacity: 100%;
                 }
-
                 .m-mm-swiper .swiper-slide.swiper-slide-next,
                 .m-mm-swiper .swiper-slide.swiper-slide-prev {
                   height: 56vw;
@@ -1018,11 +984,7 @@ A mature, recognized, and future-ready brand that stands the test of time.
             </style>
           </div>
         </div>
-        
-        <p self-opacity-anim=""
-          class="b2 ch">Each project reflects vision, creativity, and progress.
-Explore the brands we’ve elevated from concept to market success.
-</p>
+        <p self-opacity-anim="" class="b2 ch">Each project reflects vision, creativity, and progress. Explore the brands we’ve elevated from concept to market success.</p>
       </div>
     </div>
   </section>
@@ -1156,231 +1118,6 @@ Explore the brands we’ve elevated from concept to market success.
       </div>
     </div>
   </section>
- <!-- <section id="contact-e2e" class="contact-sec grey">
-    <div slide-up-anim="" class="w-layout-blockcontainer e2e-contact-cont w-container">
-      <div class="w-layout-hflex cont-hero-flex gradient">
-        <div slide-up-anim="" class="e2e-cont-img"></div>
-        <div class="e2e-img-wrp2">
-          <div class="booking-form-wrpr e2e-cont w-form">
-            <form id="enquiryForm" name="email-form" data-name="Email Form" method="get" class="form-inr-wrp e2e"
-              data-wf-page-id="686fb1e94cda3faa6950d2c6" data-wf-element-id="5bca00f8-f1a0-0a42-d891-0295e8fd191e">
-              <div class="w-layout-hflex book-inr-flex">
-                <div class="w-layout-vflex input-wrapper ver"><label for="brandName" class="s3 white">Brand / Business
-                    Name</label><input class="input-field e2e w-input" maxlength="256" name="name" data-name="Name"
-                    placeholder="Your business name" type="text" id="brandName" />
-                  <div class="err-state-div"></div>
-                </div>
-                <div class="w-layout-vflex input-wrapper ver"><label for="founderName" class="s3 white">Contact Person
-                    Name</label><input class="input-field e2e w-input" maxlength="256" name="email" data-name="Email"
-                    placeholder="Your name" type="email" id="founderName" required="" />
-                  <div class="err-state-div"></div>
-                </div>
-              </div>
-              <div class="w-layout-hflex book-inr-flex">
-                <div class="w-layout-vflex input-wrapper ver"><label for="phone" class="s3 white">Phone
-                    Number</label><input class="input-field e2e w-input" maxlength="256" name="name" data-name="Name"
-                    placeholder="Your phone number" type="tel" id="phone" />
-                  <div class="err-state-div"></div>
-                </div>
-                <div class="w-layout-vflex input-wrapper ver"><label for="email" class="s3 white">Email ID</label><input
-                    class="input-field e2e w-input" maxlength="256" name="name" data-name="Name"
-                    placeholder="Your email" type="text" id="email" />
-                  <div class="err-state-div"></div>
-                </div>
-              </div>
-              <div class="w-layout-hflex book-inr-flex">
-                <div class="w-layout-vflex input-wrapper ver"><label for="social" class="s3 white">Brand Social media
-                    Link</label><input class="input-field e2e w-input" maxlength="256" name="email" data-name="Email"
-                    placeholder="Your social media link" type="email" id="social" required="" />
-                  <div class="err-state-div"></div>
-                </div>
-                <div class="w-layout-vflex input-wrapper ver"><label for="website" class="s3 white">Website (if
-                    any)</label><input class="input-field e2e w-input" maxlength="256" name="name" data-name="Name"
-                    placeholder="Your website link" type="text" id="website" />
-                  <div class="err-state-div"></div>
-                </div>
-              </div>
-              <div class="w-layout-hflex book-inr-flex">
-                <div class="w-layout-vflex input-wrapper ver"><label for="industry" class="s3 white">Industry /
-                    Category</label><input class="input-field e2e w-input" maxlength="256" name="email"
-                    data-name="Email" placeholder="Business industry or category" type="email" id="industry"
-                    required="" />
-                  <div class="err-state-div"></div>
-                </div>
-                <div class="w-layout-vflex input-wrapper ver"><label for="products" class="s3 white">Products / Services
-                    Offered </label><input class="input-field e2e w-input" maxlength="256" name="email"
-                    data-name="Email" placeholder="Your products or services offered" type="email" id="products"
-                    required="" />
-                  <div class="err-state-div"></div>
-                </div>
-              </div>
-              <div class="w-layout-hflex book-inr-flex">
-                <div class="w-layout-vflex input-wrapper ver"><label for="location" class="s3 white">Current
-                    Location</label><input class="input-field e2e w-input" maxlength="256" name="email"
-                    data-name="Email" placeholder="Your location" type="email" id="location" required="" />
-                  <div class="err-state-div"></div>
-                </div>
-                <div class="w-layout-vflex input-wrapper ver"><label for="promotions" class="s3 white">Any Ongoing
-                    Promotions</label><input class="input-field e2e w-input" maxlength="256" name="email"
-                    data-name="Email" placeholder="Any Ongoing Promotions" type="email" id="promotions" required="" />
-                  <div class="err-state-div"></div>
-                </div>
-              </div>
-              <div class="w-layout-vflex input-wrapper ver"><label for="budget" class="s3 white">Budget Range for
-                  Branding</label><input class="input-field e2e w-input" maxlength="256" name="email" data-name="Email"
-                  placeholder="Your budget" type="email" id="budget" required="" />
-                <div class="err-state-div"></div>
-              </div>
-              <div class="error-wrp"></div>
-            </form>
-            <div class="w-form-done">
-              <div>Thank you! Your submission has been received!</div>
-            </div>
-            <div class="w-form-fail">
-              <div>Oops! Something went wrong while submitting the form.</div>
-            </div>
-            <div class="w-layout-hflex btn-outer-wrp black">
-              <div id="submit" class="w-layout-hflex btn gradient">
-                <div class="btn-txt">Submit</div>
-                <div class="btn-arr w-embed"><svg width="16" height="11" viewBox="0 0 16 11" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd"
-                      d="M0 5.50071C0 5.35153 0.0592632 5.20845 0.164752 5.10296C0.270242 4.99747 0.413316 4.93821 0.5625 4.93821H13.8296L10.2892 1.39896C10.1836 1.29334 10.1243 1.15008 10.1243 1.00071C10.1243 0.851338 10.1836 0.708083 10.2892 0.60246C10.3949 0.496838 10.5381 0.4375 10.6875 0.4375C10.8369 0.4375 10.9801 0.496838 11.0858 0.60246L15.5858 5.10246C15.6381 5.15471 15.6797 5.21678 15.7081 5.28512C15.7364 5.35346 15.751 5.42672 15.751 5.50071C15.751 5.5747 15.7364 5.64796 15.7081 5.7163C15.6797 5.78464 15.6381 5.84671 15.5858 5.89896L11.0858 10.399C10.9801 10.5046 10.8369 10.5639 10.6875 10.5639C10.5381 10.5639 10.3949 10.5046 10.2892 10.399C10.1836 10.2933 10.1243 10.1501 10.1243 10.0007C10.1243 9.85134 10.1836 9.70808 10.2892 9.60246L13.8296 6.06321H0.5625C0.413316 6.06321 0.270242 6.00395 0.164752 5.89846C0.0592632 5.79297 0 5.6499 0 5.50071Z"
-                      fill="white" />
-                  </svg></div>
-              </div>
-            </div>
-          </div>
-          <div class="os-booking-code w-embed w-script">
-            <style>
-              .input-field:focus,
-              .input-field.date:focus,
-              input[type="text"]:focus,
-              input[type="email"]:focus,
-              input[type="phone"]:focus,
-              input[type="url"]:focus {
-                border: 2px solid #000000 !important;
-                outline: none !important;
-                box-shadow: none !important;
-              }
-
-              .input-field::placeholder {
-                color: #9b9b9b;
-                font-size: 12px;
-                opacity: 1;
-              }
-            </style>
-
-
-
-
-            <script>
-              const submitButton = document.getElementById('submit');
-              const scriptURL = 'https://script.google.com/macros/s/AKfycbxJs7vpZaIkppCcfUoFtgu7cNtHkPrI2BChJVmK5zu0lNnktEdy85lRYGXE7Y3bTCv4BA/exec';
-              const errorWrp = document.querySelector('.error-wrp');
-              const whatsappNumber = '919384446512';
-
-              submitButton.addEventListener('click', function (e) {
-                e.preventDefault();
-                errorWrp.style.display = "none";
-                errorWrp.innerHTML = "";
-
-                // Collect values
-                const data = {
-                  brandName: document.getElementById('brandName').value.trim(),
-                  founderName: document.getElementById('founderName').value.trim(),
-                  phone: document.getElementById('phone').value.trim(),
-                  email: document.getElementById('email').value.trim(),
-                  social: document.getElementById('social').value.trim(),
-                  website: document.getElementById('website').value.trim(),
-                  industry: document.getElementById('industry').value.trim(),
-                  products: document.getElementById('products').value.trim(),
-                  location: document.getElementById('location').value.trim(),
-                  promotions: document.getElementById('promotions').value.trim(),
-                  budget: document.getElementById('budget').value.trim()
-                };
-
-                // Clear previous errors
-                document.querySelectorAll('.err-state-div').forEach(div => div.textContent = '');
-                let hasError = false;
-
-                // Validation (required fields except website, promotions)
-                if (!data.brandName) { showError(document.getElementById('brandName'), 'Brand name is required'); hasError = true; }
-                if (!data.founderName) { showError(document.getElementById('founderName'), 'Founder/Contact name is required'); hasError = true; }
-                if (!data.phone || !validatePhone(data.phone)) { showError(document.getElementById('phone'), 'Valid phone is required'); hasError = true; }
-                if (!data.email || !validateEmail(data.email)) { showError(document.getElementById('email'), 'Valid email is required'); hasError = true; }
-                if (!data.industry) { showError(document.getElementById('industry'), 'Industry/Category is required'); hasError = true; }
-                if (!data.products) { showError(document.getElementById('products'), 'Products/Services are required'); hasError = true; }
-                if (!data.location) { showError(document.getElementById('location'), 'Location is required'); hasError = true; }
-                if (!data.budget) { showError(document.getElementById('budget'), 'Budget is required'); hasError = true; }
-
-                if (hasError) return;
-
-                // ✅ Send to Google Sheets
-                fetch(scriptURL, {
-                  method: 'POST',
-                  body: JSON.stringify(data)
-                })
-                  .then(res => res.json())
-                  .then(res => {
-                    if (res.status === "success") {
-                      // ✅ WhatsApp message
-                      const whatsappMessage =
-                        `📌 End-to-End Inquiry\n\n` +
-                        `Brand / Business: ${data.brandName}\n` +
-                        `Founder / Contact: ${data.founderName}\n` +
-                        `Phone / WhatsApp: ${data.phone}\n` +
-                        `Email: ${data.email}\n` +
-                        `Social Media: ${data.social}\n` +
-                        `Website: ${data.website}\n` +
-                        `Industry: ${data.industry}\n` +
-                        `Products/Services: ${data.products}\n` +
-                        `Location: ${data.location}\n` +
-                        `Promotions/Launches: ${data.promotions}\n` +
-                        `Budget: ${data.budget}`;
-
-                      const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-                      window.open(whatsappLink, '_blank');
-
-                      alert(res.message);
-                      document.getElementById('enquiryForm').reset();
-                    } else {
-                      errorWrp.innerHTML = "Error: " + res.message;
-                      errorWrp.style.display = "block";
-                    }
-                  })
-                  .catch(err => {
-                    errorWrp.innerHTML = "Error sending enquiry: " + err;
-                    errorWrp.style.display = "block";
-                  });
-              });
-
-              function showError(inputElement, message) {
-                const errorDiv = inputElement.closest('.input-wrapper')?.querySelector('.err-state-div');
-                if (errorDiv) {
-                  errorDiv.textContent = message;
-                }
-              }
-
-              function validateEmail(email) {
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-              }
-              function validatePhone(phone) {
-                return /^[0-9]{10,14}$/.test(phone);
-              }
-            </script>
-          </div>
-        </div>
-        <div slide-up-anim="" class="w-layout-vflex stage-contact-div">
-          <div class="w-layout-vflex inr-flex l-a _2">
-            <div stagger-animation="" text-split="" class="caption">[ Contact us ]</div>
-            <h2 stagger-animation="" text-split="" class="h2 white l-a ch2">Your Journey to Building a Remarkable Brand
-              Begins Here</h2>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>-->
    <section id="contact-e2e" class="contact-sec grey">
     <div slide-up-anim="" class="w-layout-blockcontainer e2e-contact-cont w-container">
       <div class="w-layout-hflex cont-hero-flex gradient"
@@ -1490,7 +1227,6 @@ Explore the brands we’ve elevated from concept to market success.
                 outline: none !important;
                 box-shadow: none !important;
               }
-
               .input-field::placeholder {
                 color: #9b9b9b;
                 font-size: 12px;
@@ -1512,7 +1248,6 @@ Explore the brands we’ve elevated from concept to market success.
                 errorWrp.style.display = "none";
                 errorWrp.innerHTML = "";
 
-                // Collect values
                 const data = {
                   brandName: document.getElementById('brandName').value.trim(),
                   founderName: document.getElementById('founderName').value.trim(),
@@ -1527,11 +1262,9 @@ Explore the brands we’ve elevated from concept to market success.
                   budget: document.getElementById('budget').value.trim()
                 };
 
-                // Clear previous errors
                 document.querySelectorAll('.err-state-div').forEach(div => div.textContent = '');
                 let hasError = false;
 
-                // Validation (required fields except website, promotions)
                 if (!data.brandName) { showError(document.getElementById('brandName'), 'Brand name is required'); hasError = true; }
                 if (!data.founderName) { showError(document.getElementById('founderName'), 'Founder/Contact name is required'); hasError = true; }
                 if (!data.phone || !validatePhone(data.phone)) { showError(document.getElementById('phone'), 'Valid phone is required'); hasError = true; }
@@ -1543,7 +1276,6 @@ Explore the brands we’ve elevated from concept to market success.
 
                 if (hasError) return;
 
-                // ✅ Send to Google Sheets
                 fetch(scriptURL, {
                   method: 'POST',
                   body: JSON.stringify(data)
@@ -1551,7 +1283,6 @@ Explore the brands we’ve elevated from concept to market success.
                   .then(res => res.json())
                   .then(res => {
                     if (res.status === "success") {
-                      // ✅ WhatsApp message
                       const whatsappMessage =
                         `📌 End-to-End Inquiry\n\n` +
                         `Brand / Business: ${data.brandName}\n` +
@@ -1665,13 +1396,9 @@ Explore the brands we’ve elevated from concept to market success.
     window.addEventListener('scroll', function () {
       const header = document.querySelector('.header');
 
-      if (window.scrollY > 0) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
+      if (window.scrollY > 0) { header.classList.add('scrolled');} 
+      else { header.classList.remove('scrolled');}
     });
-    /* --- Left-to-Right Entry Animation --- */
     document.querySelectorAll("[data-scaleup]").forEach(el => {
       const delayMs = parseFloat(el.getAttribute("data-scaleup-delay")) || 0.5;
       gsap.set(el, { clipPath: "inset(0% 100% 0% 0%)" });
@@ -1683,7 +1410,6 @@ Explore the brands we’ve elevated from concept to market success.
       });
       el._cleanupScaleUp = () => anim.kill();
     });
-
   </script>
 
 
@@ -1985,6 +1711,5 @@ Explore the brands we’ve elevated from concept to market success.
     });
   </script>
 </body>
-<!-- Mirrored from montage-memories-by-saran.webflow.io/end-to-end by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 12 Oct 2025 06:59:20 GMT -->
 
 </html>
