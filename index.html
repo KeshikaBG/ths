@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const ease = "power2.inOut";
   function hideLoader() {
     if (loader) {
-      setTimeout(() => { window.loaderFinished = true; }, loaderVisibleTime - 50);
+      setTimeout(() => { window.loaderFinished = true; }, loaderVisibleTime);
     } else {
       window.loaderFinished = true;
     }
