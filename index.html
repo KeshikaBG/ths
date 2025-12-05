@@ -1119,6 +1119,367 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+
+
+<script type="module">
+/* -------------------- SANITY SETUP -------------------- */
+import { createClient } from "https://esm.sh/@sanity/client";
+import { toHTML } from "https://esm.sh/@portabletext/to-html";
+
+const client = createClient({
+  projectId: "n7jjk6nd",
+  dataset: "production",
+  apiVersion: "2023-01-01",
+  useCdn: true,
+});
+
+/* -------------------- UTILITIES -------------------- */
+const $ = (sel, p = document) => p.querySelector(sel);
+const $$ = (sel, p = document) => [...p.querySelectorAll(sel)];
+
+function applyMediaStyles(el, { absolute = false, fit = "cover"} = {}) {
+  Object.assign(el.style, {
+    width: "100%",
+    height: "100%",
+    maxWidth: "none",
+    objectFit: fit,
+    ...(absolute && { position: "absolute", top: 0, left: 0 })
+  });
+}
+
+function insertMedia(container, mediaArr, label = "Media", styleOpts = {}) {
+  if (!container || !mediaArr?.length) return;
+
+  const asset = mediaArr[0]?.asset;
+  if (!asset) return;
+
+  let el = asset._type === "sanity.imageAsset"
+    ? Object.assign(new Image(), { src: asset.url, alt: label })
+    : Object.assign(document.createElement("video"), {
+        src: asset.url,
+        autoplay: true, loop: true, muted: true, playsInline: true
+      });
+
+  applyMediaStyles(el, styleOpts);
+  container.appendChild(el);
+}
+
+/* ============================================================
+   ===================  TESTIMONIALS  =========================
+=============================================================== */
+async function loadTestimonials() {
+  const data = await client.fetch(`
+    *[_type=="testPage"][0]{
+      tests[]{ reviewer, review }
+    }
+  `);
+
+  const wrapper = $(".testimonial-swiper .swiper-wrapper.white");
+  const template = $(".testimonial-swiper .swiper-slide.test");
+  if (!wrapper || !template) return;
+
+  template.style.display = "none";
+
+  data.tests?.forEach(t => {
+    const card = template.cloneNode(true);
+    card.style.display = "flex";
+
+    const review = toHTML(t.review || []).replace(/<p><\/p>/g, "<br><br>");
+    card.querySelector(".b1.ch").innerHTML = review;
+    card.querySelector(".s1").textContent = t.reviewer || "";
+
+    wrapper.appendChild(card);
+  });
+}
+
+/* ============================================================
+   ========================  FAQ  ==============================
+=============================================================== */
+async function loadFAQs() {
+  const data = await client.fetch(`
+    *[_type=="faqPage"][0]{ faqs[]{question, answer} }
+  `);
+
+  const cont = $(".faqs");
+  const template = $(".faq");
+  if (!cont || !template) return;
+
+  cont.innerHTML = "";
+  data.faqs?.forEach(f => {
+    const card = template.cloneNode(true);
+    $(".ques", card).textContent = f.question;
+    $(".ans", card).innerHTML = toHTML(f.answer || []);
+    cont.appendChild(card);
+  });
+}
+
+function initFAQAccordion() {
+  const cards = $$(".faq");
+  cards.forEach((card, index) => {
+    const ans = $(".ans", card);
+    const arrow = $(".arr-down", card);
+
+    if (index === 0) openFAQ(ans, arrow, true);
+    else closeFAQ(ans, arrow, true);
+
+    card.onclick = () => {
+      cards.forEach(c => closeFAQ($(".ans", c), $(".arr-down", c)));
+      openFAQ(ans, arrow);
+    };
+  });
+
+  function openFAQ(ans, arrow, instant = false) {
+    ans.classList.add("open");
+    ans.classList.remove("close");
+    arrow?.classList.add("up");
+
+    const h = ans.scrollHeight + "px";
+    ans.style.height = instant ? "auto" : "0px";
+    requestAnimationFrame(() => ans.style.height = h);
+
+    ans.ontransitionend = () => ans.style.height = "auto";
+  }
+  function closeFAQ(ans, arrow, instant = false) {
+    ans.classList.remove("open");
+    ans.classList.add("close");
+    arrow?.classList.remove("up");
+    ans.style.height = instant ? "0px" : ans.scrollHeight + "px";
+    requestAnimationFrame(() => ans.style.height = "0px");
+  }
+}
+
+/* ============================================================
+   =====================  HERO SWIPER  =========================
+=============================================================== */
+let heroSwiperInitialized = false;
+
+async function loadHeroSwiper() {
+  const data = await client.fetch(`
+    *[_type=="home"] | order(_createdAt asc)[0]{
+      "images": heroImages[]{asset->{url}}
+    }
+  `);
+
+  const container = $(".hero-swiper");
+  if (!container) return;
+
+  const wrapper = $(".swiper-wrapper", container);
+  const template = $(".swiper-slide", container);
+
+  wrapper.innerHTML = "";
+
+  await Promise.all(
+    data.images.map((imgData, i) => new Promise(res => {
+      const slide = template.cloneNode(true);
+      slide.innerHTML = "";
+
+      const img = new Image();
+      img.src = imgData.asset.url;
+      img.alt = "Hero Image " + (i + 1);
+      applyMediaStyles(img);
+
+      img.onload = res;
+      img.onerror = res;
+
+      const overlay = document.createElement("div");
+      Object.assign(overlay.style, {
+        position: "absolute",
+        inset: 0,
+        background: "rgba(0,0,0,0.2)",
+        pointerEvents: "none"
+      });
+
+      slide.append(overlay, img);
+      wrapper.appendChild(slide);
+    }))
+  );
+
+  if (!heroSwiperInitialized) {
+    heroSwiperInitialized = true;
+    new Swiper(container, {
+      loop: true,
+      speed: 1000,
+      autoplay: { delay: 5500, disableOnInteraction: false },
+      pagination: { el: ".swiper-pagination", clickable: true },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev"
+      },
+      on: {
+        init(sw) {
+          sw.wrapperEl.style.transitionTimingFunction = "cubic-bezier(0.65,0,0.35,1)";
+        }
+      }
+    });
+  }
+}
+
+/* ============================================================
+   ========================= BLOGS =============================
+=============================================================== */
+async function loadBlogs() {
+  const blogs = await client.fetch(`
+    *[_type=="blog"] | order(_createdAt desc){
+      title, slug, shortDescription,
+      coverImage{asset->{url}},
+      gallery[]{asset->{url}},
+      content
+    }
+  `);
+
+  const cont = $(".blogs-wrpr");
+  const template = $(".blog-card", cont);
+  if (!cont || !template) return;
+
+  template.style.display = "none";
+
+  blogs.forEach(blog => {
+    const card = template.cloneNode(true);
+    card.style.display = "flex";
+
+    $(".heading", card).textContent = blog.title;
+    $(".s-para", card).textContent = blog.shortDescription;
+
+    const cover = $(".blog-cover", card);
+    if (cover && blog.coverImage?.asset?.url) {
+      cover.style.background = `url("${blog.coverImage.asset.url}?w=900") center/cover`;
+    }
+
+    /* popup logic */
+    const openPopup = () => {
+      $(".blog-title").textContent = blog.title;
+      $(".separate-work-div .s-para").textContent = blog.shortDescription;
+      $(".long-content").innerHTML = toHTML(blog.content).replace(/<p><\/p>/g, "<br><br>");
+
+      const imgWrap = $(".images-flex-wrpr");
+      imgWrap.innerHTML = "";
+
+      blog.gallery?.forEach(g => {
+        const img = new Image();
+        img.src = g.asset.url + "?w=1400";
+        img.style.objectFit = "contain";
+        imgWrap.append(img);
+      });
+
+      $(".overlay-work").classList.add("active");
+      $(".separate-work-div").classList.add("active");
+      document.body.style.overflow = "hidden";
+    };
+
+    $(".overlay-div", card)?.addEventListener("click", openPopup);
+    $(".overlay-div .btn", card)?.addEventListener("click", openPopup);
+
+    cont.appendChild(card);
+  });
+}
+
+/* ============================================================
+   ============= FEATURED, OTHER SECTIONS, MUNCHKIN ============
+=============================================================== */
+async function loadOtherSections() {
+  const data = await Promise.all([
+    client.fetch(`*[_type=="home"] | order(_createdAt asc)[3]{ featuredSections[]{title, images[]{asset->{url}}} }`),
+    client.fetch(`*[_type=="home"] | order(_createdAt asc)[1]{ heroImages[]{asset->{url}} }`),
+    client.fetch(`*[_type=="home"] | order(_createdAt asc)[4]{ heroImages[]{asset->{url}} }`),
+    client.fetch(`*[_type=="home"] | order(_createdAt asc)[6]{ heroImages[]{asset->{url}} }`),
+    client.fetch(`*[_type=="home"] | order(_createdAt asc)[7]{ heroImages[]{asset->{url}} }`),
+    client.fetch(`*[_type=="home"] | order(_createdAt asc)[5]{ heroImages[]{asset->{url}} }`)
+  ]);
+
+  const [featured, abt, os, vid, cont, munch] = data;
+
+  /* WRK CHIPS */
+  const chipsCont = $(".chips-cont");
+  if (chipsCont) {
+    chipsCont.innerHTML = "";
+    featured.featuredSections?.forEach((sec, i) => {
+      if (!sec.title) return;
+
+      const chip = document.createElement("div");
+      chip.className = "wrk-chip";
+      chip.dataset.index = i;
+      chip.innerHTML = `<div class="chip-text">${sec.title}</div>`;
+      chipsCont.appendChild(chip);
+    });
+  }
+
+  /* Insert images into WRK groups */
+  const imgDivs = $$(".wrk-img-div");
+  const chips = $$(".wrk-chip");
+
+  if (imgDivs.length === 4 && chips.length) {
+    featured.featuredSections.forEach((sec, i) => {
+      sec.images?.forEach((imgData, idx) => {
+        const target = imgDivs[idx];
+        const img = new Image();
+        img.src = imgData.asset.url;
+        img.dataset.chipIndex = i;
+        applyMediaStyles(img, { absolute: true });
+
+        img.style.display = i === 0 ? "block" : "none";
+        target.appendChild(img);
+      });
+    });
+
+    chips.forEach((chip, chipIndex) => {
+      chip.onmouseenter = () => {
+        imgDivs.forEach(div => {
+          div.querySelectorAll("img").forEach(img => {
+            img.classList.toggle("fade-in", img.dataset.chipIndex == chipIndex);
+          });
+        });
+
+        chips.forEach(c => c.classList.remove("hover"));
+        chip.classList.add("hover");
+      };
+    });
+  }
+
+  /* MUNCHKIN MEDIA SWIPER */
+  const mmWrap = $(".m-mm-swiper .swiper-wrapper");
+  const mmTemplate = $(".m-mm-swiper .swiper-slide.m-mm");
+
+  if (mmWrap && mmTemplate) {
+    mmWrap.innerHTML = "";
+    munch.heroImages?.forEach((m, i) => {
+      const slide = mmTemplate.cloneNode(true);
+      slide.innerHTML = "";
+      insertMedia(slide, [m], "Munchkin Media");
+      mmWrap.appendChild(slide);
+    });
+
+    new Swiper(".m-mm-swiper", {
+      loop: true,
+      slidesPerView: "auto",
+      spaceBetween: 14,
+      centeredSlides: true,
+      autoplay: { delay: 1500 },
+      speed: 2000
+    });
+  }
+
+  /* Insert images for single-image sections */
+  insertMedia($(".abt-img-div"), abt.heroImages, "About Section");
+  insertMedia($(".os-cont2"), os.heroImages, "OS Section");
+  insertMedia($(".vg-div"), vid.heroImages, "Video Section");
+  insertMedia($(".contact-div"), cont.heroImages, "Contact Section");
+}
+
+/* ============================================================
+   ====================== INITIALIZER =========================
+=============================================================== */
+document.addEventListener("DOMContentLoaded", async () => {
+  loadTestimonials();
+  await loadHeroSwiper();
+  await loadOtherSections();
+
+  loadFAQs().then(initFAQAccordion);
+  loadBlogs();
+});
+</script>
+
+  
+<!--
 <script type="module">
   import { createClient } from 'https://esm.sh/@sanity/client';
   const client = createClient({
@@ -1634,7 +1995,7 @@ if (chipsCont && featuredSections.length) {
     });
     loadBlogs();
   });
-</script>
+</script>-->
 
 </body>
 </html>
