@@ -268,7 +268,12 @@
     .stages-img-div {
         left: var(--rem-sizes--1rem);
         right: var(--rem-sizes--1rem);
-        width: calc(100% - 2rem);
+        width: calc(100% - 2rem) !important;
+    }
+}
+@media screen and (max-width: 767px) {
+    .stages-img-div {
+        width: 100% !important;
     }
 }
   .stages-img-div {
@@ -331,6 +336,7 @@
         width: auto;
     }
 }
+  
   </style>
 
 
