@@ -11,11 +11,9 @@
   .long-content {
   white-space: pre-line;
 }
-
 html {
   scroll-behavior: smooth;
 }
-
   .w-webflow-badge {
   display: none !important;
 }
@@ -167,7 +165,6 @@ lockSectionHeight();
 
 
 
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   if (gsap && ScrollToPlugin) {
@@ -185,7 +182,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 </script>
-
 
 
 
@@ -243,8 +239,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 </script>
-
-
 
 
 
@@ -347,14 +341,11 @@ document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex)
 
 
 
-<!-- SplitType animations with debounce -->
+<!-- SplitType animations with debounce
 <script>
 (function waitForLoader() {
-  if (!window.loaderFinished) {
-    requestAnimationFrame(waitForLoader);
-  } else {
-    initSplitType();
-  }
+  if (!window.loaderFinished) { requestAnimationFrame(waitForLoader); } 
+  else { initSplitType() }
 })();
 function initSplitType() {
   function initSplit() {
@@ -387,14 +378,13 @@ document.querySelectorAll("[stagger-animation]").forEach(el => {
     start: "top 90%",
     once: true,
     onEnter: () => {
-      gsap.to(el, { opacity: 1, duration: 0.1 });
-      tl.play();
+      gsap.to(el, { opacity: 1, duration: 0.1 }); tl.play();
     }
   });
 });
 }initSplit();
 }
-</script>
+</script> -->
 
 
 
@@ -433,7 +423,6 @@ gsap.to(hdr, {
 
   
 <style>
-    
 .menu, .testimonials-next, .testimonials-prev {
   background: #ffffff;
   transition: background 0.3s ease;
@@ -503,7 +492,6 @@ gsap.to(hdr, {
   transition: margin 0.3s ease;
   overflow: hidden!important;
 }
-
 .header.vis {
  overflow: visible!important;
 }
@@ -515,7 +503,6 @@ gsap.to(hdr, {
     background-color: white;
     transition: background-color 0.3s ease;
   }
-
   .header.scrolled .nav-line {
     background-color: #c3c3c3;
   }
@@ -527,21 +514,16 @@ gsap.to(hdr, {
  margin: 0rem;
  transition: margin 0.3s ease;
  }
-
 .header.scrolled .nav-inr-wrp{
  margin: 1rem;
  }
 }
-
-
 .header.scrolled .menu {
   background-color: #373737;
 }
-
 .header.scrolled .menu:hover {
   background-color: #454545 !important;
 }
-
   .header .menu-line {
     background-color: #373737;
     transition: background-color 0.3s ease;
@@ -567,7 +549,6 @@ gsap.to(hdr, {
   color: #c3c3c3 !important;
   transition: color 0.3s ease;
 }
-
 .nav-link-div.w--current .nav-links,
 .nav-link-div:hover .nav-links {
   color: #373737 !important;
@@ -576,7 +557,7 @@ gsap.to(hdr, {
 
 
   .overlay {
-    position: fixed;
+ position: fixed;
   top: 0;
   left: 0;
   width: 100vw !important;
@@ -630,7 +611,7 @@ gsap.to(hdr, {
 
 
 
-/* Overlay inside card */
+
 .overlay-div {
   transition: opacity 0.35s ease;
 }
@@ -643,7 +624,6 @@ gsap.to(hdr, {
   pointer-events: auto;
 }
 
-/* Blog full overlay */
 .overlay-work {
     display: block !important;
     visibility: hidden;
@@ -657,7 +637,6 @@ gsap.to(hdr, {
   pointer-events: auto;
 }
 
-/* The blog content inside */
 .separate-work-div {
   opacity: 0;
   transform: translateY(20px);
@@ -673,10 +652,7 @@ gsap.to(hdr, {
 .wrk-close{
   cursor: pointer;
 }
-
 </style>
-
-
 
 
 
@@ -693,11 +669,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const navWrap = document.querySelector(".nav-inr-wrp");
   const overlay = document.querySelector(".overlay");
   const head = document.querySelector(".header");
-
-  function isMobile() {
-    return window.innerWidth <= 991;
-  }
-
+  function isMobile() { return window.innerWidth <= 991; }
   function closeMenu() {
     if (isMobile()) {
       navWrap.classList.remove("active");
@@ -708,7 +680,6 @@ document.addEventListener("DOMContentLoaded", () => {
       head.classList.remove("vis");
     }
   }
-
   if (menuBtn && closeBtn && navWrap && overlay) {
     menuBtn.addEventListener("click", () => {
       if (isMobile()) {
@@ -718,7 +689,6 @@ document.addEventListener("DOMContentLoaded", () => {
         head.classList.add("vis");
       }
     });
-
     closeBtn.addEventListener("click", closeMenu);
     overlay.addEventListener("click", closeMenu);
     navWrap.querySelectorAll("a").forEach(link => {
@@ -767,117 +737,6 @@ document.addEventListener("DOMContentLoaded", () => {
 </svg></div></div></div><div scale-anim="" class="w-layout-blockcontainer os-cont2 w-container"></div></section>
   
 
-  
-  
-  
-  
- <!-- 
-<div class="w-layout-hflex bene-and-test-sec"><div class="w-layout-vflex benefits-main-flex"><div stagger-animation="" text-split="" class="caption-black">[ Why Choose The Happening Story (THS)? ]</div><div class="w-layout-hflex benefits-wrap home"><div id="w-node-cc7c6387-bbf8-9e6c-c613-4777a79b7874-0fc0725f" class="w-layout-vflex ben-card"><div stagger-animation="" text-split="" class="caption-black">[01]</div><p stagger-animation="" text-split="" class="b1 ch2">High-Quality &amp; Timeless Results</p><div class="w-layout-hflex div-block-5"><img src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/6863d030b5a4c224a4c2753a_image%201.png" loading="lazy" alt="" class="bene-icon"/></div></div><div id="w-node-_9593518f-448c-dc8c-efb5-4e42c47d368b-0fc0725f" class="w-layout-vflex ben-card"><div stagger-animation="" text-split="" class="caption-black">[02]</div><p stagger-animation="" text-split="" class="b1 ch2">Unique Photography Approach</p><div class="w-layout-hflex div-block-5"><img src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/6863d02fbe7a6c9f9c9d8caf_image%203.png" loading="lazy" alt="" class="bene-icon"/></div></div><div id="w-node-d8b6837c-82c4-659d-2e30-184274727c24-0fc0725f" class="w-layout-vflex ben-card"><div stagger-animation="" text-split="" class="caption-black">[03]</div><p stagger-animation="" text-split="" class="b1 ch2">Expertise &amp; Passion in Every Shot</p><div class="w-layout-hflex div-block-5"><img src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/6863d02fd16d0400130cde05_image%202.png" loading="lazy" alt="" class="bene-icon"/></div></div><div id="w-node-_5dbdffd3-3cc9-edbf-59b0-3dcafc0604ad-0fc0725f" class="w-layout-vflex ben-card"><div stagger-animation="" text-split="" class="caption-black">[04]</div><p stagger-animation="" text-split="" class="b1 ch2">Client-Centric Experience</p><div class="w-layout-hflex div-block-5"><img src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/6863d02f50497e698c604759_image%204.png" loading="lazy" alt="" class="bene-icon"/></div></div></div></div>
-    
-<section class="test-sec"><div class="w-layout-blockcontainer test-cont w-container"><div class="w-layout-vflex test-outer-flex"><div class="w-layout-hflex test-main-flex"><h3 stagger-animation="" text-split="" class="h3">testimonials</h3></div><div class="w-layout-hflex testimonial-swiper"><div class="w-layout-hflex test-arrs-div"><div class="w-layout-hflex testimonials-prev"><div class="test-left-arr w-embed"><svg width="30" height="20" viewBox="0 0 30 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M30 10C30 10.2946 29.8871 10.5772 29.6862 10.7856C29.4853 10.9939 29.2128 11.111 28.9286 11.111L3.65954 11.111L10.4027 18.1011C10.6039 18.3097 10.7169 18.5926 10.7169 18.8876C10.7169 19.1827 10.6039 19.4656 10.4027 19.6742C10.2015 19.8828 9.92866 20 9.64416 20C9.35965 20 9.08681 19.8828 8.88563 19.6742L0.314751 10.7866C0.214979 10.6834 0.13582 10.5608 0.08181 10.4258C0.0277996 10.2908 -1.90735e-06 10.1461 -1.90735e-06 10C-1.90735e-06 9.85387 0.0277996 9.70918 0.08181 9.57421C0.13582 9.43924 0.214979 9.31664 0.314751 9.21344L8.88563 0.325802C9.08681 0.117193 9.35965 0 9.64416 0C9.92866 0 10.2015 0.117193 10.4027 0.325802C10.6039 0.534409 10.7169 0.817343 10.7169 1.11236C10.7169 1.40737 10.6039 1.69031 10.4027 1.89891L3.65954 8.88904L28.9286 8.88904C29.2128 8.88904 29.4853 9.00609 29.6862 9.21444C29.8871 9.42278 30 9.70536 30 10Z" fill="#373737"/>
-</svg></div></div><div class="w-layout-hflex testimonials-next"><div class="test-right-arr w-embed"><svg width="29" height="18" viewBox="0 0 29 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M0 9C0 8.73482 0.109113 8.4805 0.303334 8.29299C0.497556 8.10548 0.760977 8.00014 1.03565 8.00014H25.4624L18.9441 1.70902C18.7496 1.52128 18.6404 1.26664 18.6404 1.00112C18.6404 0.735608 18.7496 0.480969 18.9441 0.293222C19.1385 0.105475 19.4023 6.25573e-09 19.6773 0C19.9523 -6.25573e-09 20.2161 0.105475 20.4106 0.293222L28.6957 8.2921C28.7922 8.38498 28.8687 8.49531 28.9209 8.61679C28.9731 8.73826 29 8.86848 29 9C29 9.13152 28.9731 9.26174 28.9209 9.38321C28.8687 9.50469 28.7922 9.61502 28.6957 9.7079L20.4106 17.7068C20.2161 17.8945 19.9523 18 19.6773 18C19.4023 18 19.1385 17.8945 18.9441 17.7068C18.7496 17.519 18.6404 17.2644 18.6404 16.9989C18.6404 16.7334 18.7496 16.4787 18.9441 16.291L25.4624 9.99986H1.03565C0.760977 9.99986 0.497556 9.89452 0.303334 9.70701C0.109113 9.5195 0 9.26518 0 9Z" fill="#373737"/>
-</svg></div></div></div>
-
-
-  
- <div scale-opacity-anim="" class="w-layout-hflex swiper-wrapper white">
-    <div class="w-layout-vflex swiper-slide test">
-        <p class="b1 ch">“Our wedding album feels like a storybook. Every photo is emotional, real, and beautifully
-            captured.”</p>
-        <div class="w-layout-vflex test-inr-flex">
-            <div class="ratings-star w-embed"><svg width="52" height="9" viewBox="0 0 52 9" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0_213_315)">
-                        <path
-                            d="M2.03505 8.69586C1.82209 8.8051 1.58043 8.61365 1.62347 8.36924L2.0814 5.75959L0.137674 3.908C-0.0438431 3.73476 0.0505017 3.41807 0.293812 3.38386L2.99616 2.99986L4.20112 0.612551C4.30981 0.397379 4.60388 0.397379 4.71257 0.612551L5.91754 2.99986L8.61988 3.38386C8.86319 3.41807 8.95754 3.73476 8.77547 3.908L6.83229 5.75959L7.29023 8.36924C7.33326 8.61365 7.09161 8.8051 6.87864 8.69586L4.45602 7.45117L2.03505 8.69586Z"
-                            fill="#CDA349" />
-                    </g>
-                    <g clip-path="url(#clip1_213_315)">
-                        <path
-                            d="M12.6288 8.69586C12.4158 8.8051 12.1742 8.61365 12.2172 8.36924L12.6751 5.75959L10.7314 3.908C10.5499 3.73476 10.6443 3.41807 10.8876 3.38386L13.5899 2.99986L14.7949 0.612551C14.9036 0.397379 15.1976 0.397379 15.3063 0.612551L16.5113 2.99986L19.2136 3.38386C19.4569 3.41807 19.5513 3.73476 19.3692 3.908L17.426 5.75959L17.884 8.36924C17.927 8.61365 17.6854 8.8051 17.4724 8.69586L15.0498 7.45117L12.6288 8.69586Z"
-                            fill="#CDA349" />
-                    </g>
-                    <g clip-path="url(#clip2_213_315)">
-                        <path
-                            d="M23.2226 8.69586C23.0096 8.8051 22.7679 8.61365 22.811 8.36924L23.2689 5.75959L21.3252 3.908C21.1437 3.73476 21.238 3.41807 21.4813 3.38386L24.1837 2.99986L25.3886 0.612551C25.4973 0.397379 25.7914 0.397379 25.9001 0.612551L27.105 2.99986L29.8074 3.38386C30.0507 3.41807 30.145 3.73476 29.963 3.908L28.0198 5.75959L28.4777 8.36924C28.5208 8.61365 28.2791 8.8051 28.0661 8.69586L25.6435 7.45117L23.2226 8.69586Z"
-                            fill="#CDA349" />
-                    </g>
-                    <g clip-path="url(#clip3_213_315)">
-                        <path
-                            d="M33.8163 8.69586C33.6033 8.8051 33.3617 8.61365 33.4047 8.36924L33.8626 5.75959L31.9189 3.908C31.7374 3.73476 31.8318 3.41807 32.0751 3.38386L34.7774 2.99986L35.9824 0.612551C36.0911 0.397379 36.3851 0.397379 36.4938 0.612551L37.6988 2.99986L40.4011 3.38386C40.6444 3.41807 40.7388 3.73476 40.5567 3.908L38.6135 5.75959L39.0715 8.36924C39.1145 8.61365 38.8729 8.8051 38.6599 8.69586L36.2373 7.45117L33.8163 8.69586Z"
-                            fill="#CDA349" />
-                    </g>
-                    <g clip-path="url(#clip4_213_315)">
-                        <path
-                            d="M44.4061 8.69586C44.1932 8.8051 43.9515 8.61365 43.9946 8.36924L44.4525 5.75959L42.5088 3.908C42.3273 3.73476 42.4216 3.41807 42.6649 3.38386L45.3673 2.99986L46.5722 0.612551C46.6809 0.397379 46.975 0.397379 47.0837 0.612551L48.2886 2.99986L50.991 3.38386C51.2343 3.41807 51.3286 3.73476 51.1466 3.908L49.2034 5.75959L49.6613 8.36924C49.7044 8.61365 49.4627 8.8051 49.2497 8.69586L46.8271 7.45117L44.4061 8.69586Z"
-                            fill="#CDA349" />
-                    </g>
-                    <defs>
-                        <clipPath id="clip0_213_315">
-                            <rect width="8.82759" height="8.82759" fill="white"
-                                transform="translate(0.0429688 0.175781)" />
-                        </clipPath>
-                        <clipPath id="clip1_213_315">
-                            <rect width="8.82759" height="8.82759" fill="white"
-                                transform="translate(10.6367 0.175781)" />
-                        </clipPath>
-                        <clipPath id="clip2_213_315">
-                            <rect width="8.82759" height="8.82759" fill="white"
-                                transform="translate(21.2305 0.175781)" />
-                        </clipPath>
-                        <clipPath id="clip3_213_315">
-                            <rect width="8.82759" height="8.82759" fill="white"
-                                transform="translate(31.8242 0.175781)" />
-                        </clipPath>
-                        <clipPath id="clip4_213_315">
-                            <rect width="8.82759" height="8.82759" fill="white"
-                                transform="translate(42.4141 0.175781)" />
-                        </clipPath>
-                    </defs>
-                </svg></div>
-            <p class="s1">— Arun &amp; Divya</p>
-        </div>
-    </div>
-</div>
-
-  
-  
-<div class="os-swipper-code w-embed w-script"><script src="../unpkg.com/swiper%4012.0.2/swiper-bundle.min.js"></script>
-  
-<script>
-    var testimonialSwiper = new Swiper(".testimonial-swiper", {
-      direction: 'horizontal',
-      loop: false,
-      spaceBetween: 14,
-      centeredSlides: false,
-      observer: true,
-      observeParents: true,
-      navigation: {
-        nextEl: ".testimonials-next",
-        prevEl: ".testimonials-prev",
-      },
-   breakpoints: {
-    1920: {
-      slidesPerView: 2.5
-    },
-    // when window width is >= 1024px
-    1024: {
-      slidesPerView: 1.5
-    },
-    768: {
-      slidesPerView: 1.6
-    },
-    480: {
-      slidesPerView: 1.5
-    },
-    0: {
-      slidesPerView: 1.1
-    }
-  }
-    });
-</script></div></div></div></div></section></div>-->
 
 
 
@@ -1070,7 +929,6 @@ document.addEventListener("DOMContentLoaded", () => {
     transition: height 0.4s ease, opacity 0.4s ease;
   }
   
-  
 @media (min-width: 1024px) {
   .m-mm-swiper .swiper-wrapper {
     height: 14vw;
@@ -1248,7 +1106,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
 <script>
   const chipsCont = document.querySelector('.chips-cont');
   const height = chipsCont.offsetHeight;
@@ -1308,11 +1165,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-  
-
-
-
-
 async function loadTestimonials() {
   try {
     const testData = await client.fetch(`
@@ -1323,126 +1175,48 @@ async function loadTestimonials() {
         }
       }
     `);
-
     if (!testData?.tests?.length) { 
       console.warn("No testimonials found"); 
       return; 
     }
-
     const swiper = document.querySelector(".testimonial-swiper");
     if (!swiper) return;
-
     const wrapper = swiper.querySelector(".swiper-wrapper.white");
     if (!wrapper) return;
-
     const template = wrapper.querySelector(".swiper-slide.test");
     if (!template) {
       console.error("Template testimonial card missing (.swiper-slide.test)");
       return;
     }
-
     template.style.display = "none";
-
-    // Import PortableText → HTML converter
     const pt = await import("https://esm.sh/@portabletext/to-html");
     const toHTML = pt.toHTML;
-
     testData.tests.forEach(t => {
       const card = template.cloneNode(true);
       card.style.display = "flex";
-
       const reviewText = card.querySelector(".b1.ch");
       const reviewerName = card.querySelector(".s1");
-
-      // Handle Portable Text conversion
       if (reviewText) {
         try {
           let html = toHTML(t.review || []);
-          // Replace empty <p></p> with spacing (optional)
           html = html.replace(/<p><\/p>/g, "<br><br>");
           reviewText.innerHTML = html;
         } catch (e) {
           reviewText.textContent = "Format issue";
         }
       }
-
       if (reviewerName) reviewerName.textContent = t.reviewer || "";
-
       wrapper.appendChild(card);
     });
-
-  } catch (err) { 
-    console.error("Sanity fetch error:", err); 
-  }
+  } catch (err) { console.error("Sanity fetch error:", err); }
 }
 
 
 
-/**async function loadHeroSwiper() {
-    try {
-      const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
-        "images": heroImages[]{asset->{url}}
-      }`);
-      const images = data?.images || [];
-      const heroContainer = document.querySelector('.hero-swiper');
-      if (!heroContainer) return;
-      const swiperWrapper = heroContainer.querySelector('.swiper-wrapper');
-      const slideTemplate = heroContainer.querySelector('.swiper-slide');
-      if (!swiperWrapper || !slideTemplate) {
-        console.warn("⚠️ Swiper wrapper or slide not found in DOM.");
-        return;
-      }
-      swiperWrapper.innerHTML = '';
-      const imagePromises = images.map((imgData, index) =>
-        new Promise((resolve) => {
-          const slide = slideTemplate.cloneNode(true);
-          slide.innerHTML = '';
-          const img = new Image();
-          img.src = imgData.asset.url;
-          img.alt = `Hero Image ${index + 1}`;
-          applyMediaStyles(img, { fit: 'cover' });
-          img.onload = resolve;
-          img.onerror = resolve;
-          const overlay = document.createElement('div');
-          Object.assign(overlay.style, {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.2)',
-            pointerEvents: 'none'
-          });
-          slide.appendChild(overlay);
-          slide.appendChild(img);
-          swiperWrapper.appendChild(slide);
-        })
-      );
-      await Promise.all(imagePromises);
-      // Init Swiper
-      const swiper = new Swiper(heroContainer, {
-        direction: 'horizontal',
-        loop: true,
-        autoplay: { delay: 4000, disableOnInteraction: false },
-        speed: 1600,
-        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-        pagination: { el: '.swiper-pagination', clickable: true },
-        on: {
-          init() {
-            requestAnimationFrame(() => {
-              setTimeout(() => this.update(), 50);
-            });
-          }
-        }
-      });
-      window.addEventListener('resize', () => {
-        swiper.destroy(true, true);
-        loadHeroSwiper();
-      });
-    } catch (err) {
-      console.error('❌ Hero Swiper error:', err);
-    }
-  }**/
+
+
+
+  
 
 async function loadFAQs() {
   try {
@@ -1454,39 +1228,27 @@ async function loadFAQs() {
         }
       }
     `);
-
     const faqs = faqData?.faqs || [];
-
     const faqContainer = document.querySelector('.faqs');
     const faqTemplate = document.querySelector('.faq');
-
     if (!faqContainer || !faqTemplate) {
       console.warn("FAQ container or template missing.");
       return;
     }
-
     faqContainer.innerHTML = "";
-
     const pt = await import("https://esm.sh/@portabletext/to-html");
     const toHTML = pt.toHTML;
-
     faqs.forEach((item) => {
       const card = faqTemplate.cloneNode(true);
-
       const quesEl = card.querySelector('.ques');
       const ansEl  = card.querySelector('.ans');
-
       if (quesEl) quesEl.textContent = item.question;
       if (ansEl && item.answer) {
         ansEl.innerHTML = toHTML(item.answer);
       }
-
       faqContainer.appendChild(card);
     });
-
-  } catch (err) {
-    console.error("❌ FAQ Error:", err);
-  }
+  } catch (err) { console.error("❌ FAQ Error:", err); }
 }
 
 function initFAQAccordion() {
@@ -1497,11 +1259,8 @@ function initFAQAccordion() {
     const ans = card.querySelector('.ans');
     const arrow = card.querySelector('.arr-down');
 
-    if (index === 0) {
-      openFAQ(ans, arrow, true);
-    } else {
-      closeFAQ(ans, arrow, true);
-    }
+    if (index === 0) { openFAQ(ans, arrow, true); } 
+    else { closeFAQ(ans, arrow, true); }
 
     card.addEventListener('click', () => {
       faqCards.forEach(f => {
@@ -1509,42 +1268,32 @@ function initFAQAccordion() {
         const ar = f.querySelector('.arr-down');
         closeFAQ(a, ar);
       });
-
       openFAQ(ans, arrow);
     });
   });
 
   function openFAQ(ans, arrow, instant = false) {
-
     ans.classList.add('open');
     ans.classList.remove('close');
     arrow?.classList.add('up');
-
     ans.style.height = 'auto';
     const fullHeight = ans.scrollHeight + "px";
-
     if (instant) {
       ans.style.height = 'auto';
       return;
     }
     ans.style.height = "0px";
-    requestAnimationFrame(() => {
-      ans.style.height = fullHeight;
-    });
+    requestAnimationFrame(() => { ans.style.height = fullHeight; });
     ans.addEventListener('transitionend', () => {
-      if (ans.classList.contains('open')) {
-        ans.style.height = "auto";
-      }
+      if (ans.classList.contains('open')) { ans.style.height = "auto"; }
     }, { once: true });
   }
 
   function closeFAQ(ans, arrow, instant = false) {
-
     ans.classList.remove('open');
     ans.classList.add('close');
     arrow?.classList.remove('up');
     ans.style.height = ans.scrollHeight + "px";
-
     if (instant) {
       ans.style.height = "0px";
       return;
@@ -1556,9 +1305,6 @@ function initFAQAccordion() {
 
 
   
-
-  
-
 
 
 
@@ -1585,12 +1331,10 @@ async function loadHeroSwiper() {
       return new Promise((resolve) => {
         const slide = slideTemplate.cloneNode(true);
         slide.innerHTML = '';
-
         const img = new Image();
         img.src = imgData.asset.url;
         img.alt = `Hero Image ${index + 1}`;
         applyMediaStyles(img, { fit: 'cover' });
-
         img.onload = resolve;
         img.onerror = resolve;
 
@@ -1604,7 +1348,6 @@ async function loadHeroSwiper() {
           backgroundColor: 'rgba(0,0,0,0.2)',
           pointerEvents: 'none',
         });
-
         slide.appendChild(overlay);
         slide.appendChild(img);
         swiperWrapper.appendChild(slide);
@@ -1612,10 +1355,8 @@ async function loadHeroSwiper() {
     });
 
     await Promise.all(loadPromises);
-
 if (!heroSwiperInitialized) {
   heroSwiperInitialized = true;
-
   const swiper = new Swiper(heroContainer, {
     loop: true,
     speed: 1000,
@@ -1631,7 +1372,6 @@ if (!heroSwiperInitialized) {
     observeParents: false,
     navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
     pagination: { el: '.swiper-pagination', clickable: true },
-
     on: {
       init(swiperInstance) {
         swiperInstance.wrapperEl.style.transitionTimingFunction =
@@ -1644,20 +1384,14 @@ if (!heroSwiperInitialized) {
       },
     },
   });
-
   let t;
   window.addEventListener('resize', () => {
     clearTimeout(t);
     t = setTimeout(() => swiper.update(), 180);
   });
 }
-  } catch (err) {
-    console.error('❌ Hero Swiper error:', err);
-  }
+  } catch (err) { console.error('❌ Hero Swiper error:', err); }
 }
-
-
-
 
 
 
@@ -1728,11 +1462,9 @@ async function loadBlogs() {
       
 
 if (overlayWork && separateDiv) {
-
   const openPopup = () => {
     if (titleArea) titleArea.textContent = blog.title || "";
     if (shortDescArea) shortDescArea.textContent = blog.shortDescription || "";
-
     if (longContentArea) {
       try {
         let html = blogtoHTML(blog.content);
@@ -1742,7 +1474,6 @@ if (overlayWork && separateDiv) {
         longContentArea.innerHTML = "Content format error";
       }
     }
-
     if (imagesWrpr) {
       imagesWrpr.innerHTML = "";
       if (Array.isArray(blog.gallery) && blog.gallery.length) {
@@ -1756,25 +1487,15 @@ if (overlayWork && separateDiv) {
           el.style.borderRadius = "5px";
           imagesWrpr.appendChild(el);
         });
-      } else {
-        imagesWrpr.innerHTML = "<p>No images available</p>";
-      }
+      } else { imagesWrpr.innerHTML = "<p>No images available</p>";}
     }
-
     overlayWork.classList.add("active");
     separateDiv.classList.add("active");
-
-    // Disable scrolling
     document.body.style.overflow = "hidden";
   };
-
-  // Open on button click
   if (openBtn) openBtn.addEventListener("click", openPopup);
-
-  // Open when clicking overlay-div
   if (overlayEl) overlayEl.addEventListener("click", openPopup);
 
-  // Close button
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       overlayWork.classList.remove("active");
@@ -1782,8 +1503,6 @@ if (overlayWork && separateDiv) {
       document.body.style.overflow = "";
     });
   }
-
-  // Click outside to close
   overlayWork.addEventListener("click", (e) => {
     if (e.target === overlayWork) {
       overlayWork.classList.remove("active");
@@ -1792,14 +1511,9 @@ if (overlayWork && separateDiv) {
     }
   });
 }
-
-
-      
       container.appendChild(card);
     });
-  } catch (err) {
-    console.error("❌ Sanity blog fetch error:", err);
-  }
+  } catch (err) { console.error("❌ Sanity blog fetch error:", err); }
 }
 
 
@@ -1808,14 +1522,6 @@ if (overlayWork && separateDiv) {
 
 
 
-
-
-
-
-
-  
-  
-  // ✅ Featured + Other Sections
   async function loadOtherSections() {
     try {
       const [featuredData, abtData, osData, vidData, contData, munData] = await Promise.all([
@@ -1833,18 +1539,14 @@ if (overlayWork && separateDiv) {
 const chipsCont = document.querySelector('.chips-cont');
 if (chipsCont && featuredSections.length) {
   chipsCont.querySelectorAll('.wrk-chip').forEach(chip => chip.remove());
-
   featuredSections.forEach((section, index) => {
     if (!section.title) return;
-
     const chip = document.createElement('div');
     chip.classList.add('wrk-chip');
     chip.dataset.index = index;
-
     const chipText = document.createElement('div');
     chipText.classList.add('chip-text');
     chipText.textContent = section.title;
-
     chip.appendChild(chipText);
     chipsCont.appendChild(chip);
   });
@@ -1916,9 +1618,7 @@ if (chipsCont && featuredSections.length) {
       insertImageOrVideo(document.querySelector('.vg-div'), vidImages, 'Video Gallery');
       insertImageOrVideo(document.querySelector('.contact-div'), contImages, 'Contact Image');
       insertImageOrVideo(document.querySelector('.m-mm-swiper .swiper-slide.m-mm'), munImages, 'Munchkin Image');
-    } catch (err) {
-      console.error('❌ Other Sections error:', err);
-    }
+    } catch (err) { console.error('❌ Other Sections error:', err); }
   }
   document.addEventListener('DOMContentLoaded', () => {
     loadTestimonials();
@@ -1930,11 +1630,6 @@ if (chipsCont && featuredSections.length) {
     loadBlogs();
   });
 </script>
-
-
-
-
-
 
 </body>
 </html>
