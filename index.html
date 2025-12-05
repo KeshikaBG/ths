@@ -161,11 +161,9 @@ function lockSectionHeight() {
   });
 }
 lockSectionHeight();
-</script>
 
 
-
-<script>
+  
 document.addEventListener("DOMContentLoaded", function () {
   if (gsap && ScrollToPlugin) {
     gsap.registerPlugin(ScrollToPlugin, ScrollTrigger);
@@ -490,7 +488,6 @@ gsap.to(hdr, {
   will-change: transform, opacity !important;
   transition: transform 0.3s ease, opacity 0.3s ease !important;
 }
-
 .header {
   background: transparent;
   margin: 1rem 1rem 0 1rem;
@@ -511,7 +508,6 @@ gsap.to(hdr, {
   .header.scrolled .nav-line {
     background-color: #c3c3c3;
   }
-  
   
   
 @media screen and (max-width: 991px) {  
@@ -544,7 +540,6 @@ gsap.to(hdr, {
     filter: invert(100%);
   }
   
-  
  
 .nav-wrp {
   height: 0vh;
@@ -558,7 +553,6 @@ gsap.to(hdr, {
 .nav-link-div:hover .nav-links {
   color: #373737 !important;
 }
-
 
 
   .overlay {
@@ -593,14 +587,12 @@ gsap.to(hdr, {
     z-index: -1 !important;
     visibility: hidden;
   }
-
   .nav-inr-wrp.active {
     opacity: 1 !important;
     visibility: visible;
     min-height: 35vh;
     padding: 1rem;
   }
-
   .overlay.oveactive {
         display: block;
       position: fixed;
@@ -628,7 +620,6 @@ gsap.to(hdr, {
   opacity: 1;
   pointer-events: auto;
 }
-
 .overlay-work {
     display: block !important;
     visibility: hidden;
@@ -641,7 +632,6 @@ gsap.to(hdr, {
   opacity: 1 !important;
   pointer-events: auto;
 }
-
 .separate-work-div {
   opacity: 0;
   transform: translateY(20px);
@@ -678,9 +668,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeMenu() {
     if (isMobile()) {
       navWrap.classList.remove("active");
-      setTimeout(() => {
-        navWrap.classList.remove("height");
-      }, 0);
+      setTimeout(() => { navWrap.classList.remove("height");}, 0);
       overlay.classList.remove("oveactive");
       head.classList.remove("vis");
     }
@@ -696,12 +684,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     closeBtn.addEventListener("click", closeMenu);
     overlay.addEventListener("click", closeMenu);
-    navWrap.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", closeMenu);
-    });
+    navWrap.querySelectorAll("a").forEach(link => { link.addEventListener("click", closeMenu); });
   }
 });
-</script></div></div>
+</script>
+</div>
+</div>
   
   <section class="hero-sec">
   <div class="w-layout-blockcontainer hero-cont w-container"><div class="hero-div"><div class="w-layout-hflex hero-swiper"><div class="w-layout-hflex swiper-wrapper"><div class="swiper-code w-embed"><style>
@@ -740,9 +728,6 @@ document.addEventListener("DOMContentLoaded", () => {
 <path d="M80.2973 59.4432C77.9609 60.3701 76.2695 61.5259 74.821 63.1854C71.6035 66.8643 69.462 72.0878 69.3989 76.4061C69.3416 80.3927 71.4313 85.7412 74.0849 88.402C76.1295 90.4506 79.8884 92.4252 83.5322 93.3669C86.2933 94.0802 87.244 94.1822 89.3527 93.9971C92.9895 93.6773 95.8832 92.5513 98.5462 90.4263C100.986 88.4798 101.695 87.5486 103.051 84.5293C105.01 80.1607 105.454 76.4044 104.514 72.1569C103.801 68.9374 103.023 67.315 100.89 64.6218C96.8871 59.5619 93.7632 58.0173 87.7498 58.1306C85.5145 58.1721 81.892 58.8131 80.2973 59.4432ZM89.0952 59.3527C93.7896 59.4948 96.2784 60.8603 99.6784 65.1599C102.62 68.8804 103.644 71.6344 103.71 76.0153C103.787 81.1677 101.172 86.9672 97.5058 89.7747C93.7252 92.6692 89.6304 93.3639 83.9642 92.0673C79.4942 91.0457 76.1664 89.2966 74.3338 87.0021C70.7625 82.5333 69.7305 76.2734 71.6835 70.9094C72.5436 68.5384 74.465 65.2719 75.8986 63.7376C78.6796 60.7662 83.4381 59.1823 89.0952 59.3527Z" fill="white" fill-opacity="0.5"/>
 <path d="M81.9201 62.5912C78.8515 63.9856 77.2153 65.3694 75.7798 67.7932C75.0665 68.9988 74.2984 70.78 74.053 71.805C73.6548 73.4605 73.6748 73.9947 74.2409 76.9792C74.5938 78.846 75.1876 81.0146 75.5878 81.9133C75.975 82.7852 76.4286 83.968 76.579 84.5029C76.9611 85.8543 78.3578 87.4521 79.7842 88.1792C81.2273 88.9121 87.8044 90.2484 89.9238 90.2397C91.205 90.2307 91.7448 90.0863 92.9962 89.3973C95.3932 88.0758 97.3241 86.3284 98.8731 84.0748C101.136 80.7741 101.831 77.4772 101.319 72.4791C100.934 68.736 99.9762 66.1567 98.1296 63.8902C96.8356 62.3016 96.6943 62.2192 94.097 61.5667C92.6107 61.195 90.7414 60.8417 89.9167 60.7793C88.0352 60.6383 84.4191 61.4578 81.9201 62.5912ZM95.2037 65.7632C95.7977 66.1845 95.8276 66.2821 95.5874 67.0846C95.4446 67.5625 95.0482 68.0551 94.6954 68.1889C92.8509 68.8885 91.6168 67.8003 92.6524 66.3825C93.3873 65.3817 94.3372 65.1489 95.2037 65.7632Z" fill="white" fill-opacity="0.5"/>
 </svg></div></div></div><div scale-anim="" class="w-layout-blockcontainer os-cont2 w-container"></div></section>
-  
-
-
 
 
 
@@ -917,7 +902,6 @@ document.addEventListener("DOMContentLoaded", () => {
     </section>
 </div>
   
-  
 <section class="vg-sec"><div class="w-layout-blockcontainer vg-cont w-container"><div data-entry-anim="" class="vg-div"><div class="div-block"></div><div class="w-layout-vflex vg-main-div"><div class="w-layout-vflex inr-flex"><div stagger-animation="" text-split="" class="caption">[ Visual Storytelling ]</div><p stagger-animation="" text-split="" class="sh1 white">See how we transform real moments into cinematic memories.</p></div><a href="video-gallery.html" class="sec-btn w-inline-block"><div class="btn-txt">Video gallery</div><div class="btn-arr w-embed"><svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M0 5.50071C0 5.35153 0.0592632 5.20845 0.164752 5.10296C0.270242 4.99747 0.413316 4.93821 0.5625 4.93821H13.8296L10.2892 1.39896C10.1836 1.29334 10.1243 1.15008 10.1243 1.00071C10.1243 0.851338 10.1836 0.708083 10.2892 0.60246C10.3949 0.496838 10.5381 0.4375 10.6875 0.4375C10.8369 0.4375 10.9801 0.496838 11.0858 0.60246L15.5858 5.10246C15.6381 5.15471 15.6797 5.21678 15.7081 5.28512C15.7364 5.35346 15.751 5.42672 15.751 5.50071C15.751 5.5747 15.7364 5.64796 15.7081 5.7163C15.6797 5.78464 15.6381 5.84671 15.5858 5.89896L11.0858 10.399C10.9801 10.5046 10.8369 10.5639 10.6875 10.5639C10.5381 10.5639 10.3949 10.5046 10.2892 10.399C10.1836 10.2933 10.1243 10.1501 10.1243 10.0007C10.1243 9.85134 10.1836 9.70808 10.2892 9.60246L13.8296 6.06321H0.5625C0.413316 6.06321 0.270242 6.00395 0.164752 5.89846C0.0592632 5.79297 0 5.6499 0 5.50071Z" fill="white"/>
 </svg></div></a></div></div></div></section><section class="m-mm-sec white"><div class="w-layout-blockcontainer m-mm-cont w-container"><div class="w-layout-vflex m-mm-div"><div class="w-layout-vflex inr-flex"><div stagger-animation="" text-split="" class="caption-black">[ End-to-End Creatives ]</div><h1 stagger-animation="" text-split="" class="h1 black">Where ideas grow into powerful brand stories.</h1></div><div data-scale-img="v2" class="w-layout-hflex m-mm-swiper"><div scale-opacity-anim="" class="w-layout-hflex swiper-wrapper white m-mm"><div class="w-layout-vflex swiper-slide m-mm"></div></div><div class="m-mm-swipercode w-embed"><style>
@@ -933,7 +917,6 @@ document.addEventListener("DOMContentLoaded", () => {
     flex-shrink: 0;
     transition: height 0.4s ease, opacity 0.4s ease;
   }
-  
 @media (min-width: 1024px) {
   .m-mm-swiper .swiper-wrapper {
     height: 14vw;
@@ -952,7 +935,6 @@ document.addEventListener("DOMContentLoaded", () => {
     opacity: 60%;
   }
 }
-
 @media (min-width: 768px) and (max-width: 1023px) {
   .m-mm-swiper .swiper-wrapper {
     height: 32vw;
@@ -971,7 +953,6 @@ document.addEventListener("DOMContentLoaded", () => {
     opacity: 60%;
   }
 }
-
 @media (max-width: 767px) {
   .m-mm-swiper .swiper-wrapper {
     height: 48vw;
@@ -1113,13 +1094,10 @@ document.addEventListener("DOMContentLoaded", () => {
     else { header.classList.remove('scrolled'); }
   });
 
-
   const chipsCont = document.querySelector('.chips-cont');
   const height = chipsCont.offsetHeight;
   chipsCont.style.marginBottom = `-${height / 2}px`;
-    
 </script>
-
 
 
 
@@ -1171,8 +1149,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
-
 async function loadTestimonials() {
   try {
     const testData = await client.fetch(`
@@ -1209,8 +1185,6 @@ async function loadTestimonials() {
 
 
 
-
-
 async function loadFAQs() {
   try {
     const faqData = await client.fetch(`
@@ -1238,7 +1212,6 @@ async function loadFAQs() {
     });
   } catch (err) { console.error("❌ FAQ Error:", err); }
 }
-
 function initFAQAccordion() {
   const faqCards = document.querySelectorAll('.faq');
   if (!faqCards.length) return;
@@ -1269,7 +1242,6 @@ function initFAQAccordion() {
       if (ans.classList.contains('open')) { ans.style.height = "auto"; }
     }, { once: true });
   }
-
   function closeFAQ(ans, arrow, instant = false) {
     ans.classList.remove('open');
     ans.classList.add('close');
@@ -1282,7 +1254,6 @@ function initFAQAccordion() {
 }
 
 
-  
 
 
   
@@ -1295,7 +1266,6 @@ async function loadHeroSwiper() {
     const images = data?.images || [];
     const heroContainer = document.querySelector('.hero-swiper');
     if (!heroContainer) return;
-
     const swiperWrapper = heroContainer.querySelector('.swiper-wrapper');
     const slideTemplate = heroContainer.querySelector('.swiper-slide');
     if (!swiperWrapper || !slideTemplate) return;
@@ -1367,8 +1337,6 @@ if (!heroSwiperInitialized) {
 
 
 
-
-
 async function loadBlogs() {
   try {
     const blogs = await client.fetch(`
@@ -1390,7 +1358,6 @@ async function loadBlogs() {
     template.style.display = "none";
     const blogpt = await import("https://esm.sh/@portabletext/to-html");
     const blogtoHTML = blogpt.toHTML;
-
     blogs.forEach(blog => {
       const card = template.cloneNode(true);
       card.style.display = "flex";
@@ -1416,18 +1383,14 @@ async function loadBlogs() {
           overlayEl.classList.remove("opacity-100");
         });
       }
-
       const openBtn = card.querySelector(".overlay-div .btn");
       const overlayWork = document.querySelector(".overlay-work");
       const separateDiv = document.querySelector(".separate-work-div");
       const closeBtn = document.querySelector(".wrk-close");
-
       const titleArea = document.querySelector(".separate-work-div .blog-title");
       const shortDescArea = document.querySelector(".separate-work-div .s-para");
       const longContentArea = document.querySelector(".separate-work-div .long-content");
       const imagesWrpr = document.querySelector(".separate-work-div .images-flex-wrpr");
-      
-
 if (overlayWork && separateDiv) {
   const openPopup = () => {
     if (titleArea) titleArea.textContent = blog.title || "";
@@ -1462,7 +1425,6 @@ if (overlayWork && separateDiv) {
   };
   if (openBtn) openBtn.addEventListener("click", openPopup);
   if (overlayEl) overlayEl.addEventListener("click", openPopup);
-
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       overlayWork.classList.remove("active");
@@ -1482,8 +1444,6 @@ if (overlayWork && separateDiv) {
     });
   } catch (err) { console.error("❌ Sanity blog fetch error:", err); }
 }
-
-
 
 
 
@@ -1555,7 +1515,6 @@ if (chipsCont && featuredSections.length) {
           });
         });
       }
-
       const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
       const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
       if (swiperWrapper && slideTemplate && munImages.length) {
@@ -1583,7 +1542,6 @@ if (chipsCont && featuredSections.length) {
       insertImageOrVideo(document.querySelector('.m-mm-swiper .swiper-slide.m-mm'), munImages, 'Munchkin Image');
     } catch (err) { console.error('❌ Other Sections error:', err); }
   }
-  
   document.addEventListener('DOMContentLoaded', () => {
     loadTestimonials();
     loadHeroSwiper();
