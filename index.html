@@ -242,149 +242,154 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-<!-- Entry animations -->
 <script>
 (function waitForLoader() {
-  if (!window.loaderFinished) { requestAnimationFrame(waitForLoader);} 
-  else { runGsapAnimations();}
+  if (!window.loaderFinished) requestAnimationFrame(waitForLoader);
+  else {
+    runGsapAnimations();
+    initSplitTypeAnimations();
+  }
 })();
+
+/* -------------------------------------------------
+   GSAP ENTRY ANIMATIONS
+--------------------------------------------------*/
 function runGsapAnimations() {
   const easeType = "power2.out";
-ScrollTrigger.batch("[data-entry-anim]", {
-  onEnter: batch => {
-    batch.forEach(el => {
-      const delay = parseFloat(el.dataset.entryDelay) || 0;
-      gsap.fromTo(el,
-        { scale: 0 },
-        { scale: 1, duration: 1, ease: easeType, delay: delay }
-      );
-      gsap.to(el, {
-        filter: "grayscale(0%)", duration: 0.6, ease: easeType, delay: delay + 0.01
+  ScrollTrigger.batch("[data-entry-anim]", {
+    onEnter: batch => {
+      batch.forEach(el => {
+        const delay = parseFloat(el.dataset.entryDelay) || 0;
+        gsap.fromTo(el, { scale: 0 }, {
+          scale: 1,
+          duration: 1,
+          ease: easeType,
+          delay
+        });
+        gsap.to(el, {
+          filter: "grayscale(0%)",
+          duration: 0.6,
+          ease: easeType,
+          delay: delay + 0.01
+        });
       });
-    });
-  },
-  once: true
-});
-ScrollTrigger.batch("[scale-anim]", {
-  onEnter: batch => {
-    gsap.fromTo(batch,
-      { scale: 0, },
-      { scale: 1, duration: 0.6, ease: easeType, stagger: 0.15 }
-    );
-  },
-  once: true
-});
-document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex) => {
-  const children = container.querySelectorAll(":scope > *");
-  if (!children.length) return;
-
-  children.forEach((child, i) => {
-    gsap.fromTo(child,
-      { y: 80, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        ease: "power2.out",
-        delay: containerIndex * 0.3 + i * 0.15,
-        scrollTrigger: {
-          trigger: child,
-          start: "top 90%",
-          once: true
-        }
-      }
-    );
+    },
+    once: true
   });
-});
+  ScrollTrigger.batch("[scale-anim]", {
+    onEnter: batch => {
+      gsap.fromTo(batch, { scale: 0 }, {
+        scale: 1,
+        duration: 0.6,
+        ease: easeType,
+        stagger: 0.15
+      });
+    },
+    once: true
+  });
+  document.querySelectorAll("[slide-up-anim]").forEach((container, idx) => {
+    const children = container.children;
+    [...children].forEach((child, i) => {
+      gsap.fromTo(child,
+        { y: 80, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: easeType,
+          delay: idx * 0.3 + i * 0.15,
+          scrollTrigger: {
+            trigger: child,
+            start: "top 90%",
+            once: true
+          }
+        }
+      );
+    });
+  });
   document.querySelectorAll("[opacity-anim]").forEach(container => {
     const children = [...container.children].filter(el => !el.classList.contains("overlay"));
-    if (children.length) {
-      ScrollTrigger.batch(children, {
-        onEnter: batch => gsap.to(batch, { opacity: 1 }),
-        once: true
-      });
-    }
+    ScrollTrigger.batch(children, {
+      onEnter: batch => gsap.to(batch, { opacity: 1 }),
+      once: true
+    });
   });
   document.querySelectorAll("[scale-opacity-anim]").forEach(container => {
     const children = [...container.children];
-    if (children.length) {
-      ScrollTrigger.batch(children, {
-        onEnter: batch => gsap.fromTo(batch,
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, ease: easeType, stagger: 0.15 }
-        ),
-        once: true
-      });
-    }
+    ScrollTrigger.batch(children, {
+      onEnter: batch => gsap.fromTo(batch,
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.6, ease: easeType, stagger: 0.15 }
+      ),
+      once: true
+    });
   });
   ScrollTrigger.batch("[data-scale-img] img", {
     onEnter: batch => gsap.to(batch, {
-      opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03
+      opacity: 1,
+      duration: 0.6,
+      ease: easeType,
+      stagger: 0.03
     }),
     once: true
   });
-  const animDvdr = (sel, axis) => {
-    document.querySelectorAll(sel).forEach(dvdr => {
-      gsap.fromTo(dvdr, { [axis]: 0 }, {
+  const animDivider = (selector, axis) => {
+    document.querySelectorAll(selector).forEach(el => {
+      gsap.fromTo(el, { [axis]: 0 }, {
         [axis]: 1,
         duration: 0.6,
         ease: easeType,
-        scrollTrigger: { trigger: dvdr, start: "top 90%", once: true }
+        scrollTrigger: {
+          trigger: el,
+          start: "top 90%",
+          once: true
+        }
       });
     });
   };
-  animDvdr('.nav-line', "scaleX");
-  animDvdr('.vertical-line', "scaleY");
+  animDivider(".nav-line", "scaleX");
+  animDivider(".vertical-line", "scaleY");
 }
-</script>
 
-
-
-
-<!-- SplitType animations with debounce -->
-<script>
-(function waitForLoader() {
-  if (!window.loaderFinished) { requestAnimationFrame(waitForLoader); } 
-  else { initSplitType() }
-})();
-function initSplitType() {
-  function initSplit() {
+/* -------------------------------------------------
+   SPLIT-TYPE TEXT ANIMATIONS
+--------------------------------------------------*/
+function initSplitTypeAnimations() {
+  function setupSplit() {
     new SplitType("[text-split]", { types: "lines, words, chars", tagName: "span" });
     document.querySelectorAll("[text-split] .line").forEach(line => {
-      const wrapper = document.createElement("div");
-      wrapper.style.overflow = "hidden";
-      line.parentNode.insertBefore(wrapper, line);
-      wrapper.appendChild(line);
+      const wrap = document.createElement("div");
+      wrap.style.overflow = "hidden";
+      line.parentNode.insertBefore(wrap, line);
+      wrap.appendChild(line);
     });
-document.querySelectorAll("[stagger-animation]").forEach(el => {
-  const delay = parseFloat(el.getAttribute("data-delay") || 0.01);
-  const lines = el.querySelectorAll(".line");
-  const tl = gsap.timeline({ paused: true, delay });
-  lines.forEach((line, i) => {
-    tl.from(line, {
-      yPercent: 100,
-      duration: 0.6,
-      ease: "power2.out"
-    }, i * 0.05);
-    tl.from(line.querySelectorAll(".word, .char"), {
-      yPercent: 100,
-      duration: 0.5,
-      ease: "power2.out",
-      stagger: 0.01
-    }, i * 0.05);
-  });
-  ScrollTrigger.create({
-    trigger: el,
-    start: "top 90%",
-    once: true,
-    onEnter: () => {
-      gsap.to(el, { opacity: 1, duration: 0.1 }); tl.play();
-    }
-  });
-});
-}initSplit();
+    document.querySelectorAll("[stagger-animation]").forEach(el => {
+      const delay = parseFloat(el.dataset.delay) || 0.01;
+      const lines = el.querySelectorAll(".line");
+      const tl = gsap.timeline({ paused: true, delay });
+      lines.forEach((line, i) => {
+        tl.from(line, { yPercent: 100, duration: 0.6, ease: "power2.out" }, i * 0.05);
+        tl.from(line.querySelectorAll(".word, .char"), {
+          yPercent: 100,
+          duration: 0.5,
+          ease: "power2.out",
+          stagger: 0.01
+        }, i * 0.05);
+      });
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 90%",
+        once: true,
+        onEnter: () => {
+          gsap.to(el, { opacity: 1, duration: 0.1 });
+          tl.play();
+        }
+      });
+    });
+  }
+  setupSplit();
 }
-</script> 
+</script>
 
 
 
