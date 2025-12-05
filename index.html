@@ -1389,51 +1389,76 @@ async function loadOtherSections() {
   const [featured, abt, os, vid, cont, munch] = data;
 
   /* WRK CHIPS */
-  const chipsCont = $(".chips-cont");
-  if (chipsCont) {
-    chipsCont.innerHTML = "";
-    featured.featuredSections?.forEach((sec, i) => {
-      if (!sec.title) return;
+const chipsCont = document.querySelector('.chips-cont');
 
-      const chip = document.createElement("div");
-      chip.className = "wrk-chip";
-      chip.dataset.index = i;
-      chip.innerHTML = `<div class="chip-text">${sec.title}</div>`;
-      chipsCont.appendChild(chip);
+if (chipsCont && featuredSections.length) {
+  chipsCont.innerHTML = ""; // remove old chips
+
+  featuredSections.forEach((section, i) => {
+    const chip = document.createElement("div");
+    chip.className = "wrk-chip";
+    chip.dataset.index = i;
+    chip.innerHTML = `<div class="chip-text">${section.title}</div>`;
+    chipsCont.appendChild(chip);
+  });
+}
+
+const chips = document.querySelectorAll(".wrk-chip");
+const imgDivs = document.querySelectorAll(".wrk-img-div");
+const divsPerGroup = 4;
+
+if (featuredSections.length && chips.length && imgDivs.length === divsPerGroup) {
+
+  // Clear all images first
+  imgDivs.forEach(div => div.innerHTML = "");
+
+  // Create image groups
+  featuredSections.forEach((section, chipIndex) => {
+    section.images.forEach((imgData, imgIndex) => {
+
+      const targetDiv = imgDivs[imgIndex];
+      if (!targetDiv) return;
+
+      const img = document.createElement("img");
+      img.src = imgData.asset.url;
+      img.dataset.chipIndex = chipIndex;
+      img.classList.add("wrk-img");
+      applyMediaStyles(img, { absolute: true });
+
+      // ONLY show the first chip's images at start
+      if (chipIndex === 0) {
+        img.style.opacity = "1";
+      } else {
+        img.style.opacity = "0";
+      }
+
+      targetDiv.appendChild(img);
     });
-  }
+  });
 
-  /* Insert images into WRK groups */
-  const imgDivs = $$(".wrk-img-div");
-  const chips = $$(".wrk-chip");
+  // Hover switching logic
+  chips.forEach((chip, chipIndex) => {
+    chip.addEventListener("mouseenter", () => {
 
-  if (imgDivs.length === 4 && chips.length) {
-    featured.featuredSections.forEach((sec, i) => {
-      sec.images?.forEach((imgData, idx) => {
-        const target = imgDivs[idx];
-        const img = new Image();
-        img.src = imgData.asset.url;
-        img.dataset.chipIndex = i;
-        applyMediaStyles(img, { absolute: true });
+      chips.forEach(c => c.classList.remove("hover"));
+      chip.classList.add("hover");
 
-        img.style.display = i === 0 ? "block" : "none";
-        target.appendChild(img);
+      imgDivs.forEach(div => {
+        const imgs = div.querySelectorAll("img");
+        imgs.forEach(img => {
+          if (img.dataset.chipIndex == chipIndex) {
+            img.style.opacity = "1";
+            img.classList.add("fade-in");
+          } else {
+            img.style.opacity = "0";
+            img.classList.remove("fade-in");
+          }
+        });
       });
     });
+  });
+}
 
-    chips.forEach((chip, chipIndex) => {
-      chip.onmouseenter = () => {
-        imgDivs.forEach(div => {
-          div.querySelectorAll("img").forEach(img => {
-            img.classList.toggle("fade-in", img.dataset.chipIndex == chipIndex);
-          });
-        });
-
-        chips.forEach(c => c.classList.remove("hover"));
-        chip.classList.add("hover");
-      };
-    });
-  }
 
   /* MUNCHKIN MEDIA SWIPER */
   const mmWrap = $(".m-mm-swiper .swiper-wrapper");
