@@ -1215,43 +1215,66 @@ async function loadFAQs() {
 function initFAQAccordion() {
   const faqCards = document.querySelectorAll('.faq');
   if (!faqCards.length) return;
-  faqCards.forEach((card, index) => {
+  faqCards.forEach(card => {
     const ans = card.querySelector('.ans');
     const arrow = card.querySelector('.arr-down');
-    if (index === 0) { openFAQ(ans, arrow, true); } 
-    else { closeFAQ(ans, arrow, true); }
+    closeFAQ(ans, arrow, true);
+  });
+
+  faqCards.forEach(card => {
+    const ans = card.querySelector('.ans');
+    const arrow = card.querySelector('.arr-down');
+
     card.addEventListener('click', () => {
+      const isOpen = ans.classList.contains('open');
+      if (isOpen) {
+        closeFAQ(ans, arrow);
+        return;
+      }
+
       faqCards.forEach(f => {
         const a = f.querySelector('.ans');
         const ar = f.querySelector('.arr-down');
         closeFAQ(a, ar);
       });
+
       openFAQ(ans, arrow);
     });
   });
+
   function openFAQ(ans, arrow, instant = false) {
     ans.classList.add('open');
     ans.classList.remove('close');
     arrow?.classList.add('up');
     ans.style.height = 'auto';
     const fullHeight = ans.scrollHeight + "px";
-    if (instant) { ans.style.height = 'auto'; return; }
+    if (instant) {
+      ans.style.height = "auto";
+      return;
+    }
     ans.style.height = "0px";
     requestAnimationFrame(() => { ans.style.height = fullHeight; });
     ans.addEventListener('transitionend', () => {
-      if (ans.classList.contains('open')) { ans.style.height = "auto"; }
+      if (ans.classList.contains('open')) {
+        ans.style.height = "auto";
+      }
     }, { once: true });
   }
+
   function closeFAQ(ans, arrow, instant = false) {
     ans.classList.remove('open');
     ans.classList.add('close');
     arrow?.classList.remove('up');
     ans.style.height = ans.scrollHeight + "px";
-    if (instant) { ans.style.height = "0px"; return; }
+    if (instant) {
+      ans.style.height = "0px";
+      return;
+    }
     ans.offsetHeight;
     ans.style.height = "0px";
   }
 }
+
 
 
 
