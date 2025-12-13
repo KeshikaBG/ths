@@ -1116,7 +1116,7 @@
 async function loadBlogs() {
   try {
     const blogs = await client.fetch(`
-      *[_type == "blog"] | order(_createdAt desc) {
+      *[_type == "blog"] | order(_createdAt asc) {
         title,
         slug,
         shortDescription,
