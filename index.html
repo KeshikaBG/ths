@@ -291,12 +291,12 @@ function runGsapAnimations() {
   });
     ScrollTrigger.batch("[scaleto-anim]", {
     onEnter: batch => {
-      gsap.to(batch, {
-  scale: 1,
-  y: 0,
-  duration: 0.6,
-  ease: easeType
-});
+      gsap.fromTo(batch, { scale: 0 }, {
+        scale: 1,
+        duration: 0.6,
+        ease: easeType,
+        stagger: 0.15
+      });
     },
     once: true
   });
