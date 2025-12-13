@@ -214,7 +214,7 @@ window.loaderFinished = false;
 document.addEventListener("DOMContentLoaded", () => {
   const loader = document.querySelector(".loader");
   const ease = "power2.inOut";
-  const visibleDelay = 700;
+  const delay = 700;
 
   if (!loader) {
     window.loaderFinished = true;
@@ -223,7 +223,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   gsap.set(loader, {
     display: "flex",
-    clipPath: "inset(0% 0% 0% 0%)"
+    clipPath: "inset(0% 0% 0% 0%)",
+    willChange: "clip-path"
   });
 
   function hideLoader() {
@@ -241,7 +242,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     tl.call(() => {
       window.loaderFinished = true;
-    }, null, "-=0.2"); // 🔥 fires 200ms before animation ends
+
+      requestAnimationFrame(() => {
+        document.dispatchEvent(new Event("loader:done"));
+      });
+    }, null, "-=0.2");
   }
 
   function showLoader(cb) {
@@ -256,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  setTimeout(hideLoader, visibleDelay);
+  setTimeout(hideLoader, delay);
 
   document.querySelectorAll("a").forEach(link => {
     if (!link.href) return;
@@ -266,9 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     link.addEventListener("click", e => {
       e.preventDefault();
-      showLoader(() => {
-        location.href = link.href;
-      });
+      showLoader(() => (location.href = link.href));
     });
   });
 });
