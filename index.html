@@ -1095,46 +1095,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+
+
+
 async function loadTestimonials() {
   try {
-    const d = await client.fetch(`
-      *[_type=="testPage"][0]{ tests[]{ reviewer, review } }
+    const testData = await client.fetch(`
+      *[_type == "testPage"][0]{ tests[]{ reviewer, review } }
     `);
-
-    const ts = d?.tests;
-    if (!ts?.length) return;
-
-    const s = document.querySelector(".testimonial-swiper");
-    const w = s?.querySelector(".swiper-wrapper.white");
-    const t = w?.querySelector(".swiper-slide.test");
-    if (!s || !w || !t) return;
-
-    t.style.display = "none";
-
-    const { toHTML } = await import("https://esm.sh/@portabletext/to-html");
-
-    ts.forEach(x => {
-      const c = t.cloneNode(true);
-      c.style.display = "flex";
-
-      const r = c.querySelector(".b1.ch");
-      const n = c.querySelector(".s1");
-
-      if (r) {
+    if (!testData?.tests?.length) { console.warn("No testimonials found"); return;  }
+    const swiper = document.querySelector(".testimonial-swiper");
+    if (!swiper) return;
+    const wrapper = swiper.querySelector(".swiper-wrapper.white");
+    if (!wrapper) return;
+    const template = wrapper.querySelector(".swiper-slide.test");
+    if (!template) { console.error("Template testimonial card missing (.swiper-slide.test)"); return; }
+    template.style.display = "none";
+    const pt = await import("https://esm.sh/@portabletext/to-html");
+    const toHTML = pt.toHTML;
+    testData.tests.forEach(t => {
+      const card = template.cloneNode(true);
+      card.style.display = "flex";
+      const reviewText = card.querySelector(".b1.ch");
+      const reviewerName = card.querySelector(".s1");
+      if (reviewText) {
         try {
-          r.innerHTML = toHTML(x.review || []).replace(/<p><\/p>/g, "<br><br>");
-        } catch {
-          r.textContent = "Format issue";
-        }
+          let html = toHTML(t.review || []);
+          html = html.replace(/<p><\/p>/g, "<br><br>");
+          reviewText.innerHTML = html;
+        } catch (e) { reviewText.textContent = "Format issue"; }
       }
-
-      if (n) n.textContent = x.reviewer || "";
-      w.appendChild(c);
+      if (reviewerName) reviewerName.textContent = t.reviewer || "";
+      wrapper.appendChild(card);
     });
-
-  } catch (e) {
-    console.error("Sanity fetch error:", e);
-  }
+  } catch (err) { console.error("Sanity fetch error:", err); }
 }
 
 
@@ -1143,88 +1137,93 @@ async function loadTestimonials() {
 
 async function loadFAQs() {
   try {
-    const d = await client.fetch(`
-      *[_type=="faqPage"][0]{ faqs[]{ question, answer } }
+    const faqData = await client.fetch(`
+      *[_type == "faqPage"][0]{ faqs[]{ question, answer } }
     `);
-
-    const fs = d?.faqs || [];
-    const c = document.querySelector('.faqs');
-    const t = document.querySelector('.faq');
-    if (!c || !t) return;
-
-    c.innerHTML = "";
-
-    const { toHTML } = await import("https://esm.sh/@portabletext/to-html");
-
-    fs.forEach(f => {
-      const card = t.cloneNode(true);
-      card.querySelector('.ques')?.textContent = f.question || "";
-      if (f.answer) card.querySelector('.ans').innerHTML = toHTML(f.answer);
-      c.appendChild(card);
+    const faqs = faqData?.faqs || [];
+    const faqContainer = document.querySelector('.faqs');
+    const faqTemplate = document.querySelector('.faq');
+    if (!faqContainer || !faqTemplate) {
+      console.warn("FAQ container or template missing.");
+      return;
+    }
+    faqContainer.innerHTML = "";
+    const pt = await import("https://esm.sh/@portabletext/to-html");
+    const toHTML = pt.toHTML;
+    faqs.forEach((item) => {
+      const card = faqTemplate.cloneNode(true);
+      const quesEl = card.querySelector('.ques');
+      const ansEl  = card.querySelector('.ans');
+      if (quesEl) quesEl.textContent = item.question;
+      if (ansEl && item.answer) {
+        ansEl.innerHTML = toHTML(item.answer);
+      }
+      faqContainer.appendChild(card);
     });
-
-  } catch (e) {
-    console.error("❌ FAQ Error:", e);
-  }
+  } catch (err) { console.error("❌ FAQ Error:", err); }
 }
-
 function initFAQAccordion() {
-  const cards = document.querySelectorAll('.faq');
-  if (!cards.length) return;
-
-  cards.forEach(c => {
-    const a = c.querySelector('.ans');
-    const r = c.querySelector('.arr-down');
-    close(a, r, true);
+  const faqCards = document.querySelectorAll('.faq');
+  if (!faqCards.length) return;
+  faqCards.forEach(card => {
+    const ans = card.querySelector('.ans');
+    const arrow = card.querySelector('.arr-down');
+    closeFAQ(ans, arrow, true);
   });
 
-  cards.forEach(c => {
-    const a = c.querySelector('.ans');
-    const r = c.querySelector('.arr-down');
+  faqCards.forEach(card => {
+    const ans = card.querySelector('.ans');
+    const arrow = card.querySelector('.arr-down');
 
-    c.addEventListener('click', () => {
-      const open = a.classList.contains('open');
+    card.addEventListener('click', () => {
+      const isOpen = ans.classList.contains('open');
+      if (isOpen) {
+        closeFAQ(ans, arrow);
+        return;
+      }
 
-      cards.forEach(x => {
-        close(x.querySelector('.ans'), x.querySelector('.arr-down'));
+      faqCards.forEach(f => {
+        const a = f.querySelector('.ans');
+        const ar = f.querySelector('.arr-down');
+        closeFAQ(a, ar);
       });
 
-      if (!open) openFaq(a, r);
+      openFAQ(ans, arrow);
     });
   });
 
-  function openFaq(a, r, i = false) {
-    a.classList.add('open');
-    a.classList.remove('close');
-    r && r.classList.add('up');
-
-    a.style.height = 'auto';
-    const h = a.scrollHeight + "px";
-
-    if (i) return;
-
-    a.style.height = "0px";
-    requestAnimationFrame(() => a.style.height = h);
-
-    a.addEventListener('transitionend', () => {
-      if (a.classList.contains('open')) a.style.height = 'auto';
+  function openFAQ(ans, arrow, instant = false) {
+    ans.classList.add('open');
+    ans.classList.remove('close');
+    arrow?.classList.add('up');
+    ans.style.height = 'auto';
+    const fullHeight = ans.scrollHeight + "px";
+    if (instant) {
+      ans.style.height = "auto";
+      return;
+    }
+    ans.style.height = "0px";
+    requestAnimationFrame(() => { ans.style.height = fullHeight; });
+    ans.addEventListener('transitionend', () => {
+      if (ans.classList.contains('open')) {
+        ans.style.height = "auto";
+      }
     }, { once: true });
   }
 
-  function close(a, r, i = false) {
-    if (!a) return;
-    a.classList.remove('open');
-    a.classList.add('close');
-    r && r.classList.remove('up');
-
-    a.style.height = a.scrollHeight + "px";
-    if (i) return a.style.height = "0px";
-
-    a.offsetHeight;
-    a.style.height = "0px";
+  function closeFAQ(ans, arrow, instant = false) {
+    ans.classList.remove('open');
+    ans.classList.add('close');
+    arrow?.classList.remove('up');
+    ans.style.height = ans.scrollHeight + "px";
+    if (instant) {
+      ans.style.height = "0px";
+      return;
+    }
+    ans.offsetHeight;
+    ans.style.height = "0px";
   }
 }
-
 
 
 
