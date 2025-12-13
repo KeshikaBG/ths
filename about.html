@@ -1275,34 +1275,45 @@ function initST() {
 
 
 
-<script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@studio-freight/lenis"></script>
 
 <script>
-  gsap.registerPlugin(ScrollTrigger);
-
   const fixedEls = document.querySelectorAll('.fixed-element');
   const clipSecs = document.querySelectorAll('.clip-section');
 
-  clipSecs.forEach((sec, i) => {
-    const fixedEl = fixedEls[i];
-    if (!fixedEl) return;
-
-    gsap.fromTo(
-      fixedEl,
-      { clipPath: 'inset(100% 0% 0% 0%)' },
-      {
-        clipPath: 'inset(0% 0% 0% 0%)',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sec,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
-        }
-      }
-    );
+  const lenis = new Lenis({
+    smooth: true,
+    lerp: 0.08
   });
+
+  function updateClips() {
+    const vh = window.innerHeight;
+
+    clipSecs.forEach((sec, idx) => {
+      const fixedEl = fixedEls[idx];
+      if (!fixedEl) return;
+
+      const rect = sec.getBoundingClientRect();
+
+      if (rect.bottom > 0 && rect.top < vh) {
+        const topPct = Math.max(rect.top, 0) / vh * 100;
+        const botPct = Math.max(vh - rect.bottom, 0) / vh * 100;
+
+        fixedEl.style.clipPath =
+          `inset(${topPct}% 0% ${botPct}% 0%)`;
+      }
+    });
+  }
+
+  function raf(time) {
+    lenis.raf(time);
+    updateClips();
+    requestAnimationFrame(raf);
+  }
+
+  requestAnimationFrame(raf);
 </script>
+
 
 
 
