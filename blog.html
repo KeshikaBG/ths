@@ -171,6 +171,33 @@
         inset: auto 0% 0% auto;
     }
 }
+    .overlay-work {
+    display: block !important;
+    visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.overlay-work.active {
+  visibility: visible;  
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+.separate-work-div {
+  opacity: 0;
+  transform: translateY(20px);
+  visibility: hidden;
+  transition: all 0.4s ease;
+  display: flex;
+}
+.separate-work-div.active {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+.wrk-close{
+  cursor: pointer;
+}
   </style>
 
 
