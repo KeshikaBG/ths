@@ -1096,6 +1096,77 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+
+
+
+ async function loadOtherSections() {
+  try {
+    const [featDat, abtDat, osDat, vidDat, cntDat, munDat] = await Promise.all([
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[3]{
+        featuredSections[]{ title, images[]{ asset->{url} } }
+      }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[1]{ heroImages[]{ asset->{url,_type} } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[4]{ heroImages[]{ asset->{url,_type} } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[6]{ heroImages[]{ asset->{url,_type} } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[7]{ heroImages[]{ asset->{url,_type} } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[5]{ heroImages[]{ asset->{url,_type} } }`)
+    ]);
+
+    const featSecs = featDat?.featuredSections || [];
+    const chipBox = document.querySelector('.chips-cont');
+
+    if (chipBox && featSecs.length) {
+      chipBox.querySelectorAll('.wrk-chip').forEach(c => c.remove());
+
+      featSecs.forEach((sec, idx) => {
+        if (!sec.title) return;
+
+        const chip = document.createElement('div');
+        chip.classList.add('wrk-chip');
+        chip.dataset.index = idx;
+
+        const chipTxt = document.createElement('div');
+        chipTxt.classList.add('chip-text');
+        chipTxt.textContent = sec.title;
+
+        chip.appendChild(chipTxt);
+        chipBox.appendChild(chip);
+      });
+    }
+
+    const abtImgs = abtDat?.heroImages || [];
+    const osImgs  = osDat?.heroImages || [];
+    const vidImgs = vidDat?.heroImages || [];
+    const cntImgs = cntDat?.heroImages || [];
+    const munImgs = munDat?.heroImages || [];
+
+    const chips = document.querySelectorAll('.wrk-chip');
+    const imgDivs = document.querySelectorAll('.wrk-img-div');
+    const perGrp = 4;
+
+    if (featSecs.length && chips.length && imgDivs.length === perGrp) {
+      featSecs.forEach((sec, cIdx) => {
+        sec.images.forEach((imgDat, iIdx) => {
+          const trgDiv = imgDivs[iIdx];
+          if (!trgDiv) return;
+
+          const img = document.createElement('img');
+          img.src = imgDat.asset.url;
+          img.alt = `${sec.title} - Image ${iIdx + 1}`;
+          img.dataset.chipIndex = cIdx;
+
+          applyMediaStyles(img, { absolute: true });
+
+          if (cIdx === 0) {
+            img.style.display = 'block';
+            img.classList.add('fade-in');
+          } else {
+            img.style.display = 'none';
+          }
+
+
+
+  
   
 
 
@@ -1195,138 +1266,6 @@ async function loadHeroSwiper() {
 
   } catch (err) {
     console.error('❌ Hero Swiper error:', err);
-  }
-}
-
-
-
-
-
-
- async function loadOtherSections() {
-  try {
-    const [featDat, abtDat, osDat, vidDat, cntDat, munDat] = await Promise.all([
-      client.fetch(`*[_type=="home"] | order(_createdAt asc)[3]{
-        featuredSections[]{ title, images[]{ asset->{url} } }
-      }`),
-      client.fetch(`*[_type=="home"] | order(_createdAt asc)[1]{ heroImages[]{ asset->{url,_type} } }`),
-      client.fetch(`*[_type=="home"] | order(_createdAt asc)[4]{ heroImages[]{ asset->{url,_type} } }`),
-      client.fetch(`*[_type=="home"] | order(_createdAt asc)[6]{ heroImages[]{ asset->{url,_type} } }`),
-      client.fetch(`*[_type=="home"] | order(_createdAt asc)[7]{ heroImages[]{ asset->{url,_type} } }`),
-      client.fetch(`*[_type=="home"] | order(_createdAt asc)[5]{ heroImages[]{ asset->{url,_type} } }`)
-    ]);
-
-    const featSecs = featDat?.featuredSections || [];
-    const chipBox = document.querySelector('.chips-cont');
-
-    if (chipBox && featSecs.length) {
-      chipBox.querySelectorAll('.wrk-chip').forEach(c => c.remove());
-
-      featSecs.forEach((sec, idx) => {
-        if (!sec.title) return;
-
-        const chip = document.createElement('div');
-        chip.classList.add('wrk-chip');
-        chip.dataset.index = idx;
-
-        const chipTxt = document.createElement('div');
-        chipTxt.classList.add('chip-text');
-        chipTxt.textContent = sec.title;
-
-        chip.appendChild(chipTxt);
-        chipBox.appendChild(chip);
-      });
-    }
-
-    const abtImgs = abtDat?.heroImages || [];
-    const osImgs  = osDat?.heroImages || [];
-    const vidImgs = vidDat?.heroImages || [];
-    const cntImgs = cntDat?.heroImages || [];
-    const munImgs = munDat?.heroImages || [];
-
-    const chips = document.querySelectorAll('.wrk-chip');
-    const imgDivs = document.querySelectorAll('.wrk-img-div');
-    const perGrp = 4;
-
-    if (featSecs.length && chips.length && imgDivs.length === perGrp) {
-      featSecs.forEach((sec, cIdx) => {
-        sec.images.forEach((imgDat, iIdx) => {
-          const trgDiv = imgDivs[iIdx];
-          if (!trgDiv) return;
-
-          const img = document.createElement('img');
-          img.src = imgDat.asset.url;
-          img.alt = `${sec.title} - Image ${iIdx + 1}`;
-          img.dataset.chipIndex = cIdx;
-
-          applyMediaStyles(img, { absolute: true });
-
-          if (cIdx === 0) {
-            img.style.display = 'block';
-            img.classList.add('fade-in');
-          } else {
-            img.style.display = 'none';
-          }
-
-          trgDiv.appendChild(img);
-        });
-      });
-
-      chips.forEach((chip, cIdx) => {
-        chip.addEventListener('mouseenter', () => {
-          imgDivs.forEach(div => {
-            div.querySelectorAll('img').forEach(img => {
-              img.classList.toggle(
-                'fade-in',
-                img.dataset.chipIndex == cIdx
-              );
-            });
-          });
-
-          chips.forEach(c => c.classList.remove('hover'));
-          chip.classList.add('hover');
-        });
-      });
-    }
-
-    const mmWrap = document.querySelector('.m-mm-swiper .swiper-wrapper');
-    const mmTpl  = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
-
-    if (mmWrap && mmTpl && munImgs.length) {
-      mmTpl.remove();
-
-      munImgs.forEach((med, idx) => {
-        const slide = mmTpl.cloneNode(true);
-        slide.innerHTML = '';
-        insertImageOrVideo(slide, [med], `Munchkin Media ${idx}`);
-        mmWrap.appendChild(slide);
-      });
-
-      new Swiper('.m-mm-swiper', {
-        direction: 'horizontal',
-        loop: true,
-        spaceBetween: 14,
-        speed: 2000,
-        slidesPerView: 'auto',
-        centeredSlides: true,
-        autoplay: {
-          delay: 1500,
-          disableOnInteraction: false
-        }
-      });
-    }
-    insertImageOrVideo(document.querySelector('.abt-img-div'), abtImgs, 'About Hero Media');
-    insertImageOrVideo(document.querySelector('.os-cont2'), osImgs, 'OS Hero Media');
-    insertImageOrVideo(document.querySelector('.vg-div'), vidImgs, 'Video Gallery');
-    insertImageOrVideo(document.querySelector('.contact-div'), cntImgs, 'Contact Image');
-    insertImageOrVideo(
-      document.querySelector('.m-mm-swiper .swiper-slide.m-mm'),
-      munImgs,
-      'Munchkin Image'
-    );
-
-  } catch (err) {
-    console.error('❌ Other Sections error:', err);
   }
 }
 
