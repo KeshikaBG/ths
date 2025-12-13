@@ -211,6 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loader = document.querySelector(".loader");
   const ease = "power2.inOut";
   const loaderVisibleTime = 700;
+  const finishOffset = 200;
 
   if (!loader) {
     window.loaderFinished = true;
@@ -227,9 +228,13 @@ document.addEventListener("DOMContentLoaded", () => {
       clipPath: "inset(0% 0% 100% 0%)",
       duration: 0.8,
       ease,
+      onStart: () => {
+        setTimeout(() => {
+          window.loaderFinished = true;
+        }, Math.max(0, 800 - finishOffset));
+      },
       onComplete: () => {
         loader.style.display = "none";
-        window.loaderFinished = true;
       }
     });
   }
@@ -263,13 +268,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/* 🔥 KEY FIX */
 window.addEventListener("pageshow", e => {
   if (!e.persisted) return;
   const loader = document.querySelector(".loader");
   if (loader) loader.style.display = "none";
 });
 </script>
+
 
 
   
