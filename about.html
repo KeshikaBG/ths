@@ -218,6 +218,9 @@ html {
         width: auto !important;
     }
 }
+    .fixed-element {
+  will-change: clip-path;
+}
   </style>
 
 
@@ -1279,27 +1282,47 @@ function initST() {
   const fixedEls = document.querySelectorAll('.fixed-element');
   const clipSecs = document.querySelectorAll('.clip-section');
 
+  let ticking = false;
+
   function updateClips() {
     const vh = window.innerHeight;
+
     clipSecs.forEach((sec, idx) => {
       const rect = sec.getBoundingClientRect();
-      const topVal = Math.max(rect.top, 0);
-      const botVal = Math.min(rect.bottom, vh);
-      const topPct = (topVal / vh) * 100;
-      const botPct = 100 - (botVal / vh) * 100;
       const fixedEl = fixedEls[idx];
+
+      if (!fixedEl) return;
+
       if (rect.bottom > 0 && rect.top < vh) {
+        const topVal = Math.max(rect.top, 0);
+        const botVal = Math.min(rect.bottom, vh);
+
+        const topPct = (topVal / vh) * 100;
+        const botPct = 100 - (botVal / vh) * 100;
+
         fixedEl.style.clipPath = `inset(${topPct}% 0% ${botPct}% 0%)`;
       } else {
         fixedEl.style.clipPath = `inset(100% 0% 0% 0%)`;
       }
     });
-  }
-  updateClips();
-  window.addEventListener('scroll', updateClips);
-  window.addEventListener('resize', updateClips);
 
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(updateClips);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+
+  // Initial paint
+  requestAnimationFrame(updateClips);
 </script>
+
 
 
 
