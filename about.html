@@ -218,6 +218,28 @@ html {
         width: auto !important;
     }
 }
+
+
+.fixed-element {
+  clip-path: inset(100% 0 0 0);
+  animation: clipReveal linear both;
+  animation-timeline: scroll();
+}
+
+@keyframes clipReveal {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+    .clip-section {
+  animation-timeline: view();
+  animation-range: entry 0% exit 100%;
+}
+
+    
   </style>
 
 
@@ -1274,73 +1296,5 @@ function initST() {
 
 
 
-
-<script>
-  const fixedEls = document.querySelectorAll('.fixed-element');
-  const clipSecs = document.querySelectorAll('.clip-section');
-
-  let vh = window.innerHeight;
-  let sectionsData = [];
-
-  function cacheMeasurements() {
-    vh = window.innerHeight;
-    sectionsData = [];
-
-    clipSecs.forEach((sec, idx) => {
-      const rect = sec.getBoundingClientRect();
-      const scrollTop = window.scrollY || window.pageYOffset;
-
-      sectionsData.push({
-        el: sec,
-        fixedEl: fixedEls[idx],
-        top: rect.top + scrollTop,
-        bottom: rect.bottom + scrollTop
-      });
-    });
-  }
-
-  function updateClips() {
-    const scrollY = window.scrollY || window.pageYOffset;
-
-    sectionsData.forEach(({ top, bottom, fixedEl }) => {
-      if (!fixedEl) return;
-
-      const sectionTopInView = top - scrollY;
-      const sectionBottomInView = bottom - scrollY;
-
-      if (sectionBottomInView > 0 && sectionTopInView < vh) {
-        const topVal = Math.max(sectionTopInView, 0);
-        const botVal = Math.min(sectionBottomInView, vh);
-
-        const topPct = (topVal / vh) * 100;
-        const botPct = 100 - (botVal / vh) * 100;
-
-        fixedEl.style.clipPath =
-          `inset(${topPct}% 0% ${botPct}% 0%)`;
-      } else {
-        fixedEl.style.clipPath = 'inset(100% 0% 0% 0%)';
-      }
-    });
-  }
-
-  // INITIALIZE
-  cacheMeasurements();
-  updateClips();
-
-  // SCROLL (NO RECALCULATION)
-  window.addEventListener('scroll', updateClips, { passive: true });
-
-  // RESIZE (INTENTIONAL RECALCULATION)
-  window.addEventListener('resize', () => {
-    cacheMeasurements();
-    updateClips();
-  });
-</script>
-
-
-
-
-
 </body>
-
 </html>
