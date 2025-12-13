@@ -1280,24 +1280,29 @@ function initST() {
 
   function updateClips() {
     const vh = window.innerHeight;
+
     clipSecs.forEach((sec, idx) => {
-      const rect = sec.getBoundingClientRect();
-      const topVal = Math.max(rect.top, 0);
-      const botVal = Math.min(rect.bottom, vh);
-      const topPct = (topVal / vh) * 100;
-      const botPct = 100 - (botVal / vh) * 100;
       const fixedEl = fixedEls[idx];
-      if (rect.bottom > 0 && rect.top < vh) {
-        fixedEl.style.clipPath = `inset(${topPct}% 0% ${botPct}% 0%)`;
-      } else {
-        fixedEl.style.clipPath = `inset(100% 0% 0% 0%)`;
-      }
+      if (!fixedEl) return;
+
+      const rect = sec.getBoundingClientRect();
+
+      let progress = (vh - rect.top) / (vh + rect.height);
+      progress = Math.min(Math.max(progress, 0), 1);
+
+      const insetTop = (1 - progress) * 100;
+      const insetBottom = (1 - progress) * 100;
+
+      fixedEl.style.clipPath = `inset(${insetTop}% 0% ${insetBottom}% 0%)`;
     });
   }
-  window.addEventListener('scroll', updateClips);
+
+  window.addEventListener('scroll', updateClips, { passive: true });
   window.addEventListener('resize', updateClips);
+
   updateClips();
 </script>
+
 
 
 
