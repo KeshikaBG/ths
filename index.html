@@ -1099,7 +1099,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
- async function loadOtherSections() {
+async function loadOtherSections() {
   try {
     const [featDat, abtDat, osDat, vidDat, cntDat, munDat] = await Promise.all([
       client.fetch(`*[_type=="home"] | order(_createdAt asc)[3]{
@@ -1163,6 +1163,69 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             img.style.display = 'none';
           }
+
+          trgDiv.appendChild(img);
+        });
+      });
+
+      chips.forEach((chip, cIdx) => {
+        chip.addEventListener('mouseenter', () => {
+          imgDivs.forEach(div => {
+            div.querySelectorAll('img').forEach(img => {
+              img.classList.toggle(
+                'fade-in',
+                img.dataset.chipIndex == cIdx
+              );
+            });
+          });
+
+          chips.forEach(c => c.classList.remove('hover'));
+          chip.classList.add('hover');
+        });
+      });
+    }
+
+    const mmWrap = document.querySelector('.m-mm-swiper .swiper-wrapper');
+    const mmTpl  = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
+
+    if (mmWrap && mmTpl && munImgs.length) {
+      mmTpl.remove();
+
+      munImgs.forEach((med, idx) => {
+        const slide = mmTpl.cloneNode(true);
+        slide.innerHTML = '';
+        insertImageOrVideo(slide, [med], `Munchkin Media ${idx}`);
+        mmWrap.appendChild(slide);
+      });
+
+      new Swiper('.m-mm-swiper', {
+        direction: 'horizontal',
+        loop: true,
+        spaceBetween: 14,
+        speed: 2000,
+        slidesPerView: 'auto',
+        centeredSlides: true,
+        autoplay: {
+          delay: 1500,
+          disableOnInteraction: false
+        }
+      });
+    }
+
+    insertImageOrVideo(document.querySelector('.abt-img-div'), abtImgs, 'About Hero Media');
+    insertImageOrVideo(document.querySelector('.os-cont2'), osImgs, 'OS Hero Media');
+    insertImageOrVideo(document.querySelector('.vg-div'), vidImgs, 'Video Gallery');
+    insertImageOrVideo(document.querySelector('.contact-div'), cntImgs, 'Contact Image');
+    insertImageOrVideo(
+      document.querySelector('.m-mm-swiper .swiper-slide.m-mm'),
+      munImgs,
+      'Munchkin Image'
+    );
+
+  } catch (err) {
+    console.error('❌ Other Sections error:', err);
+  }
+}
 
 
 
