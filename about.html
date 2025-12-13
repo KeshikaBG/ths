@@ -1283,19 +1283,18 @@ function initST() {
   const clipSecs = document.querySelectorAll('.clip-section');
 
   let ticking = false;
+  let vh = window.innerHeight;
 
   function updateClips() {
-    const vh = window.innerHeight;
-
     clipSecs.forEach((sec, idx) => {
-      const rect = sec.getBoundingClientRect();
       const fixedEl = fixedEls[idx];
-
       if (!fixedEl) return;
 
+      const rect = sec.getBoundingClientRect();
+
       if (rect.bottom > 0 && rect.top < vh) {
-        const topVal = Math.max(rect.top, 0);
-        const botVal = Math.min(rect.bottom, vh);
+        const topVal = rect.top < 0 ? 0 : rect.top;
+        const botVal = rect.bottom > vh ? vh : rect.bottom;
 
         const topPct = (topVal / vh) * 100;
         const botPct = 100 - (botVal / vh) * 100;
@@ -1316,12 +1315,18 @@ function initST() {
     }
   }
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
+  // Keep viewport height fresh
+  window.addEventListener('resize', () => {
+    vh = window.innerHeight;
+    onScroll(); // re-sync on resize
+  });
 
-  // Initial paint
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Initial render
   requestAnimationFrame(updateClips);
 </script>
+
 
 
 
