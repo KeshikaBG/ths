@@ -1099,100 +1099,130 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-   async function loadOtherSections() {
-    try {
-      const [featuredData, abtData, osData, vidData, contData, munData] = await Promise.all([
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[3] {
-          featuredSections[] { title, images[]{ asset->{ url } } }
-        }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[1] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[4] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[6] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[7] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[5] { heroImages[]{ asset->{ url, _type } } }`)
-      ]);
-      const featuredSections = featuredData?.featuredSections || [];
-const chipsCont = document.querySelector('.chips-cont');
-if (chipsCont && featuredSections.length) {
-  chipsCont.querySelectorAll('.wrk-chip').forEach(chip => chip.remove());
-  featuredSections.forEach((section, index) => {
-    if (!section.title) return;
-    const chip = document.createElement('div');
-    chip.classList.add('wrk-chip');
-    chip.dataset.index = index;
-    const chipText = document.createElement('div');
-    chipText.classList.add('chip-text');
-    chipText.textContent = section.title;
-    chip.appendChild(chipText);
-    chipsCont.appendChild(chip);
-  });
-}
-      const abtImages = abtData?.heroImages || [];
-      const osImages = osData?.heroImages || [];
-      const vidImages = vidData?.heroImages || [];
-      const contImages = contData?.heroImages || [];
-      const munImages = munData?.heroImages || [];
-      const chips = document.querySelectorAll('.wrk-chip');
-      const imgDivs = document.querySelectorAll('.wrk-img-div');
-      const divsPerGroup = 4;
-      if (featuredSections.length && chips.length && imgDivs.length === divsPerGroup) {
-        featuredSections.forEach((section, chipIndex) => {
-          section.images.forEach((imgData, imgIndex) => {
-            const targetDiv = imgDivs[imgIndex];
-            if (!targetDiv) return;
-            const img = document.createElement('img');
-            img.src = imgData.asset.url;
-            img.alt = `${section.title} - Image ${imgIndex + 1}`;
-            img.dataset.chipIndex = chipIndex;
-            applyMediaStyles(img, { absolute: true });
-            if (chipIndex === 0) {
-              img.style.display = 'block';
-              img.classList.add('fade-in');
-            } else { img.style.display = 'none'; }
-            targetDiv.appendChild(img);
-          });
-        });
-        chips.forEach((chip, chipIndex) => {
-          chip.addEventListener('mouseenter', () => {
-            imgDivs.forEach((div) => {
-              const imgs = div.querySelectorAll('img');
-              imgs.forEach((img) => {
-                img.classList.toggle('fade-in', img.dataset.chipIndex == chipIndex);
-              });
-            });
-            chips.forEach((c) => c.classList.remove('hover'));
-            chip.classList.add('hover');
-          });
-        });
+ async function loadFeaturedSections() {
+  try {
+    const featData = await client.fetch(`
+      *[_type=="home"] | order(_createdAt asc)[3]{
+        featuredSections[]{ title, images[]{ asset->{ url } } }
       }
-      const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
-      const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
-      if (swiperWrapper && slideTemplate && munImages.length) {
-        slideTemplate.remove();
-        munImages.forEach((media, index) => {
-          const slide = slideTemplate.cloneNode(true);
-          slide.innerHTML = '';
-          insertImageOrVideo(slide, [media], `Munchkin Media ${index}`);
-          swiperWrapper.appendChild(slide);
-        });
-        new Swiper(".m-mm-swiper", {
-          direction: 'horizontal',
-          loop: true,
-          spaceBetween: 14,
-          speed: 2000,
-          slidesPerView: 'auto',
-          centeredSlides: true,
-          autoplay: { delay: 1500, disableOnInteraction: false }
-        });
-      }
-      insertImageOrVideo(document.querySelector('.abt-img-div'), abtImages, 'About Hero Media');
-      insertImageOrVideo(document.querySelector('.os-cont2'), osImages, 'OS Hero Media');
-      insertImageOrVideo(document.querySelector('.vg-div'), vidImages, 'Video Gallery');
-      insertImageOrVideo(document.querySelector('.contact-div'), contImages, 'Contact Image');
-      insertImageOrVideo(document.querySelector('.m-mm-swiper .swiper-slide.m-mm'), munImages, 'Munchkin Image');
-    } catch (err) { console.error('❌ Other Sections error:', err); }
-  }
+    `);
 
+    const featSecs = featData?.featuredSections || [];
+    const chipWrap = document.querySelector('.chips-cont');
+    if (!chipWrap || !featSecs.length) return;
+
+    chipWrap.querySelectorAll('.wrk-chip').forEach(c => c.remove());
+
+    featSecs.forEach((sec, idx) => {
+      if (!sec.title) return;
+      const chip = document.createElement('div');
+      chip.classList.add('wrk-chip');
+      chip.dataset.index = idx;
+
+      const txt = document.createElement('div');
+      txt.classList.add('chip-text');
+      txt.textContent = sec.title;
+
+      chip.appendChild(txt);
+      chipWrap.appendChild(chip);
+    });
+
+    const chips = document.querySelectorAll('.wrk-chip');
+    const imgDivs = document.querySelectorAll('.wrk-img-div');
+    const divCnt = 4;
+
+    if (chips.length && imgDivs.length === divCnt) {
+      featSecs.forEach((sec, cIdx) => {
+        sec.images.forEach((imgDat, iIdx) => {
+          const tgt = imgDivs[iIdx];
+          if (!tgt) return;
+
+          const img = document.createElement('img');
+          img.src = imgDat.asset.url;
+          img.alt = `${sec.title} - Image ${iIdx + 1}`;
+          img.dataset.chipIndex = cIdx;
+
+          applyMediaStyles(img, { absolute: true });
+
+          if (cIdx === 0) {
+            img.style.display = 'block';
+            img.classList.add('fade-in');
+          } else img.style.display = 'none';
+
+          tgt.appendChild(img);
+        });
+      });
+
+      chips.forEach((chip, cIdx) => {
+        chip.addEventListener('mouseenter', () => {
+          imgDivs.forEach(div => {
+            div.querySelectorAll('img').forEach(img => {
+              img.classList.toggle('fade-in', img.dataset.chipIndex == cIdx);
+            });
+          });
+          chips.forEach(c => c.classList.remove('hover'));
+          chip.classList.add('hover');
+        });
+      });
+    }
+  } catch (err) {
+    console.error('❌ Featured Sections error:', err);
+  }
+}
+
+
+
+
+
+
+  async function loadOtherSections() {
+  try {
+    const [abtDat, osDat, vidDat, contDat, munDat] = await Promise.all([
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[1]{ heroImages[]{ asset->{ url,_type } } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[4]{ heroImages[]{ asset->{ url,_type } } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[6]{ heroImages[]{ asset->{ url,_type } } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[7]{ heroImages[]{ asset->{ url,_type } } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[5]{ heroImages[]{ asset->{ url,_type } } }`)
+    ]);
+
+    const abtImgs  = abtDat?.heroImages || [];
+    const osImgs   = osDat?.heroImages || [];
+    const vidImgs  = vidDat?.heroImages || [];
+    const contImgs = contDat?.heroImages || [];
+    const munImgs  = munDat?.heroImages || [];
+
+    const wrap = document.querySelector('.m-mm-swiper .swiper-wrapper');
+    const temp = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
+
+    if (wrap && temp && munImgs.length) {
+      temp.remove();
+      munImgs.forEach((med, idx) => {
+        const slide = temp.cloneNode(true);
+        slide.innerHTML = '';
+        insertImageOrVideo(slide, [med], `Munchkin Media ${idx}`);
+        wrap.appendChild(slide);
+      });
+
+      new Swiper(".m-mm-swiper", {
+        direction: 'horizontal',
+        loop: true,
+        spaceBetween: 14,
+        speed: 2000,
+        slidesPerView: 'auto',
+        centeredSlides: true,
+        autoplay: { delay: 1500, disableOnInteraction: false }
+      });
+    }
+
+    insertImageOrVideo(document.querySelector('.abt-img-div'), abtImgs, 'About Hero Media');
+    insertImageOrVideo(document.querySelector('.os-cont2'), osImgs, 'OS Hero Media');
+    insertImageOrVideo(document.querySelector('.vg-div'), vidImgs, 'Video Gallery');
+    insertImageOrVideo(document.querySelector('.contact-div'), contImgs, 'Contact Image');
+
+  } catch (err) {
+    console.error('❌ Other Sections error:', err);
+  }
+}
 
 
   
@@ -1483,6 +1513,7 @@ function initFAQAccordion() {
   
   document.addEventListener('DOMContentLoaded', () => {
     loadHeroSwiper();
+    loadFeaturedSections();
     loadOtherSections();
     loadTestimonials();
     loadFAQs().then(() => { initFAQAccordion(); });
