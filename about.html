@@ -1119,195 +1119,120 @@ function initST() {
 
 
 
-<script src="../cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
 <script type="module">
-  import { createClient } from 'https://esm.sh/@sanity/client';
+import { createClient } from 'https://esm.sh/@sanity/client';
 
-  const client = createClient({
-    projectId: 'n7jjk6nd',
-    dataset: 'production',
-    useCdn: true,
-    apiVersion: '2023-01-01'
-  });
+const client = createClient({
+  projectId: 'n7jjk6nd',
+  dataset: 'production',
+  useCdn: true,
+  apiVersion: '2023-01-01'
+});
 
-  const qs = sel => document.querySelector(sel);
+const qs = sel => document.querySelector(sel);
+const preloadImgs = urls => Promise.all(urls.map(u => new Promise(r => { const i = new Image(); i.onload = r; i.onerror = r; i.src = u; })));
+const styleImg = (el, abs = false) => { if(abs){el.style.position='absolute';el.style.top=0;el.style.left=0;} el.style.width='100%'; el.style.height='100%'; el.style.objectFit='cover'; };
 
-  const preloadImgs = urls =>
-    Promise.all(
-      urls.map(url =>
-        new Promise(res => {
-          const img = new Image();
-          img.onload = res;
-          img.onerror = res;
-          img.src = url;
-        })
-      )
-    );
+const addImg = (wrap, arr, alt) => { 
+  if(!wrap||!arr?.length) return; 
+  const m=arr[0]; 
+  if(m.asset._type!=='sanity.imageAsset') return; 
+  const img=document.createElement('img'); img.src=m.asset.url; img.alt=alt; styleImg(img); wrap.appendChild(img); 
+};
 
-  const styleImg = (el, abs = false) => {
-    if (abs) {
-      el.style.position = 'absolute';
-      el.style.top = 0;
-      el.style.left = 0;
-    }
-    el.style.width = '100%';
-    el.style.height = '100%';
-    el.style.maxWidth = 'none';
-    el.style.objectFit = 'cover';
-  };
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const fetch = q => client.fetch(q);
+    const [heroRes, contRes, workRes, thsRes, osRes, e2eRes] = await Promise.all([
+      fetch(`*[_type=="about"]|order(_createdAt asc)[0]{aboutImages[]{asset->{url,_type}}}`),
+      fetch(`*[_type=="home"]|order(_createdAt asc)[7]{heroImages[]{asset->{url,_type}}}`),
+      fetch(`*[_type=="about"]|order(_createdAt asc)[1]{featuredSections[]{title,images[]{asset->{url,_type}}}}`),
+      fetch(`*[_type=="about"]|order(_createdAt asc)[2]{aboutImages[]{asset->{url,_type}}}`),
+      fetch(`*[_type=="about"]|order(_createdAt asc)[3]{aboutImages[]{asset->{url,_type}}}`),
+      fetch(`*[_type=="about"]|order(_createdAt asc)[4]{aboutImages[]{asset->{url,_type}}}`)
+    ]);
 
-  const addImg = (wrap, arr, alt) => {
-    if (!wrap || !arr?.length) return;
-    const m = arr[0];
-    if (m.asset._type !== 'sanity.imageAsset') return;
+    const heroImgs = heroRes?.aboutImages||[];
+    const contImgs = contRes?.heroImages||[];
+    const thsImgs = thsRes?.aboutImages||[];
+    const osImgs = osRes?.aboutImages||[];
+    const e2eImgs = e2eRes?.aboutImages||[];
+    const teamSecs = workRes?.featuredSections||[];
 
-    const img = document.createElement('img');
-    img.src = m.asset.url;
-    img.alt = alt;
-    styleImg(img);
-    wrap.appendChild(img);
-  };
+    const wraps = {
+      hero: qs('.abt-img-wrp'),
+      cont: qs('.contact-div'),
+      ths:  qs('.div-block-9'),
+      os:   qs('.div-block-10'),
+      e2e:  qs('.div-block-11')
+    };
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const fetch = q => client.fetch(q);
+    const cards = document.querySelectorAll('.card');
+    const slider = qs('.slider');
 
-      const [
-        heroRes,
-        contRes,
-        workRes,
-        thsRes,
-        osRes,
-        e2eRes
-      ] = await Promise.all([
-        fetch(`*[_type=="about"]|order(_createdAt asc)[0]{aboutImages[]{asset->{url,_type}}}`),
-        fetch(`*[_type=="home"]|order(_createdAt asc)[7]{heroImages[]{asset->{url,_type}}}`),
-        fetch(`*[_type=="about"]|order(_createdAt asc)[1]{featuredSections[]{title,images[]{asset->{url,_type}}}}`),
-        fetch(`*[_type=="about"]|order(_createdAt asc)[2]{aboutImages[]{asset->{url,_type}}}`),
-        fetch(`*[_type=="about"]|order(_createdAt asc)[3]{aboutImages[]{asset->{url,_type}}}`),
-        fetch(`*[_type=="about"]|order(_createdAt asc)[4]{aboutImages[]{asset->{url,_type}}}`)
-      ]);
+    await preloadImgs([
+      ...heroImgs.map(i=>i.asset.url),
+      ...contImgs.map(i=>i.asset.url),
+      ...teamSecs.flatMap(s=>s.images.map(i=>i.asset.url))
+    ]);
 
-      const heroImgs = heroRes?.aboutImages || [];
-      const contImgs = contRes?.heroImages || [];
-      const thsImgs  = thsRes?.aboutImages || [];
-      const osImgs   = osRes?.aboutImages || [];
-      const e2eImgs  = e2eRes?.aboutImages || [];
-      const teamSecs = workRes?.featuredSections || [];
+    addImg(wraps.hero, heroImgs,'About Hero');
+    addImg(wraps.cont, contImgs,'Contact');
+    addImg(wraps.ths, thsImgs,'THS');
+    addImg(wraps.os, osImgs,'OS');
+    addImg(wraps.e2e, e2eImgs,'E2E');
 
-      const wraps = {
-        hero: qs('.abt-img-wrp'),
-        cont: qs('.contact-div'),
-        ths:  qs('.div-block-9'),
-        os:   qs('.div-block-10'),
-        e2e:  qs('.div-block-11')
-      };
-
-      const cards = document.querySelectorAll('.card');
-      const slider = qs('.slider');
-
-      await preloadImgs([
-        ...heroImgs.map(i => i.asset.url),
-        ...contImgs.map(i => i.asset.url),
-        ...teamSecs.flatMap(s => s.images.map(i => i.asset.url))
-      ]);
-
-      addImg(wraps.hero, heroImgs, 'About Hero');
-      addImg(wraps.cont, contImgs, 'Contact');
-      addImg(wraps.ths,  thsImgs,  'THS');
-      addImg(wraps.os,   osImgs,   'OS');
-      addImg(wraps.e2e,  e2eImgs,  'E2E');
-
-      let i = 0;
-      teamSecs.forEach(sec => {
-        sec.images.forEach(imgObj => {
-          if (i >= cards.length) return;
-
-          const card = cards[i++];
-          const h4 = document.createElement('h4');
-          const img = document.createElement('img');
-
-          h4.textContent = sec.title;
-          img.src = imgObj.asset.url;
-          img.alt = sec.title;
-          styleImg(img);
-
-          card.replaceChildren(h4, img);
-        });
+    let i=0;
+    teamSecs.forEach(sec=>{
+      sec.images.forEach(imgObj=>{
+        if(i>=cards.length) return;
+        const card=cards[i++];
+        const h4=document.createElement('h4');
+        const img=document.createElement('img');
+        h4.textContent=sec.title;
+        img.src=imgObj.asset.url; img.alt=sec.title;
+        styleImg(img);
+        card.replaceChildren(h4,img);
       });
-
-      slider.querySelectorAll('.card').forEach(c =>
-        slider.appendChild(c.cloneNode(true))
-      );
-
-      const allCards = slider.querySelectorAll('.card');
-      const total = allCards.length;
-      let angle = 0;
-
-      gsap.set(allCards, {
-        rotationY: i => i * (360 / total),
-        transformOrigin: "50% 50% 880px"
-      });
-
-      const speed = 360 / 40;
-      let last = performance.now();
-
-      const loop = now => {
-        const dt = (now - last) / 1000;
-        last = now;
-        angle += speed * dt;
-
-        gsap.set(allCards, {
-          rotationY: i => angle + i * (360 / total)
-        });
-
-        requestAnimationFrame(loop);
-      };
-
-      requestAnimationFrame(loop);
-
-    } catch (e) {
-      console.error('❌ Sanity fetch error:', e);
-    }
-  });
-</script>
-
-
-
-  
-
-
-still bad:
-
-
-
-<script>
-  const fixedEls = document.querySelectorAll('.fixed-element');
-  const clipSecs = document.querySelectorAll('.clip-section');
-
-  function updateClips() {
-    const vh = window.innerHeight;
-    clipSecs.forEach((sec, idx) => {
-      const rect = sec.getBoundingClientRect();
-      const topVal = Math.max(rect.top, 0);
-      const botVal = Math.min(rect.bottom, vh);
-      const topPct = (topVal / vh) * 100;
-      const botPct = 100 - (botVal / vh) * 100;
-      const fixedEl = fixedEls[idx];
-      if (rect.bottom > 0 && rect.top < vh) {
-        fixedEl.style.clipPath = `inset(${topPct}% 0% ${botPct}% 0%)`;
-      } else {
-        fixedEl.style.clipPath = `inset(100% 0% 0% 0%)`;
-      }
     });
-  }
-  window.addEventListener('scroll', updateClips);
-  window.addEventListener('resize', updateClips);
-  updateClips();
+
+    slider.querySelectorAll('.card').forEach(c=>slider.appendChild(c.cloneNode(true)));
+    const allCards = slider.querySelectorAll('.card');
+    const total = allCards.length;
+    let angle = 0;
+    gsap.set(allCards, { rotationY:i=>i*(360/total), transformOrigin:"50% 50% 880px" });
+    const speed = 360/40; let last = performance.now();
+    const loop = now => {
+      const dt = (now-last)/1000; last=now; angle+=speed*dt;
+      gsap.set(allCards,{rotationY:i=>angle+i*(360/total)});
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+
+    // ==== SCROLL BASED CLIP ANIMATION ====
+    const fixedEls = document.querySelectorAll('.fixed-element');
+    const clipSecs = document.querySelectorAll('.clip-section');
+
+    fixedEls.forEach((el, idx)=>{
+      gsap.set(el,{height:'100vh', clipPath:'inset(100% 0% 0% 0%)'});
+      ScrollTrigger.create({
+        trigger: clipSecs[idx],
+        start:'top bottom',
+        end:'bottom top',
+        onUpdate: self=>{
+          const p = self.progress;
+          el.style.clipPath = `inset(${100*(1-p)}% 0% 0% 0%)`;
+        },
+        scrub:true
+      });
+    });
+
+  } catch(e){ console.error('❌ Sanity fetch error:', e); }
+});
 </script>
-
-
 
 
 
