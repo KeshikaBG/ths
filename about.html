@@ -220,13 +220,31 @@ html {
 }
 
 
-.fixed-element {
-  clip-path: inset(100% 0 0 0);
-  animation: clipReveal linear both;
-  animation-timeline: scroll();
+
+    
+
+.clip-section {
+  position: relative;
+  height: 100vh;
 }
 
-@keyframes clipReveal {
+.sticky-wrap {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.fixed-element {
+  height: 100%;
+  width: 100%;
+  clip-path: inset(0 0 100% 0);
+  animation: reveal linear both;
+  animation-timeline: view();
+  animation-range: entry 0% exit 100%;
+}
+
+@keyframes reveal {
   from {
     clip-path: inset(100% 0 0 0);
   }
@@ -234,12 +252,7 @@ html {
     clip-path: inset(0 0 0 0);
   }
 }
-    .clip-section {
-  animation-timeline: view();
-  animation-range: entry 0% exit 100%;
-}
 
-    
   </style>
 
 
