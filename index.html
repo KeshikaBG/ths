@@ -210,7 +210,7 @@ window.loaderFinished = false;
 document.addEventListener("DOMContentLoaded", () => {
   const loader = document.querySelector(".loader");
   const ease = "power2.inOut";
-  const loaderVisibleTime = 1000;
+  const loaderVisibleTime = 700;
 
   if (!loader) {
     window.loaderFinished = true;
@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function hideLoader() {
     gsap.to(loader, {
       clipPath: "inset(0% 0% 100% 0%)",
-      duration: 1.2,
+      duration: 0.8,
       ease,
       onComplete: () => {
         loader.style.display = "none";
