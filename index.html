@@ -42,7 +42,11 @@ html {
 .loader {
   display: flex;
   clip-path: inset(0% 0% 0% 0%);
+  will-change: clip-path;
+  inset: 0;
 }
+
+
   [slide-up-anim] > *{
   opacity: 0;
 }
