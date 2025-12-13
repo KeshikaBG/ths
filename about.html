@@ -1279,6 +1279,8 @@ function initST() {
 <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
 
 <script>
+    const fixedEls = document.querySelectorAll('.fixed-element');
+  const clipSecs = document.querySelectorAll('.clip-section');
 gsap.registerPlugin(ScrollTrigger);
 
 clipSecs.forEach((sec, i) => {
