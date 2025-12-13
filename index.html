@@ -1100,31 +1100,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-let heroSwiperInitialized = false;
+let heroInit = false;
+
 async function loadHeroSwiper() {
   try {
-    const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
+    const data = await client.fetch(`*[_type=="home"] | order(_createdAt asc)[0]{
       "images": heroImages[]{asset->{url}}
     }`);
+
     const images = data?.images || [];
-    const heroContainer = document.querySelector('.hero-swiper');
-    if (!heroContainer) return;
-    const swiperWrapper = heroContainer.querySelector('.swiper-wrapper');
-    const slideTemplate = heroContainer.querySelector('.swiper-slide');
-    if (!swiperWrapper || !slideTemplate) return;
-    swiperWrapper.innerHTML = '';
-    const loadPromises = images.map((imgData, index) => {
-      return new Promise((resolve) => {
-        const slide = slideTemplate.cloneNode(true);
-        slide.innerHTML = '';
-        const img = new Image();
-        img.src = imgData.asset.url;
-        img.alt = `Hero Image ${index + 1}`;
-        applyMediaStyles(img, { fit: 'cover' });
-        img.onload = resolve;
-        img.onerror = resolve;
-        const overlay = document.createElement('div');
-        Object.assign(overlay.style, {
+    const heroEl = document.querySelector('.hero-swiper');
+    if (!heroEl) return;
+
+    const wrapEl = heroEl.querySelector('.swiper-wrapper');
+    const slideTpl = heroEl.querySelector('.swiper-slide');
+    if (!wrapEl || !slideTpl) return;
+
+    wrapEl.innerHTML = '';
+
+    const loadJobs = images.map((imgItem, index) => {
+      return new Promise(resolve => {
+        const slideEl = slideTpl.cloneNode(true);
+        slideEl.innerHTML = '';
+
+        const imgEl = new Image();
+        imgEl.src = imgItem.asset.url;
+        imgEl.alt = `Hero Image ${index + 1}`;
+        applyMediaStyles(imgEl, { fit: 'cover' });
+        imgEl.onload = resolve;
+        imgEl.onerror = resolve;
+
+        const overlayEl = document.createElement('div');
+        Object.assign(overlayEl.style, {
           position: 'absolute',
           top: 0,
           left: 0,
@@ -1133,147 +1140,197 @@ async function loadHeroSwiper() {
           backgroundColor: 'rgba(0,0,0,0.2)',
           pointerEvents: 'none',
         });
-        slide.appendChild(overlay);
-        slide.appendChild(img);
-        swiperWrapper.appendChild(slide);
+
+        slideEl.appendChild(overlayEl);
+        slideEl.appendChild(imgEl);
+        wrapEl.appendChild(slideEl);
       });
     });
-    await Promise.all(loadPromises);
-if (!heroSwiperInitialized) {
-  heroSwiperInitialized = true;
-  const swiper = new Swiper(heroContainer, {
-    loop: true,
-    speed: 1000,
-    preloadImages: true,
-    lazy: false,
-    autoplay: {
-      delay: 5500,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: false,
-    },
-    updateOnWindowResize: false,
-    observer: false,
-    observeParents: false,
-    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-    pagination: { el: '.swiper-pagination', clickable: true },
-    on: {
-      init(swiperInstance) {
-        swiperInstance.wrapperEl.style.transitionTimingFunction =
-          'cubic-bezier(0.65, 0, 0.35, 1)';
-        setTimeout(() => swiperInstance.autoplay.start(), 400);
-      },
-      setTransition(swiperInstance) {
-        swiperInstance.wrapperEl.style.transitionTimingFunction = 'cubic-bezier(0.65, 0, 0.35, 1)';
-      },
-    },
-  });
-  let t;
-  window.addEventListener('resize', () => {
-    clearTimeout(t);
-    t = setTimeout(() => swiper.update(), 180);
-  });
-}
-  } catch (err) { console.error('❌ Hero Swiper error:', err); }
-}
 
+    await Promise.all(loadJobs);
 
+    if (!heroInit) {
+      heroInit = true;
 
+      const swiper = new Swiper(heroEl, {
+        loop: true,
+        speed: 1000,
+        preloadImages: true,
+        lazy: false,
+        autoplay: {
+          delay: 5500,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: false,
+        },
+        updateOnWindowResize: false,
+        observer: false,
+        observeParents: false,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+        on: {
+          init(swiperInst) {
+            swiperInst.wrapperEl.style.transitionTimingFunction =
+              'cubic-bezier(0.65, 0, 0.35, 1)';
+            setTimeout(() => swiperInst.autoplay.start(), 400);
+          },
+          setTransition(swiperInst) {
+            swiperInst.wrapperEl.style.transitionTimingFunction =
+              'cubic-bezier(0.65, 0, 0.35, 1)';
+          },
+        },
+      });
 
+      let resizeT;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeT);
+        resizeT = setTimeout(() => swiper.update(), 180);
+      });
+    }
 
-
-    async function loadOtherSections() {
-    try {
-      const [featuredData, abtData, osData, vidData, contData, munData] = await Promise.all([
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[3] {
-          featuredSections[] { title, images[]{ asset->{ url } } }
-        }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[1] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[4] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[6] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[7] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[5] { heroImages[]{ asset->{ url, _type } } }`)
-      ]);
-      const featuredSections = featuredData?.featuredSections || [];
-const chipsCont = document.querySelector('.chips-cont');
-if (chipsCont && featuredSections.length) {
-  chipsCont.querySelectorAll('.wrk-chip').forEach(chip => chip.remove());
-  featuredSections.forEach((section, index) => {
-    if (!section.title) return;
-    const chip = document.createElement('div');
-    chip.classList.add('wrk-chip');
-    chip.dataset.index = index;
-    const chipText = document.createElement('div');
-    chipText.classList.add('chip-text');
-    chipText.textContent = section.title;
-    chip.appendChild(chipText);
-    chipsCont.appendChild(chip);
-  });
-}
-      const abtImages = abtData?.heroImages || [];
-      const osImages = osData?.heroImages || [];
-      const vidImages = vidData?.heroImages || [];
-      const contImages = contData?.heroImages || [];
-      const munImages = munData?.heroImages || [];
-      const chips = document.querySelectorAll('.wrk-chip');
-      const imgDivs = document.querySelectorAll('.wrk-img-div');
-      const divsPerGroup = 4;
-      if (featuredSections.length && chips.length && imgDivs.length === divsPerGroup) {
-        featuredSections.forEach((section, chipIndex) => {
-          section.images.forEach((imgData, imgIndex) => {
-            const targetDiv = imgDivs[imgIndex];
-            if (!targetDiv) return;
-            const img = document.createElement('img');
-            img.src = imgData.asset.url;
-            img.alt = `${section.title} - Image ${imgIndex + 1}`;
-            img.dataset.chipIndex = chipIndex;
-            applyMediaStyles(img, { absolute: true });
-            if (chipIndex === 0) {
-              img.style.display = 'block';
-              img.classList.add('fade-in');
-            } else { img.style.display = 'none'; }
-            targetDiv.appendChild(img);
-          });
-        });
-        chips.forEach((chip, chipIndex) => {
-          chip.addEventListener('mouseenter', () => {
-            imgDivs.forEach((div) => {
-              const imgs = div.querySelectorAll('img');
-              imgs.forEach((img) => {
-                img.classList.toggle('fade-in', img.dataset.chipIndex == chipIndex);
-              });
-            });
-            chips.forEach((c) => c.classList.remove('hover'));
-            chip.classList.add('hover');
-          });
-        });
-      }
-      const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
-      const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
-      if (swiperWrapper && slideTemplate && munImages.length) {
-        slideTemplate.remove();
-        munImages.forEach((media, index) => {
-          const slide = slideTemplate.cloneNode(true);
-          slide.innerHTML = '';
-          insertImageOrVideo(slide, [media], `Munchkin Media ${index}`);
-          swiperWrapper.appendChild(slide);
-        });
-        new Swiper(".m-mm-swiper", {
-          direction: 'horizontal',
-          loop: true,
-          spaceBetween: 14,
-          speed: 2000,
-          slidesPerView: 'auto',
-          centeredSlides: true,
-          autoplay: { delay: 1500, disableOnInteraction: false }
-        });
-      }
-      insertImageOrVideo(document.querySelector('.abt-img-div'), abtImages, 'About Hero Media');
-      insertImageOrVideo(document.querySelector('.os-cont2'), osImages, 'OS Hero Media');
-      insertImageOrVideo(document.querySelector('.vg-div'), vidImages, 'Video Gallery');
-      insertImageOrVideo(document.querySelector('.contact-div'), contImages, 'Contact Image');
-      insertImageOrVideo(document.querySelector('.m-mm-swiper .swiper-slide.m-mm'), munImages, 'Munchkin Image');
-    } catch (err) { console.error('❌ Other Sections error:', err); }
+  } catch (err) {
+    console.error('❌ Hero Swiper error:', err);
   }
+}
+
+
+
+
+
+
+ async function loadOtherSections() {
+  try {
+    const [featDat, abtDat, osDat, vidDat, cntDat, munDat] = await Promise.all([
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[3]{
+        featuredSections[]{ title, images[]{ asset->{url} } }
+      }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[1]{ heroImages[]{ asset->{url,_type} } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[4]{ heroImages[]{ asset->{url,_type} } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[6]{ heroImages[]{ asset->{url,_type} } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[7]{ heroImages[]{ asset->{url,_type} } }`),
+      client.fetch(`*[_type=="home"] | order(_createdAt asc)[5]{ heroImages[]{ asset->{url,_type} } }`)
+    ]);
+
+    const featSecs = featDat?.featuredSections || [];
+    const chipBox = document.querySelector('.chips-cont');
+
+    if (chipBox && featSecs.length) {
+      chipBox.querySelectorAll('.wrk-chip').forEach(c => c.remove());
+
+      featSecs.forEach((sec, idx) => {
+        if (!sec.title) return;
+
+        const chip = document.createElement('div');
+        chip.classList.add('wrk-chip');
+        chip.dataset.index = idx;
+
+        const chipTxt = document.createElement('div');
+        chipTxt.classList.add('chip-text');
+        chipTxt.textContent = sec.title;
+
+        chip.appendChild(chipTxt);
+        chipBox.appendChild(chip);
+      });
+    }
+
+    const abtImgs = abtDat?.heroImages || [];
+    const osImgs  = osDat?.heroImages || [];
+    const vidImgs = vidDat?.heroImages || [];
+    const cntImgs = cntDat?.heroImages || [];
+    const munImgs = munDat?.heroImages || [];
+
+    const chips = document.querySelectorAll('.wrk-chip');
+    const imgDivs = document.querySelectorAll('.wrk-img-div');
+    const perGrp = 4;
+
+    if (featSecs.length && chips.length && imgDivs.length === perGrp) {
+      featSecs.forEach((sec, cIdx) => {
+        sec.images.forEach((imgDat, iIdx) => {
+          const trgDiv = imgDivs[iIdx];
+          if (!trgDiv) return;
+
+          const img = document.createElement('img');
+          img.src = imgDat.asset.url;
+          img.alt = `${sec.title} - Image ${iIdx + 1}`;
+          img.dataset.chipIndex = cIdx;
+
+          applyMediaStyles(img, { absolute: true });
+
+          if (cIdx === 0) {
+            img.style.display = 'block';
+            img.classList.add('fade-in');
+          } else {
+            img.style.display = 'none';
+          }
+
+          trgDiv.appendChild(img);
+        });
+      });
+
+      chips.forEach((chip, cIdx) => {
+        chip.addEventListener('mouseenter', () => {
+          imgDivs.forEach(div => {
+            div.querySelectorAll('img').forEach(img => {
+              img.classList.toggle(
+                'fade-in',
+                img.dataset.chipIndex == cIdx
+              );
+            });
+          });
+
+          chips.forEach(c => c.classList.remove('hover'));
+          chip.classList.add('hover');
+        });
+      });
+    }
+
+    const mmWrap = document.querySelector('.m-mm-swiper .swiper-wrapper');
+    const mmTpl  = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
+
+    if (mmWrap && mmTpl && munImgs.length) {
+      mmTpl.remove();
+
+      munImgs.forEach((med, idx) => {
+        const slide = mmTpl.cloneNode(true);
+        slide.innerHTML = '';
+        insertImageOrVideo(slide, [med], `Munchkin Media ${idx}`);
+        mmWrap.appendChild(slide);
+      });
+
+      new Swiper('.m-mm-swiper', {
+        direction: 'horizontal',
+        loop: true,
+        spaceBetween: 14,
+        speed: 2000,
+        slidesPerView: 'auto',
+        centeredSlides: true,
+        autoplay: {
+          delay: 1500,
+          disableOnInteraction: false
+        }
+      });
+    }
+
+    insertImageOrVideo(document.querySelector('.abt-img-div'), abtImgs, 'About Hero Media');
+    insertImageOrVideo(document.querySelector('.os-cont2'), osImgs, 'OS Hero Media');
+    insertImageOrVideo(document.querySelector('.vg-div'), vidImgs, 'Video Gallery');
+    insertImageOrVideo(document.querySelector('.contact-div'), cntImgs, 'Contact Image');
+    insertImageOrVideo(
+      document.querySelector('.m-mm-swiper .swiper-slide.m-mm'),
+      munImgs,
+      'Munchkin Image'
+    );
+
+  } catch (err) {
+    console.error('❌ Other Sections error:', err);
+  }
+}
+
 
 
 
@@ -1283,128 +1340,171 @@ if (chipsCont && featuredSections.length) {
 
 async function loadTestimonials() {
   try {
-    const tD = await client.fetch(`
-      *[_type == "testPage"][0]{ tests[]{ reviewer, review } }
+    const tstDat = await client.fetch(`
+      *[_type=="testPage"][0]{ tests[]{ reviewer, review } }
     `);
-    if (!tD?.tests?.length) { console.warn("No testimonials found"); return;  }
-    const swiper = document.querySelector(".testimonial-swiper");
-    if (!swiper) return;
-    const wrapper = swiper.querySelector(".swiper-wrapper.white");
-    if (!wrapper) return;
-    const template = wrapper.querySelector(".swiper-slide.test");
-    if (!template) { console.error("Template testimonial card missing (.swiper-slide.test)"); return; }
-    template.style.display = "none";
-    const pt = await import("https://esm.sh/@portabletext/to-html");
-    const toHTML = pt.toHTML;
-    tD.tests.forEach(t => {
-      const card = template.cloneNode(true);
-      card.style.display = "flex";
-      const reviewText = card.querySelector(".b1.ch");
-      const reviewerName = card.querySelector(".s1");
-      if (reviewText) {
+
+    if (!tstDat?.tests?.length) {
+      console.warn("No testimonials found");
+      return;
+    }
+
+    const swiperEl = document.querySelector(".testimonial-swiper");
+    if (!swiperEl) return;
+
+    const wrapEl = swiperEl.querySelector(".swiper-wrapper.white");
+    if (!wrapEl) return;
+
+    const tempEl = wrapEl.querySelector(".swiper-slide.test");
+    if (!tempEl) {
+      console.error("Template testimonial card missing (.swiper-slide.test)");
+      return;
+    }
+
+    tempEl.style.display = "none";
+
+    const ptMod = await import("https://esm.sh/@portabletext/to-html");
+    const toHTML = ptMod.toHTML;
+
+    tstDat.tests.forEach(ts => {
+      const cardEl = tempEl.cloneNode(true);
+      cardEl.style.display = "flex";
+
+      const revTxt = cardEl.querySelector(".b1.ch");
+      const revNam = cardEl.querySelector(".s1");
+
+      if (revTxt) {
         try {
-          let html = toHTML(t.review || []);
+          let html = toHTML(ts.review || []);
           html = html.replace(/<p><\/p>/g, "<br><br>");
-          reviewText.innerHTML = html;
-        } catch (e) { reviewText.textContent = "Format issue"; }
+          revTxt.innerHTML = html;
+        } catch {
+          revTxt.textContent = "Format issue";
+        }
       }
-      if (reviewerName) reviewerName.textContent = t.reviewer || "";
-      wrapper.appendChild(card);
+
+      if (revNam) revNam.textContent = ts.reviewer || "";
+      wrapEl.appendChild(cardEl);
     });
-  } catch (err) { console.error("Sanity fetch error:", err); }
+
+  } catch (err) {
+    console.error("Sanity fetch error:", err);
+  }
 }
 
 
+
+
+
+  
 
 
 
 async function loadFAQs() {
   try {
-    const faqData = await client.fetch(`
-      *[_type == "faqPage"][0]{ faqs[]{ question, answer } }
+    const faqDat = await client.fetch(`
+      *[_type=="faqPage"][0]{ faqs[]{ question, answer } }
     `);
-    const faqs = faqData?.faqs || [];
-    const faqContainer = document.querySelector('.faqs');
-    const faqTemplate = document.querySelector('.faq');
-    if (!faqContainer || !faqTemplate) {
+
+    const faqArr = faqDat?.faqs || [];
+    const faqWrap = document.querySelector('.faqs');
+    const faqTemp = document.querySelector('.faq');
+
+    if (!faqWrap || !faqTemp) {
       console.warn("FAQ container or template missing.");
       return;
     }
-    faqContainer.innerHTML = "";
-    const pt = await import("https://esm.sh/@portabletext/to-html");
-    const toHTML = pt.toHTML;
-    faqs.forEach((item) => {
-      const card = faqTemplate.cloneNode(true);
-      const quesEl = card.querySelector('.ques');
-      const ansEl  = card.querySelector('.ans');
+
+    faqWrap.innerHTML = "";
+
+    const ptMod = await import("https://esm.sh/@portabletext/to-html");
+    const toHTML = ptMod.toHTML;
+
+    faqArr.forEach(item => {
+      const cardEl = faqTemp.cloneNode(true);
+      const quesEl = cardEl.querySelector('.ques');
+      const ansEl  = cardEl.querySelector('.ans');
+
       if (quesEl) quesEl.textContent = item.question;
-      if (ansEl && item.answer) {
-        ansEl.innerHTML = toHTML(item.answer);
-      }
-      faqContainer.appendChild(card);
+      if (ansEl && item.answer) ansEl.innerHTML = toHTML(item.answer);
+
+      faqWrap.appendChild(cardEl);
     });
-  } catch (err) { console.error("❌ FAQ Error:", err); }
+
+  } catch (err) {
+    console.error("❌ FAQ Error:", err);
+  }
 }
+
 function initFAQAccordion() {
-  const faqCards = document.querySelectorAll('.faq');
-  if (!faqCards.length) return;
-  faqCards.forEach(card => {
-    const ans = card.querySelector('.ans');
-    const arrow = card.querySelector('.arr-down');
-    closeFAQ(ans, arrow, true);
+  const faqEls = document.querySelectorAll('.faq');
+  if (!faqEls.length) return;
+
+  faqEls.forEach(card => {
+    const ansEl = card.querySelector('.ans');
+    const arrEl = card.querySelector('.arr-down');
+    closeFAQ(ansEl, arrEl, true);
   });
 
-  faqCards.forEach(card => {
-    const ans = card.querySelector('.ans');
-    const arrow = card.querySelector('.arr-down');
+  faqEls.forEach(card => {
+    const ansEl = card.querySelector('.ans');
+    const arrEl = card.querySelector('.arr-down');
 
     card.addEventListener('click', () => {
-      const isOpen = ans.classList.contains('open');
+      const isOpen = ansEl.classList.contains('open');
       if (isOpen) {
-        closeFAQ(ans, arrow);
+        closeFAQ(ansEl, arrEl);
         return;
       }
 
-      faqCards.forEach(f => {
-        const a = f.querySelector('.ans');
-        const ar = f.querySelector('.arr-down');
-        closeFAQ(a, ar);
+      faqEls.forEach(f => {
+        closeFAQ(
+          f.querySelector('.ans'),
+          f.querySelector('.arr-down')
+        );
       });
 
-      openFAQ(ans, arrow);
+      openFAQ(ansEl, arrEl);
     });
   });
 
-  function openFAQ(ans, arrow, instant = false) {
-    ans.classList.add('open');
-    ans.classList.remove('close');
-    arrow?.classList.add('up');
-    ans.style.height = 'auto';
-    const fullHeight = ans.scrollHeight + "px";
-    if (instant) {
-      ans.style.height = "auto";
+  function openFAQ(ansEl, arrEl, inst = false) {
+    ansEl.classList.add('open');
+    ansEl.classList.remove('close');
+    arrEl?.classList.add('up');
+
+    ansEl.style.height = 'auto';
+    const fullHt = ansEl.scrollHeight + "px";
+
+    if (inst) {
+      ansEl.style.height = "auto";
       return;
     }
-    ans.style.height = "0px";
-    requestAnimationFrame(() => { ans.style.height = fullHeight; });
-    ans.addEventListener('transitionend', () => {
-      if (ans.classList.contains('open')) {
-        ans.style.height = "auto";
+
+    ansEl.style.height = "0px";
+    requestAnimationFrame(() => ansEl.style.height = fullHt);
+
+    ansEl.addEventListener('transitionend', () => {
+      if (ansEl.classList.contains('open')) {
+        ansEl.style.height = "auto";
       }
     }, { once: true });
   }
 
-  function closeFAQ(ans, arrow, instant = false) {
-    ans.classList.remove('open');
-    ans.classList.add('close');
-    arrow?.classList.remove('up');
-    ans.style.height = ans.scrollHeight + "px";
-    if (instant) {
-      ans.style.height = "0px";
+  function closeFAQ(ansEl, arrEl, inst = false) {
+    ansEl.classList.remove('open');
+    ansEl.classList.add('close');
+    arrEl?.classList.remove('up');
+
+    ansEl.style.height = ansEl.scrollHeight + "px";
+
+    if (inst) {
+      ansEl.style.height = "0px";
       return;
     }
-    ans.offsetHeight;
-    ans.style.height = "0px";
+
+    ansEl.offsetHeight;
+    ansEl.style.height = "0px";
   }
 }
 
