@@ -1100,10 +1100,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadTestimonials() {
   try {
-    const testData = await client.fetch(`
+    const tD = await client.fetch(`
       *[_type == "testPage"][0]{ tests[]{ reviewer, review } }
     `);
-    if (!testData?.tests?.length) { console.warn("No testimonials found"); return;  }
+    if (!tD?.tests?.length) { console.warn("No testimonials found"); return;  }
     const swiper = document.querySelector(".testimonial-swiper");
     if (!swiper) return;
     const wrapper = swiper.querySelector(".swiper-wrapper.white");
@@ -1113,7 +1113,7 @@ async function loadTestimonials() {
     template.style.display = "none";
     const pt = await import("https://esm.sh/@portabletext/to-html");
     const toHTML = pt.toHTML;
-    testData.tests.forEach(t => {
+    tD.tests.forEach(t => {
       const card = template.cloneNode(true);
       card.style.display = "flex";
       const reviewText = card.querySelector(".b1.ch");
