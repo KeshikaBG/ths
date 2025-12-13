@@ -1096,6 +1096,189 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+  
+
+
+
+let heroSwiperInitialized = false;
+async function loadHeroSwiper() {
+  try {
+    const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
+      "images": heroImages[]{asset->{url}}
+    }`);
+    const images = data?.images || [];
+    const heroContainer = document.querySelector('.hero-swiper');
+    if (!heroContainer) return;
+    const swiperWrapper = heroContainer.querySelector('.swiper-wrapper');
+    const slideTemplate = heroContainer.querySelector('.swiper-slide');
+    if (!swiperWrapper || !slideTemplate) return;
+    swiperWrapper.innerHTML = '';
+    const loadPromises = images.map((imgData, index) => {
+      return new Promise((resolve) => {
+        const slide = slideTemplate.cloneNode(true);
+        slide.innerHTML = '';
+        const img = new Image();
+        img.src = imgData.asset.url;
+        img.alt = `Hero Image ${index + 1}`;
+        applyMediaStyles(img, { fit: 'cover' });
+        img.onload = resolve;
+        img.onerror = resolve;
+        const overlay = document.createElement('div');
+        Object.assign(overlay.style, {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.2)',
+          pointerEvents: 'none',
+        });
+        slide.appendChild(overlay);
+        slide.appendChild(img);
+        swiperWrapper.appendChild(slide);
+      });
+    });
+    await Promise.all(loadPromises);
+if (!heroSwiperInitialized) {
+  heroSwiperInitialized = true;
+  const swiper = new Swiper(heroContainer, {
+    loop: true,
+    speed: 1000,
+    preloadImages: true,
+    lazy: false,
+    autoplay: {
+      delay: 5500,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: false,
+    },
+    updateOnWindowResize: false,
+    observer: false,
+    observeParents: false,
+    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+    pagination: { el: '.swiper-pagination', clickable: true },
+    on: {
+      init(swiperInstance) {
+        swiperInstance.wrapperEl.style.transitionTimingFunction =
+          'cubic-bezier(0.65, 0, 0.35, 1)';
+        setTimeout(() => swiperInstance.autoplay.start(), 400);
+      },
+      setTransition(swiperInstance) {
+        swiperInstance.wrapperEl.style.transitionTimingFunction = 'cubic-bezier(0.65, 0, 0.35, 1)';
+      },
+    },
+  });
+  let t;
+  window.addEventListener('resize', () => {
+    clearTimeout(t);
+    t = setTimeout(() => swiper.update(), 180);
+  });
+}
+  } catch (err) { console.error('❌ Hero Swiper error:', err); }
+}
+
+
+
+
+
+
+    async function loadOtherSections() {
+    try {
+      const [featuredData, abtData, osData, vidData, contData, munData] = await Promise.all([
+        client.fetch(`*[_type == "home"] | order(_createdAt asc)[3] {
+          featuredSections[] { title, images[]{ asset->{ url } } }
+        }`),
+        client.fetch(`*[_type == "home"] | order(_createdAt asc)[1] { heroImages[]{ asset->{ url, _type } } }`),
+        client.fetch(`*[_type == "home"] | order(_createdAt asc)[4] { heroImages[]{ asset->{ url, _type } } }`),
+        client.fetch(`*[_type == "home"] | order(_createdAt asc)[6] { heroImages[]{ asset->{ url, _type } } }`),
+        client.fetch(`*[_type == "home"] | order(_createdAt asc)[7] { heroImages[]{ asset->{ url, _type } } }`),
+        client.fetch(`*[_type == "home"] | order(_createdAt asc)[5] { heroImages[]{ asset->{ url, _type } } }`)
+      ]);
+      const featuredSections = featuredData?.featuredSections || [];
+const chipsCont = document.querySelector('.chips-cont');
+if (chipsCont && featuredSections.length) {
+  chipsCont.querySelectorAll('.wrk-chip').forEach(chip => chip.remove());
+  featuredSections.forEach((section, index) => {
+    if (!section.title) return;
+    const chip = document.createElement('div');
+    chip.classList.add('wrk-chip');
+    chip.dataset.index = index;
+    const chipText = document.createElement('div');
+    chipText.classList.add('chip-text');
+    chipText.textContent = section.title;
+    chip.appendChild(chipText);
+    chipsCont.appendChild(chip);
+  });
+}
+      const abtImages = abtData?.heroImages || [];
+      const osImages = osData?.heroImages || [];
+      const vidImages = vidData?.heroImages || [];
+      const contImages = contData?.heroImages || [];
+      const munImages = munData?.heroImages || [];
+      const chips = document.querySelectorAll('.wrk-chip');
+      const imgDivs = document.querySelectorAll('.wrk-img-div');
+      const divsPerGroup = 4;
+      if (featuredSections.length && chips.length && imgDivs.length === divsPerGroup) {
+        featuredSections.forEach((section, chipIndex) => {
+          section.images.forEach((imgData, imgIndex) => {
+            const targetDiv = imgDivs[imgIndex];
+            if (!targetDiv) return;
+            const img = document.createElement('img');
+            img.src = imgData.asset.url;
+            img.alt = `${section.title} - Image ${imgIndex + 1}`;
+            img.dataset.chipIndex = chipIndex;
+            applyMediaStyles(img, { absolute: true });
+            if (chipIndex === 0) {
+              img.style.display = 'block';
+              img.classList.add('fade-in');
+            } else { img.style.display = 'none'; }
+            targetDiv.appendChild(img);
+          });
+        });
+        chips.forEach((chip, chipIndex) => {
+          chip.addEventListener('mouseenter', () => {
+            imgDivs.forEach((div) => {
+              const imgs = div.querySelectorAll('img');
+              imgs.forEach((img) => {
+                img.classList.toggle('fade-in', img.dataset.chipIndex == chipIndex);
+              });
+            });
+            chips.forEach((c) => c.classList.remove('hover'));
+            chip.classList.add('hover');
+          });
+        });
+      }
+      const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
+      const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
+      if (swiperWrapper && slideTemplate && munImages.length) {
+        slideTemplate.remove();
+        munImages.forEach((media, index) => {
+          const slide = slideTemplate.cloneNode(true);
+          slide.innerHTML = '';
+          insertImageOrVideo(slide, [media], `Munchkin Media ${index}`);
+          swiperWrapper.appendChild(slide);
+        });
+        new Swiper(".m-mm-swiper", {
+          direction: 'horizontal',
+          loop: true,
+          spaceBetween: 14,
+          speed: 2000,
+          slidesPerView: 'auto',
+          centeredSlides: true,
+          autoplay: { delay: 1500, disableOnInteraction: false }
+        });
+      }
+      insertImageOrVideo(document.querySelector('.abt-img-div'), abtImages, 'About Hero Media');
+      insertImageOrVideo(document.querySelector('.os-cont2'), osImages, 'OS Hero Media');
+      insertImageOrVideo(document.querySelector('.vg-div'), vidImages, 'Video Gallery');
+      insertImageOrVideo(document.querySelector('.contact-div'), contImages, 'Contact Image');
+      insertImageOrVideo(document.querySelector('.m-mm-swiper .swiper-slide.m-mm'), munImages, 'Munchkin Image');
+    } catch (err) { console.error('❌ Other Sections error:', err); }
+  }
+
+
+
+  
+
 
 
 async function loadTestimonials() {
@@ -1229,185 +1412,12 @@ function initFAQAccordion() {
 
 
 
+
   
-let heroSwiperInitialized = false;
-async function loadHeroSwiper() {
-  try {
-    const data = await client.fetch(`*[_type == "home"] | order(_createdAt asc)[0] {
-      "images": heroImages[]{asset->{url}}
-    }`);
-    const images = data?.images || [];
-    const heroContainer = document.querySelector('.hero-swiper');
-    if (!heroContainer) return;
-    const swiperWrapper = heroContainer.querySelector('.swiper-wrapper');
-    const slideTemplate = heroContainer.querySelector('.swiper-slide');
-    if (!swiperWrapper || !slideTemplate) return;
-    swiperWrapper.innerHTML = '';
-    const loadPromises = images.map((imgData, index) => {
-      return new Promise((resolve) => {
-        const slide = slideTemplate.cloneNode(true);
-        slide.innerHTML = '';
-        const img = new Image();
-        img.src = imgData.asset.url;
-        img.alt = `Hero Image ${index + 1}`;
-        applyMediaStyles(img, { fit: 'cover' });
-        img.onload = resolve;
-        img.onerror = resolve;
-        const overlay = document.createElement('div');
-        Object.assign(overlay.style, {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.2)',
-          pointerEvents: 'none',
-        });
-        slide.appendChild(overlay);
-        slide.appendChild(img);
-        swiperWrapper.appendChild(slide);
-      });
-    });
-    await Promise.all(loadPromises);
-if (!heroSwiperInitialized) {
-  heroSwiperInitialized = true;
-  const swiper = new Swiper(heroContainer, {
-    loop: true,
-    speed: 1000,
-    preloadImages: true,
-    lazy: false,
-    autoplay: {
-      delay: 5500,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: false,
-    },
-    updateOnWindowResize: false,
-    observer: false,
-    observeParents: false,
-    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-    pagination: { el: '.swiper-pagination', clickable: true },
-    on: {
-      init(swiperInstance) {
-        swiperInstance.wrapperEl.style.transitionTimingFunction =
-          'cubic-bezier(0.65, 0, 0.35, 1)';
-        setTimeout(() => swiperInstance.autoplay.start(), 400);
-      },
-      setTransition(swiperInstance) {
-        swiperInstance.wrapperEl.style.transitionTimingFunction = 'cubic-bezier(0.65, 0, 0.35, 1)';
-      },
-    },
-  });
-  let t;
-  window.addEventListener('resize', () => {
-    clearTimeout(t);
-    t = setTimeout(() => swiper.update(), 180);
-  });
-}
-  } catch (err) { console.error('❌ Hero Swiper error:', err); }
-}
-
-
-
-
-
-
-  async function loadOtherSections() {
-    try {
-      const [featuredData, abtData, osData, vidData, contData, munData] = await Promise.all([
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[3] {
-          featuredSections[] { title, images[]{ asset->{ url } } }
-        }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[1] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[4] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[6] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[7] { heroImages[]{ asset->{ url, _type } } }`),
-        client.fetch(`*[_type == "home"] | order(_createdAt asc)[5] { heroImages[]{ asset->{ url, _type } } }`)
-      ]);
-      const featuredSections = featuredData?.featuredSections || [];
-const chipsCont = document.querySelector('.chips-cont');
-if (chipsCont && featuredSections.length) {
-  chipsCont.querySelectorAll('.wrk-chip').forEach(chip => chip.remove());
-  featuredSections.forEach((section, index) => {
-    if (!section.title) return;
-    const chip = document.createElement('div');
-    chip.classList.add('wrk-chip');
-    chip.dataset.index = index;
-    const chipText = document.createElement('div');
-    chipText.classList.add('chip-text');
-    chipText.textContent = section.title;
-    chip.appendChild(chipText);
-    chipsCont.appendChild(chip);
-  });
-}
-      const abtImages = abtData?.heroImages || [];
-      const osImages = osData?.heroImages || [];
-      const vidImages = vidData?.heroImages || [];
-      const contImages = contData?.heroImages || [];
-      const munImages = munData?.heroImages || [];
-      const chips = document.querySelectorAll('.wrk-chip');
-      const imgDivs = document.querySelectorAll('.wrk-img-div');
-      const divsPerGroup = 4;
-      if (featuredSections.length && chips.length && imgDivs.length === divsPerGroup) {
-        featuredSections.forEach((section, chipIndex) => {
-          section.images.forEach((imgData, imgIndex) => {
-            const targetDiv = imgDivs[imgIndex];
-            if (!targetDiv) return;
-            const img = document.createElement('img');
-            img.src = imgData.asset.url;
-            img.alt = `${section.title} - Image ${imgIndex + 1}`;
-            img.dataset.chipIndex = chipIndex;
-            applyMediaStyles(img, { absolute: true });
-            if (chipIndex === 0) {
-              img.style.display = 'block';
-              img.classList.add('fade-in');
-            } else { img.style.display = 'none'; }
-            targetDiv.appendChild(img);
-          });
-        });
-        chips.forEach((chip, chipIndex) => {
-          chip.addEventListener('mouseenter', () => {
-            imgDivs.forEach((div) => {
-              const imgs = div.querySelectorAll('img');
-              imgs.forEach((img) => {
-                img.classList.toggle('fade-in', img.dataset.chipIndex == chipIndex);
-              });
-            });
-            chips.forEach((c) => c.classList.remove('hover'));
-            chip.classList.add('hover');
-          });
-        });
-      }
-      const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
-      const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
-      if (swiperWrapper && slideTemplate && munImages.length) {
-        slideTemplate.remove();
-        munImages.forEach((media, index) => {
-          const slide = slideTemplate.cloneNode(true);
-          slide.innerHTML = '';
-          insertImageOrVideo(slide, [media], `Munchkin Media ${index}`);
-          swiperWrapper.appendChild(slide);
-        });
-        new Swiper(".m-mm-swiper", {
-          direction: 'horizontal',
-          loop: true,
-          spaceBetween: 14,
-          speed: 2000,
-          slidesPerView: 'auto',
-          centeredSlides: true,
-          autoplay: { delay: 1500, disableOnInteraction: false }
-        });
-      }
-      insertImageOrVideo(document.querySelector('.abt-img-div'), abtImages, 'About Hero Media');
-      insertImageOrVideo(document.querySelector('.os-cont2'), osImages, 'OS Hero Media');
-      insertImageOrVideo(document.querySelector('.vg-div'), vidImages, 'Video Gallery');
-      insertImageOrVideo(document.querySelector('.contact-div'), contImages, 'Contact Image');
-      insertImageOrVideo(document.querySelector('.m-mm-swiper .swiper-slide.m-mm'), munImages, 'Munchkin Image');
-    } catch (err) { console.error('❌ Other Sections error:', err); }
-  }
   document.addEventListener('DOMContentLoaded', () => {
-    loadTestimonials();
     loadHeroSwiper();
     loadOtherSections();
+    loadTestimonials();
     loadFAQs().then(() => { initFAQAccordion(); });
   });
 </script>
