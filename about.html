@@ -506,33 +506,39 @@ window.addEventListener("pageshow", e => {
 
 
 
-  <!-- Header ANIMATION -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const headers = document.querySelectorAll(".header");
-      if (!headers.length) return;
-      headers.forEach(hdr => {
-        const hdrHeight = hdr.offsetHeight;
-        let lastScrollY = window.scrollY;
-        const animateHeaderOnScroll = () => {
-          const scrollY = window.scrollY;
-          const isScrollingDown = scrollY > lastScrollY;
-          gsap.to(hdr, {
-            top: isScrollingDown ? -hdrHeight : 0,
-            ease: "power2.out",
-            duration: 0.6
-          });
-          lastScrollY = scrollY;
-        };
-        window.addEventListener('scroll', animateHeaderOnScroll);
-        ScrollTrigger.create({
-          trigger: hdr,
-          start: `top top+=${hdrHeight}`,
-          end: `bottom top+=${hdrHeight}`
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const hdrs = document.querySelectorAll(".header");
+    if (!hdrs.length) return;
+
+    hdrs.forEach(hdr => {
+      const hdrH = hdr.offsetHeight;
+      let lastY = window.scrollY;
+
+      const animHdr = () => {
+        const curY = window.scrollY;
+        const isDown = curY > lastY;
+
+        gsap.to(hdr, {
+          top: isDown ? -hdrH : 0,
+          ease: "power2.out",
+          duration: 0.6
         });
+
+        lastY = curY;
+      };
+
+      window.addEventListener("scroll", animHdr);
+
+      ScrollTrigger.create({
+        trigger: hdr,
+        start: `top top+=${hdrH}`,
+        end: `bottom top+=${hdrH}`
       });
     });
-  </script>
+  });
+</script>
+
   <style>
     .fixed-element {
       position: fixed;
@@ -733,48 +739,48 @@ window.addEventListener("pageshow", e => {
 
 
 
-            <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    const menuBtn = document.querySelector(".menu");
-                    const closeBtn = document.querySelector(".menu-close");
-                    const navWrap = document.querySelector(".nav-inr-wrp");
-                    const overlay = document.querySelector(".overlay");
-                    const head = document.querySelector(".header");
+ <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const menuBtn = document.querySelector(".menu");
+    const clsBtn  = document.querySelector(".menu-close");
+    const navWrp  = document.querySelector(".nav-inr-wrp");
+    const ovl     = document.querySelector(".overlay");
+    const hdr     = document.querySelector(".header");
 
-                    function isMobile() {
-                        return window.innerWidth <= 991;
-                    }
+    function isMob() {
+      return window.innerWidth <= 991;
+    }
 
-                    function closeMenu() {
-                        if (isMobile()) {
-                            navWrap.classList.remove("active");
-                            setTimeout(() => {
-                                navWrap.classList.remove("height");
-                            }, 0);
-                            overlay.classList.remove("oveactive");
-                            head.classList.remove("vis");
-                        }
-                    }
+    function closeNav() {
+      if (isMob()) {
+        navWrp.classList.remove("active");
+        setTimeout(() => {
+          navWrp.classList.remove("height");
+        }, 0);
+        ovl.classList.remove("oveactive");
+        hdr.classList.remove("vis");
+      }
+    }
 
-                    if (menuBtn && closeBtn && navWrap && overlay) {
-                        menuBtn.addEventListener("click", () => {
-                            if (isMobile()) {
-                                navWrap.classList.add("active");
-                                navWrap.classList.add("height");
-                                overlay.classList.add("oveactive");
-                                head.classList.add("vis");
-                            }
-                        });
+    if (menuBtn && clsBtn && navWrp && ovl) {
+      menuBtn.addEventListener("click", () => {
+        if (isMob()) {
+          navWrp.classList.add("active", "height");
+          ovl.classList.add("oveactive");
+          hdr.classList.add("vis");
+        }
+      });
 
-                        closeBtn.addEventListener("click", closeMenu);
-                        overlay.addEventListener("click", closeMenu);
+      clsBtn.addEventListener("click", closeNav);
+      ovl.addEventListener("click", closeNav);
 
-                        navWrap.querySelectorAll("a").forEach(link => {
-                            link.addEventListener("click", closeMenu);
-                        });
-                    }
-                });
-            </script>
+      navWrp.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", closeNav);
+      });
+    }
+  });
+</script>
+
         </div>
         <div class="w-layout-hflex abt-hero-div abt">
             <div data-entry-anim="" id="w-node-ccfae169-bd3a-49f0-98b0-a04bf35c45f5-e9ac4aa3"
@@ -1076,183 +1082,207 @@ window.addEventListener("pageshow", e => {
     type="text/javascript"></script>
   <script src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/js/webflow.751e0867.148dc658e77a3916.js"
     type="text/javascript"></script>
-  <script>
-    const fixedElements = document.querySelectorAll('.fixed-element');
-    const sections = document.querySelectorAll('.clip-section');
-    function updateClipPaths() {
-      const viewportHeight = window.innerHeight;
-      sections.forEach((section, index) => {
-        const rect = section.getBoundingClientRect();
-        const top = Math.max(rect.top, 0);
-        const bottom = Math.min(rect.bottom, viewportHeight);
-        const topPercent = (top / viewportHeight) * 100;
-        const bottomPercent = 100 - (bottom / viewportHeight) * 100;
-        const fixedEl = fixedElements[index];
-        if (rect.bottom > 0 && rect.top < viewportHeight) {
-          fixedEl.style.clipPath = `inset(${topPercent}% 0% ${bottomPercent}% 0%)`;
-        } else {
-          fixedEl.style.clipPath = `inset(100% 0 0 0)`;
-        }
-      });
-    }
-    window.addEventListener('scroll', updateClipPaths);
-    window.addEventListener('resize', updateClipPaths);
-    updateClipPaths();
-  </script>
 
+  
+<script>
+  const fixedEls = document.querySelectorAll('.fixed-element');
+  const clipSecs = document.querySelectorAll('.clip-section');
 
-
-
-
-  <script src="../cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@sanity/client';
-    const client = createClient({
-      projectId: 'n7jjk6nd',
-      dataset: 'production',
-      useCdn: true,
-      apiVersion: '2023-01-01'
+  function updateClips() {
+    const vh = window.innerHeight;
+    clipSecs.forEach((sec, idx) => {
+      const rect = sec.getBoundingClientRect();
+      const topVal = Math.max(rect.top, 0);
+      const botVal = Math.min(rect.bottom, vh);
+      const topPct = (topVal / vh) * 100;
+      const botPct = 100 - (botVal / vh) * 100;
+      const fixedEl = fixedEls[idx];
+      if (rect.bottom > 0 && rect.top < vh) {
+        fixedEl.style.clipPath = `inset(${topPct}% 0% ${botPct}% 0%)`;
+      } else {
+        fixedEl.style.clipPath = `inset(100% 0% 0% 0%)`;
+      }
     });
-    async function preloadImages(urls) {
-      return Promise.all(
-        urls.map(
-          url =>
-            new Promise(resolve => {
-              const img = new Image();
-              img.onload = resolve;
-              img.onerror = resolve;
-              img.src = url;
-            })
-        )
-      );
-    }
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        const [heroData, contData, works, thsData, osData, e2eData] = await Promise.all([
-          client.fetch(`*[_type == "about"] | order(_createdAt asc)[0] {
+  }
+  window.addEventListener('scroll', updateClips);
+  window.addEventListener('resize', updateClips);
+  updateClips();
+</script>
+
+
+
+
+
+
+<script src="../cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@sanity/client';
+
+  const sanityClient = createClient({
+    projectId: 'n7jjk6nd',
+    dataset: 'production',
+    useCdn: true,
+    apiVersion: '2023-01-01'
+  });
+
+  async function preloadImgs(urls) {
+    return Promise.all(
+      urls.map(
+        url =>
+          new Promise(done => {
+            const img = new Image();
+            img.onload = done;
+            img.onerror = done;
+            img.src = url;
+          })
+      )
+    );
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const [
+        heroRes, contRes, workRes, thsRes, osRes, e2eRes
+      ] = await Promise.all([
+        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[0] {
           aboutImages[] { asset->{ url, _type } }
         }`),
-          client.fetch(`*[_type == "home"] | order(_createdAt asc)[7] {
+        sanityClient.fetch(`*[_type == "home"] | order(_createdAt asc)[7] {
           heroImages[] { asset->{ url, _type } }
         }`),
-          client.fetch(`*[_type == "about"] | order(_createdAt asc)[1] {
+        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[1] {
           featuredSections[] {
             title,
             images[]{ asset->{ url, _type } }
           }
         }`),
-          client.fetch(`*[_type == "about"] | order(_createdAt asc)[2] {
+        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[2] {
           aboutImages[] { asset->{ url, _type } }
         }`),
-          client.fetch(`*[_type == "about"] | order(_createdAt asc)[3] {
+        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[3] {
           aboutImages[] { asset->{ url, _type } }
         }`),
-          client.fetch(`*[_type == "about"] | order(_createdAt asc)[4] {
+        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[4] {
           aboutImages[] { asset->{ url, _type } }
         }`)
-        ]);
-        const heroImages = heroData?.aboutImages || [];
-        const contImages = contData?.heroImages || [];
-        const thsImages = thsData?.aboutImages || [];
-        const osImages = osData?.aboutImages || [];
-        const e2eImages = e2eData?.aboutImages || [];
-        
-        const teamSections = works?.featuredSections || [];
+      ]);
 
-        const heroImgDiv = document.querySelector('.abt-img-wrp');
-        const contImgDiv = document.querySelector('.contact-div');
-        const thsImgDiv = document.querySelector('.div-block-9');
-        const osImgDiv = document.querySelector('.div-block-10');
-        const e2eImgDiv = document.querySelector('.div-block-11');
-        
-        const teamCards = document.querySelectorAll('.card');
-        const slider = document.querySelector('.slider');
+      const heroImgs = heroRes?.aboutImages || [];
+      const contImgs = contRes?.heroImages || [];
+      const thsImgs  = thsRes?.aboutImages || [];
+      const osImgs   = osRes?.aboutImages || [];
+      const e2eImgs  = e2eRes?.aboutImages || [];
 
-        const allUrls = [
-          ...heroImages.map(img => img.asset.url),
-          ...contImages.map(img => img.asset.url),
-          ...teamSections.flatMap(sec => sec.images.map(img => img.asset.url))
-        ];
-        await preloadImages(allUrls);
-        function applyImageStyles(el, { absolute = false } = {}) {
-          if (absolute) {
-            el.style.position = 'absolute';
-            el.style.top = 0;
-            el.style.left = 0;
-          }
-          el.style.width = '100%';
-          el.style.height = '100%';
-          el.style.maxWidth = 'none';
-          el.style.objectFit = 'cover';
+      const teamSecs = workRes?.featuredSections || [];
+
+      const heroWrap = document.querySelector('.abt-img-wrp');
+      const contWrap = document.querySelector('.contact-div');
+      const thsWrap  = document.querySelector('.div-block-9');
+      const osWrap   = document.querySelector('.div-block-10');
+      const e2eWrap  = document.querySelector('.div-block-11');
+
+      const teamCards = document.querySelectorAll('.card');
+      const sliderElm = document.querySelector('.slider');
+
+      const allImgs = [
+        ...heroImgs.map(i => i.asset.url),
+        ...contImgs.map(i => i.asset.url),
+        ...teamSecs.flatMap(sec => sec.images.map(i => i.asset.url))
+      ];
+
+      await preloadImgs(allImgs);
+
+      function styleImg(el, { absolute = false } = {}) {
+        if (absolute) {
+          el.style.position = 'absolute';
+          el.style.top = 0;
+          el.style.left = 0;
         }
-        function insertImage(container, mediaArr, label = 'Media') {
-          if (container && mediaArr.length > 0) {
-            const media = mediaArr[0];
-            if (media.asset._type === 'sanity.imageAsset') {
-              const img = document.createElement('img');
-              img.src = media.asset.url;
-              img.alt = label;
-              applyImageStyles(img);
-              container.appendChild(img);
-            }
-          }
+        el.style.width = '100%';
+        el.style.height = '100%';
+        el.style.maxWidth = 'none';
+        el.style.objectFit = 'cover';
+      }
+
+      function addImg(wrap, arr, label = 'Media') {
+        if (!wrap || !arr.length) return;
+        const media = arr[0];
+        if (media.asset._type === 'sanity.imageAsset') {
+          const img = document.createElement('img');
+          img.src = media.asset.url;
+          img.alt = label;
+          styleImg(img);
+          wrap.appendChild(img);
         }
-        insertImage(heroImgDiv, heroImages, 'About Hero Media');
-        insertImage(contImgDiv, contImages, 'Contact Media');
-        insertImage(thsImgDiv, thsImages, 'THS Media');
-        insertImage(osImgDiv, osImages, 'OS Media');
-        insertImage(e2eImgDiv, e2eImages, 'E2E Media');
-        
-        let cardIndex = 0;
-        teamSections.forEach(section => {
-          section.images.forEach(imgObj => {
-            if (cardIndex < teamCards.length) {
-              const card = teamCards[cardIndex];
+      }
 
-              const titleEl = document.createElement('h4');
-              titleEl.textContent = section.title;
+      addImg(heroWrap, heroImgs, 'About Hero');
+      addImg(contWrap, contImgs, 'Contact');
+      addImg(thsWrap,  thsImgs,  'THS');
+      addImg(osWrap,   osImgs,   'OS');
+      addImg(e2eWrap,  e2eImgs,  'E2E');
 
-              const imgEl = document.createElement('img');
-              imgEl.src = imgObj.asset.url;
-              imgEl.alt = section.title;
-              applyImageStyles(imgEl);
+      let idx = 0;
+      teamSecs.forEach(sec => {
+        sec.images.forEach(imgObj => {
+          if (idx >= teamCards.length) return;
 
-              card.innerHTML = '';
-              card.appendChild(titleEl);
-              card.appendChild(imgEl);
+          const card = teamCards[idx];
+          const title = document.createElement('h4');
+          const img = document.createElement('img');
 
-              cardIndex++;
-            }
-          });
+          title.textContent = sec.title;
+          img.src = imgObj.asset.url;
+          img.alt = sec.title;
+          styleImg(img);
+
+          card.innerHTML = '';
+          card.appendChild(title);
+          card.appendChild(img);
+
+          idx++;
         });
-        const originalCards = Array.from(slider.querySelectorAll('.card'));
-        originalCards.forEach(card => {
-          const clone = card.cloneNode(true);
-          slider.appendChild(clone);
-        });
-        const cards = slider.querySelectorAll('.card');
-        const total = cards.length;
-        let angle = 0;
+      });
+
+      const baseCards = Array.from(sliderElm.querySelectorAll('.card'));
+      baseCards.forEach(card => {
+        sliderElm.appendChild(card.cloneNode(true));
+      });
+
+      const cards = sliderElm.querySelectorAll('.card');
+      const count = cards.length;
+      let rot = 0;
+
+      gsap.set(cards, {
+        rotationY: i => i * (360 / count),
+        transformOrigin: "50% 50% 880px"
+      });
+
+      const rotSpeed = 360 / 40;
+      let prev = performance.now();
+
+      function spin(now) {
+        const diff = (now - prev) / 1000;
+        prev = now;
+        rot += rotSpeed * diff;
+
         gsap.set(cards, {
-          rotationY: (i) => i * (360 / total),
-          transformOrigin: "50% 50% 880px",
+          rotationY: i => rot + i * (360 / count),
+          transformOrigin: "50% 50% 880px"
         });
-        const speed = 360 / 40;
-        let lastTime = performance.now();
-        function animate(time) {
-          const delta = (time - lastTime) / 1000;
-          lastTime = time;
-          angle += speed * delta;
-          gsap.set(cards, {
-            rotationY: (i) => angle + i * (360 / total),
-            transformOrigin: "50% 50% 880px",
-          });
-          requestAnimationFrame(animate);
-        }
-        requestAnimationFrame(animate);
-      } catch (err) { console.error('❌ Sanity fetch error:', err); }
-    });
-  </script>
+
+        requestAnimationFrame(spin);
+      }
+
+      requestAnimationFrame(spin);
+
+    } catch (err) {
+      console.error('❌ Sanity fetch error:', err);
+    }
+  });
+</script>
+
 </body>
 
 </html>
