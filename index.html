@@ -1097,129 +1097,117 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadTestimonials() {
   try {
-    const testData = await client.fetch(`
-      *[_type == "testPage"][0]{ tests[]{ reviewer, review } }
-    `);
-    if (!testData?.tests?.length) { console.warn("No testimonials found"); return;  }
-    const swiper = document.querySelector(".testimonial-swiper");
-    if (!swiper) return;
-    const wrapper = swiper.querySelector(".swiper-wrapper.white");
-    if (!wrapper) return;
-    const template = wrapper.querySelector(".swiper-slide.test");
-    if (!template) { console.error("Template testimonial card missing (.swiper-slide.test)"); return; }
-    template.style.display = "none";
-    const pt = await import("https://esm.sh/@portabletext/to-html");
-    const toHTML = pt.toHTML;
-    testData.tests.forEach(t => {
-      const card = template.cloneNode(true);
+    const { tests = [] } = await client.fetch(`
+      *[_type=="testPage"][0]{ tests[]{ reviewer, review } }
+    `) || {};
+
+    if (!tests.length) return;
+
+    const wrap = document.querySelector(".testimonial-swiper .swiper-wrapper.white");
+    const tpl  = wrap?.querySelector(".swiper-slide.test");
+    if (!wrap || !tpl) return;
+
+    tpl.style.display = "none";
+
+    const { toHTML } = await import("https://esm.sh/@portabletext/to-html");
+
+    tests.forEach(({ reviewer = "", review = [] }) => {
+      const card = tpl.cloneNode(true);
       card.style.display = "flex";
-      const reviewText = card.querySelector(".b1.ch");
-      const reviewerName = card.querySelector(".s1");
-      if (reviewText) {
+
+      const txt = card.querySelector(".b1.ch");
+      const name = card.querySelector(".s1");
+
+      if (txt) {
         try {
-          let html = toHTML(t.review || []);
-          html = html.replace(/<p><\/p>/g, "<br><br>");
-          reviewText.innerHTML = html;
-        } catch (e) { reviewText.textContent = "Format issue"; }
+          txt.innerHTML = toHTML(review).replace(/<p><\/p>/g, "<br><br>");
+        } catch {
+          txt.textContent = "Format issue";
+        }
       }
-      if (reviewerName) reviewerName.textContent = t.reviewer || "";
-      wrapper.appendChild(card);
+
+      if (name) name.textContent = reviewer;
+      wrap.appendChild(card);
     });
-  } catch (err) { console.error("Sanity fetch error:", err); }
+
+  } catch (e) {
+    console.error("Sanity testimonial error:", e);
+  }
 }
+
 
 
 
 
 async function loadFAQs() {
   try {
-    const faqData = await client.fetch(`
-      *[_type == "faqPage"][0]{ faqs[]{ question, answer } }
-    `);
-    const faqs = faqData?.faqs || [];
-    const faqContainer = document.querySelector('.faqs');
-    const faqTemplate = document.querySelector('.faq');
-    if (!faqContainer || !faqTemplate) {
-      console.warn("FAQ container or template missing.");
-      return;
-    }
-    faqContainer.innerHTML = "";
-    const pt = await import("https://esm.sh/@portabletext/to-html");
-    const toHTML = pt.toHTML;
-    faqs.forEach((item) => {
-      const card = faqTemplate.cloneNode(true);
-      const quesEl = card.querySelector('.ques');
-      const ansEl  = card.querySelector('.ans');
-      if (quesEl) quesEl.textContent = item.question;
-      if (ansEl && item.answer) {
-        ansEl.innerHTML = toHTML(item.answer);
-      }
-      faqContainer.appendChild(card);
+    const { faqs = [] } = await client.fetch(`
+      *[_type=="faqPage"][0]{ faqs[]{ question, answer } }
+    `) || {};
+
+    const wrap = document.querySelector('.faqs');
+    const tpl  = wrap?.querySelector('.faq');
+    if (!wrap || !tpl) return;
+
+    wrap.innerHTML = "";
+
+    const { toHTML } = await import("https://esm.sh/@portabletext/to-html");
+
+    faqs.forEach(({ question = "", answer }) => {
+      const card = tpl.cloneNode(true);
+      card.querySelector('.ques')?.textContent = question;
+      if (answer) card.querySelector('.ans')?.innerHTML = toHTML(answer);
+      wrap.appendChild(card);
     });
-  } catch (err) { console.error("❌ FAQ Error:", err); }
+
+  } catch (e) {
+    console.error("❌ FAQ Error:", e);
+  }
 }
+
 function initFAQAccordion() {
-  const faqCards = document.querySelectorAll('.faq');
-  if (!faqCards.length) return;
-  faqCards.forEach(card => {
-    const ans = card.querySelector('.ans');
-    const arrow = card.querySelector('.arr-down');
-    closeFAQ(ans, arrow, true);
-  });
+  const cards = [...document.querySelectorAll('.faq')];
+  if (!cards.length) return;
 
-  faqCards.forEach(card => {
-    const ans = card.querySelector('.ans');
-    const arrow = card.querySelector('.arr-down');
+  cards.forEach(c => toggle(c, false, true));
 
+  cards.forEach(card => {
     card.addEventListener('click', () => {
-      const isOpen = ans.classList.contains('open');
-      if (isOpen) {
-        closeFAQ(ans, arrow);
-        return;
-      }
+      const isOpen = card.classList.contains('open');
 
-      faqCards.forEach(f => {
-        const a = f.querySelector('.ans');
-        const ar = f.querySelector('.arr-down');
-        closeFAQ(a, ar);
-      });
-
-      openFAQ(ans, arrow);
+      cards.forEach(c => toggle(c, false));
+      if (!isOpen) toggle(card, true);
     });
   });
 
-  function openFAQ(ans, arrow, instant = false) {
-    ans.classList.add('open');
-    ans.classList.remove('close');
-    arrow?.classList.add('up');
-    ans.style.height = 'auto';
-    const fullHeight = ans.scrollHeight + "px";
-    if (instant) {
-      ans.style.height = "auto";
-      return;
-    }
-    ans.style.height = "0px";
-    requestAnimationFrame(() => { ans.style.height = fullHeight; });
-    ans.addEventListener('transitionend', () => {
-      if (ans.classList.contains('open')) {
-        ans.style.height = "auto";
-      }
-    }, { once: true });
-  }
+  function toggle(card, open, instant = false) {
+    const ans = card.querySelector('.ans');
+    const arr = card.querySelector('.arr-down');
+    if (!ans) return;
 
-  function closeFAQ(ans, arrow, instant = false) {
-    ans.classList.remove('open');
-    ans.classList.add('close');
-    arrow?.classList.remove('up');
-    ans.style.height = ans.scrollHeight + "px";
+    card.classList.toggle('open', open);
+    card.classList.toggle('close', !open);
+    arr?.classList.toggle('up', open);
+
     if (instant) {
-      ans.style.height = "0px";
+      ans.style.height = open ? 'auto' : '0px';
       return;
     }
+
+    ans.style.height = open ? ans.scrollHeight + 'px' : ans.scrollHeight + 'px';
     ans.offsetHeight;
-    ans.style.height = "0px";
+    ans.style.height = open ? ans.scrollHeight + 'px' : '0px';
+
+    if (open) {
+      ans.addEventListener(
+        'transitionend',
+        () => card.classList.contains('open') && (ans.style.height = 'auto'),
+        { once: true }
+      );
+    }
   }
 }
+
 
 
 
