@@ -1229,29 +1229,12 @@ if (overlayWork && separateDiv) {
 
   async function loadOtherSections() {
     try {
-      const [featuredData, abtData, osData, vidData, contData, munData] = await Promise.all([
+      const [contData] = await Promise.all([
         client.fetch(`*[_type == "home"] | order(_createdAt asc)[7] { heroImages[]{ asset->{ url, _type } } }`)
       ]);
-      const featuredSections = featuredData?.featuredSections || [];
-const chipsCont = document.querySelector('.chips-cont');
-if (chipsCont && featuredSections.length) {
-  chipsCont.querySelectorAll('.wrk-chip').forEach(chip => chip.remove());
-  featuredSections.forEach((section, index) => {
-    if (!section.title) return;
-    const chip = document.createElement('div');
-    chip.classList.add('wrk-chip');
-    chip.dataset.index = index;
-    const chipText = document.createElement('div');
-    chipText.classList.add('chip-text');
-    chipText.textContent = section.title;
-    chip.appendChild(chipText);
-    chipsCont.appendChild(chip);
-  });
-}
-
       const contImages = contData?.heroImages || [];
-
       insertImageOrVideo(document.querySelector('.contact-div'), contImages, 'Contact Image');
+      
     } catch (err) { console.error('❌ Other Sections error:', err); }
   }
   document.addEventListener('DOMContentLoaded', () => {
