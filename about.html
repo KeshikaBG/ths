@@ -1277,29 +1277,41 @@ function initST() {
 
   
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
 <script>
   const fixedEls = document.querySelectorAll('.fixed-element');
   const clipSecs = document.querySelectorAll('.clip-section');
 
-  fixedEls.forEach((el, idx) => {
-    const sec = clipSecs[idx];
-    if (!sec) return;
+  function updateClips() {
+    const vh = window.innerHeight;
 
-    ScrollTrigger.create({
-      trigger: sec,
-      start: "top bottom",
-      end: "bottom top",
-      scrub: true,
-      onUpdate: self => {
-        const progress = gsap.utils.clamp(0, 1, self.progress); // 0 → 1
-        const clipTop = 100 * (1 - progress); // from 100% → 0%
-        el.style.clipPath = `inset(${clipTop}% 0% 0% 0%)`;
+    clipSecs.forEach((sec, idx) => {
+      const rect = sec.getBoundingClientRect();
+      const fixedEl = fixedEls[idx];
+      if (!fixedEl) return;
+
+      // Start with fully hidden
+      let clipTop = 100;
+      let clipBottom = 0;
+
+      if (rect.bottom > 0 && rect.top < vh) {
+        // Element is in viewport
+        // progress 0 (section bottom at bottom) → 1 (section top at top)
+        const progress = (vh - rect.top) / (vh + rect.height);
+        clipTop = 100 * (1 - progress);
+        clipBottom = 0; // bottom stays 0%, height fixed
       }
+
+      fixedEl.style.height = "100vh"; // always fixed
+      fixedEl.style.clipPath = `inset(${clipTop}% 0% ${clipBottom}% 0%)`;
     });
-  });
+  }
+
+  window.addEventListener('scroll', updateClips, { passive: true });
+  window.addEventListener('resize', updateClips);
+  updateClips();
 </script>
+
 
 
   
