@@ -214,8 +214,8 @@ window.loaderFinished = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   const loader = document.querySelector(".loader");
-  const loaderVisibleTime = 1000;
   const ease = "power2.inOut";
+  const loaderVisibleTime = 1000;
 
   if (!loader) {
     window.loaderFinished = true;
@@ -239,17 +239,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function showLoader(callback) {
+  function showLoader(cb) {
     loader.style.display = "flex";
-    gsap.set(loader, {
-      clipPath: "inset(100% 0% 0% 0%)"
-    });
+    gsap.set(loader, { clipPath: "inset(100% 0% 0% 0%)" });
 
     gsap.to(loader, {
       clipPath: "inset(0% 0% 0% 0%)",
       duration: 0.8,
       ease,
-      onComplete: callback
+      onComplete: cb
     });
   }
 
@@ -257,45 +255,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll("a").forEach(link => {
     if (!link.href) return;
-    if (!link.href.startsWith(window.location.origin)) return;
+    if (!link.href.startsWith(location.origin)) return;
     if (link.target === "_blank") return;
     if (link.href.includes("#")) return;
 
     link.addEventListener("click", e => {
       e.preventDefault();
-      const targetUrl = link.href;
-
       showLoader(() => {
-        window.location.href = targetUrl;
+        location.href = link.href;
       });
     });
   });
-
-  window.addEventListener("popstate", () => {
-    showLoader(() => {
-      window.location.reload();
-    });
-  });
 });
 
-window.addEventListener("pageshow", event => {
-  if (!event.persisted) return;
-
+/* 🔥 KEY FIX */
+window.addEventListener("pageshow", e => {
+  if (!e.persisted) return;
   const loader = document.querySelector(".loader");
-  if (!loader) return;
-
-  loader.style.display = "flex";
-  gsap.set(loader, {
-    clipPath: "inset(100% 0% 0% 0%)"
-  });
-
-  gsap.to(loader, {
-    clipPath: "inset(0% 0% 0% 0%)",
-    duration: 0.8,
-    ease: "power2.inOut"
-  });
+  if (loader) loader.style.display = "none";
 });
 </script>
+
 
 
 
