@@ -1117,6 +1117,8 @@ function initST() {
 
 
 
+
+
 <script src="../cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
 <script type="module">
@@ -1273,40 +1275,33 @@ function initST() {
 
 
 
+  
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
 <script>
   const fixedEls = document.querySelectorAll('.fixed-element');
   const clipSecs = document.querySelectorAll('.clip-section');
 
-  function updateClips() {
-    const vh = window.innerHeight;
+  fixedEls.forEach((el, idx) => {
+    const sec = clipSecs[idx];
+    if (!sec) return;
 
-    clipSecs.forEach((sec, idx) => {
-      const fixedEl = fixedEls[idx];
-      if (!fixedEl) return;
-
-      const rect = sec.getBoundingClientRect();
-
-      let progress = (vh - rect.top) / (vh + rect.height);
-      progress = Math.min(Math.max(progress, 0), 1);
-
-      const insetTop = (1 - progress) * 100;
-      const insetBottom = (1 - progress) * 100;
-
-      fixedEl.style.clipPath = `inset(${insetTop}% 0% ${insetBottom}% 0%)`;
-    });
-  }
-
-  window.addEventListener('scroll', updateClips, { passive: true });
-  window.addEventListener('resize', updateClips);
-
-  updateClips();
+    gsap.fromTo(el, 
+      { clipPath: "inset(100% 0% 0% 0%)" },
+      { 
+        clipPath: "inset(0% 0% 0% 0%)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: sec,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true
+        }
+      }
+    );
+  });
 </script>
-
-
-
-
-
 
 
   
