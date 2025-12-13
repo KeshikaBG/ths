@@ -1097,41 +1097,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadTestimonials() {
   try {
-    const { tests = [] } = await client.fetch(`
+    const d = await client.fetch(`
       *[_type=="testPage"][0]{ tests[]{ reviewer, review } }
-    `) || {};
+    `);
 
-    if (!tests.length) return;
+    const ts = d?.tests;
+    if (!ts?.length) return;
 
-    const wrap = document.querySelector(".testimonial-swiper .swiper-wrapper.white");
-    const tpl  = wrap?.querySelector(".swiper-slide.test");
-    if (!wrap || !tpl) return;
+    const s = document.querySelector(".testimonial-swiper");
+    const w = s?.querySelector(".swiper-wrapper.white");
+    const t = w?.querySelector(".swiper-slide.test");
+    if (!s || !w || !t) return;
 
-    tpl.style.display = "none";
+    t.style.display = "none";
 
     const { toHTML } = await import("https://esm.sh/@portabletext/to-html");
 
-    tests.forEach(({ reviewer = "", review = [] }) => {
-      const card = tpl.cloneNode(true);
-      card.style.display = "flex";
+    ts.forEach(x => {
+      const c = t.cloneNode(true);
+      c.style.display = "flex";
 
-      const txt = card.querySelector(".b1.ch");
-      const name = card.querySelector(".s1");
+      const r = c.querySelector(".b1.ch");
+      const n = c.querySelector(".s1");
 
-      if (txt) {
+      if (r) {
         try {
-          txt.innerHTML = toHTML(review).replace(/<p><\/p>/g, "<br><br>");
+          r.innerHTML = toHTML(x.review || []).replace(/<p><\/p>/g, "<br><br>");
         } catch {
-          txt.textContent = "Format issue";
+          r.textContent = "Format issue";
         }
       }
 
-      if (name) name.textContent = reviewer;
-      wrap.appendChild(card);
+      if (n) n.textContent = x.reviewer || "";
+      w.appendChild(c);
     });
 
   } catch (e) {
-    console.error("Sanity testimonial error:", e);
+    console.error("Sanity fetch error:", e);
   }
 }
 
@@ -1141,23 +1143,24 @@ async function loadTestimonials() {
 
 async function loadFAQs() {
   try {
-    const { faqs = [] } = await client.fetch(`
+    const d = await client.fetch(`
       *[_type=="faqPage"][0]{ faqs[]{ question, answer } }
-    `) || {};
+    `);
 
-    const wrap = document.querySelector('.faqs');
-    const tpl  = wrap?.querySelector('.faq');
-    if (!wrap || !tpl) return;
+    const fs = d?.faqs || [];
+    const c = document.querySelector('.faqs');
+    const t = document.querySelector('.faq');
+    if (!c || !t) return;
 
-    wrap.innerHTML = "";
+    c.innerHTML = "";
 
     const { toHTML } = await import("https://esm.sh/@portabletext/to-html");
 
-    faqs.forEach(({ question = "", answer }) => {
-      const card = tpl.cloneNode(true);
-      card.querySelector('.ques')?.textContent = question;
-      if (answer) card.querySelector('.ans')?.innerHTML = toHTML(answer);
-      wrap.appendChild(card);
+    fs.forEach(f => {
+      const card = t.cloneNode(true);
+      card.querySelector('.ques')?.textContent = f.question || "";
+      if (f.answer) card.querySelector('.ans').innerHTML = toHTML(f.answer);
+      c.appendChild(card);
     });
 
   } catch (e) {
@@ -1166,45 +1169,59 @@ async function loadFAQs() {
 }
 
 function initFAQAccordion() {
-  const cards = [...document.querySelectorAll('.faq')];
+  const cards = document.querySelectorAll('.faq');
   if (!cards.length) return;
 
-  cards.forEach(c => toggle(c, false, true));
+  cards.forEach(c => {
+    const a = c.querySelector('.ans');
+    const r = c.querySelector('.arr-down');
+    close(a, r, true);
+  });
 
-  cards.forEach(card => {
-    card.addEventListener('click', () => {
-      const isOpen = card.classList.contains('open');
+  cards.forEach(c => {
+    const a = c.querySelector('.ans');
+    const r = c.querySelector('.arr-down');
 
-      cards.forEach(c => toggle(c, false));
-      if (!isOpen) toggle(card, true);
+    c.addEventListener('click', () => {
+      const open = a.classList.contains('open');
+
+      cards.forEach(x => {
+        close(x.querySelector('.ans'), x.querySelector('.arr-down'));
+      });
+
+      if (!open) openFaq(a, r);
     });
   });
 
-  function toggle(card, open, instant = false) {
-    const ans = card.querySelector('.ans');
-    const arr = card.querySelector('.arr-down');
-    if (!ans) return;
+  function openFaq(a, r, i = false) {
+    a.classList.add('open');
+    a.classList.remove('close');
+    r && r.classList.add('up');
 
-    card.classList.toggle('open', open);
-    card.classList.toggle('close', !open);
-    arr?.classList.toggle('up', open);
+    a.style.height = 'auto';
+    const h = a.scrollHeight + "px";
 
-    if (instant) {
-      ans.style.height = open ? 'auto' : '0px';
-      return;
-    }
+    if (i) return;
 
-    ans.style.height = open ? ans.scrollHeight + 'px' : ans.scrollHeight + 'px';
-    ans.offsetHeight;
-    ans.style.height = open ? ans.scrollHeight + 'px' : '0px';
+    a.style.height = "0px";
+    requestAnimationFrame(() => a.style.height = h);
 
-    if (open) {
-      ans.addEventListener(
-        'transitionend',
-        () => card.classList.contains('open') && (ans.style.height = 'auto'),
-        { once: true }
-      );
-    }
+    a.addEventListener('transitionend', () => {
+      if (a.classList.contains('open')) a.style.height = 'auto';
+    }, { once: true });
+  }
+
+  function close(a, r, i = false) {
+    if (!a) return;
+    a.classList.remove('open');
+    a.classList.add('close');
+    r && r.classList.remove('up');
+
+    a.style.height = a.scrollHeight + "px";
+    if (i) return a.style.height = "0px";
+
+    a.offsetHeight;
+    a.style.height = "0px";
   }
 }
 
