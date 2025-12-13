@@ -1275,32 +1275,35 @@ function initST() {
 
 
 
+<script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+
 <script>
+  gsap.registerPlugin(ScrollTrigger);
+
   const fixedEls = document.querySelectorAll('.fixed-element');
   const clipSecs = document.querySelectorAll('.clip-section');
 
-  const vh = () => window.innerHeight;
+  clipSecs.forEach((sec, i) => {
+    const fixedEl = fixedEls[i];
+    if (!fixedEl) return;
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const idx = [...clipSecs].indexOf(entry.target);
-      const fixedEl = fixedEls[idx];
-      if (!fixedEl) return;
-
-      const rect = entry.boundingClientRect;
-
-      const topPct = Math.max(rect.top, 0) / vh() * 100;
-      const botPct = Math.max(vh() - rect.bottom, 0) / vh() * 100;
-
-      fixedEl.style.clipPath =
-        `inset(${topPct}% 0% ${botPct}% 0%)`;
-    });
-  }, {
-    threshold: Array.from({ length: 101 }, (_, i) => i / 100)
+    gsap.fromTo(
+      fixedEl,
+      { clipPath: 'inset(100% 0% 0% 0%)' },
+      {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: sec,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
   });
-
-  clipSecs.forEach(sec => observer.observe(sec));
 </script>
+
 
 
 </body>
