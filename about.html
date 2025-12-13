@@ -1287,19 +1287,17 @@ function initST() {
     const sec = clipSecs[idx];
     if (!sec) return;
 
-    gsap.fromTo(el, 
-      { clipPath: "inset(100% 0% 0% 0%)" },
-      { 
-        clipPath: "inset(0% 0% 0% 0%)",
-        ease: "none",
-        scrollTrigger: {
-          trigger: sec,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true
-        }
+    ScrollTrigger.create({
+      trigger: sec,
+      start: "top bottom",
+      end: "bottom top",
+      scrub: true,
+      onUpdate: self => {
+        const progress = gsap.utils.clamp(0, 1, self.progress); // 0 → 1
+        const clipTop = 100 * (1 - progress); // from 100% → 0%
+        el.style.clipPath = `inset(${clipTop}% 0% 0% 0%)`;
       }
-    );
+    });
   });
 </script>
 
