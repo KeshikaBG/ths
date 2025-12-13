@@ -278,17 +278,22 @@ function runGsapAnimations() {
     },
     once: true
   });
-  ScrollTrigger.batch("[scale-anim]", {
-    onEnter: batch => {
-      gsap.fromTo(batch, { scale: 0 }, {
-        scale: 1,
+ScrollTrigger.batch("[scale-anim]", {
+  onEnter: batch => {
+    gsap.fromTo(
+      batch,
+      { clipPath: "inset(100% 0% 0% 0%)" },
+      {
+        clipPath: "inset(0% 0% 0% 0%)",
         duration: 0.6,
         ease: easeType,
         stagger: 0.15
-      });
-    },
-    once: true
-  });
+      }
+    );
+  },
+  once: true
+});
+
     ScrollTrigger.batch("[scaleto-anim]", {
     onEnter: batch => {
       gsap.fromTo(batch, { scale: 0 }, {
