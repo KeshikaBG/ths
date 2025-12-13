@@ -1145,53 +1145,69 @@ function initST() {
 <script type="module">
   import { createClient } from 'https://esm.sh/@sanity/client';
 
-  const sanityClient = createClient({
+  const client = createClient({
     projectId: 'n7jjk6nd',
     dataset: 'production',
     useCdn: true,
     apiVersion: '2023-01-01'
   });
 
-  async function preloadImgs(urls) {
-    return Promise.all(
-      urls.map(
-        url =>
-          new Promise(done => {
-            const img = new Image();
-            img.onload = done;
-            img.onerror = done;
-            img.src = url;
-          })
+  const qs = sel => document.querySelector(sel);
+
+  const preloadImgs = urls =>
+    Promise.all(
+      urls.map(url =>
+        new Promise(res => {
+          const img = new Image();
+          img.onload = res;
+          img.onerror = res;
+          img.src = url;
+        })
       )
     );
-  }
+
+  const styleImg = (el, abs = false) => {
+    if (abs) {
+      el.style.position = 'absolute';
+      el.style.top = 0;
+      el.style.left = 0;
+    }
+    el.style.width = '100%';
+    el.style.height = '100%';
+    el.style.maxWidth = 'none';
+    el.style.objectFit = 'cover';
+  };
+
+  const addImg = (wrap, arr, alt) => {
+    if (!wrap || !arr?.length) return;
+    const m = arr[0];
+    if (m.asset._type !== 'sanity.imageAsset') return;
+
+    const img = document.createElement('img');
+    img.src = m.asset.url;
+    img.alt = alt;
+    styleImg(img);
+    wrap.appendChild(img);
+  };
 
   document.addEventListener('DOMContentLoaded', async () => {
     try {
+      const fetch = q => client.fetch(q);
+
       const [
-        heroRes, contRes, workRes, thsRes, osRes, e2eRes
+        heroRes,
+        contRes,
+        workRes,
+        thsRes,
+        osRes,
+        e2eRes
       ] = await Promise.all([
-        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[0] {
-          aboutImages[] { asset->{ url, _type } }
-        }`),
-        sanityClient.fetch(`*[_type == "home"] | order(_createdAt asc)[7] {
-          heroImages[] { asset->{ url, _type } }
-        }`),
-        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[1] {
-          featuredSections[] {
-            title,
-            images[]{ asset->{ url, _type } }
-          }
-        }`),
-        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[2] {
-          aboutImages[] { asset->{ url, _type } }
-        }`),
-        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[3] {
-          aboutImages[] { asset->{ url, _type } }
-        }`),
-        sanityClient.fetch(`*[_type == "about"] | order(_createdAt asc)[4] {
-          aboutImages[] { asset->{ url, _type } }
-        }`)
+        fetch(`*[_type=="about"]|order(_createdAt asc)[0]{aboutImages[]{asset->{url,_type}}}`),
+        fetch(`*[_type=="home"]|order(_createdAt asc)[7]{heroImages[]{asset->{url,_type}}}`),
+        fetch(`*[_type=="about"]|order(_createdAt asc)[1]{featuredSections[]{title,images[]{asset->{url,_type}}}}`),
+        fetch(`*[_type=="about"]|order(_createdAt asc)[2]{aboutImages[]{asset->{url,_type}}}`),
+        fetch(`*[_type=="about"]|order(_createdAt asc)[3]{aboutImages[]{asset->{url,_type}}}`),
+        fetch(`*[_type=="about"]|order(_createdAt asc)[4]{aboutImages[]{asset->{url,_type}}}`)
       ]);
 
       const heroImgs = heroRes?.aboutImages || [];
@@ -1199,115 +1215,85 @@ function initST() {
       const thsImgs  = thsRes?.aboutImages || [];
       const osImgs   = osRes?.aboutImages || [];
       const e2eImgs  = e2eRes?.aboutImages || [];
-
       const teamSecs = workRes?.featuredSections || [];
 
-      const heroWrap = document.querySelector('.abt-img-wrp');
-      const contWrap = document.querySelector('.contact-div');
-      const thsWrap  = document.querySelector('.div-block-9');
-      const osWrap   = document.querySelector('.div-block-10');
-      const e2eWrap  = document.querySelector('.div-block-11');
+      const wraps = {
+        hero: qs('.abt-img-wrp'),
+        cont: qs('.contact-div'),
+        ths:  qs('.div-block-9'),
+        os:   qs('.div-block-10'),
+        e2e:  qs('.div-block-11')
+      };
 
-      const teamCards = document.querySelectorAll('.card');
-      const sliderElm = document.querySelector('.slider');
+      const cards = document.querySelectorAll('.card');
+      const slider = qs('.slider');
 
-      const allImgs = [
+      await preloadImgs([
         ...heroImgs.map(i => i.asset.url),
         ...contImgs.map(i => i.asset.url),
-        ...teamSecs.flatMap(sec => sec.images.map(i => i.asset.url))
-      ];
+        ...teamSecs.flatMap(s => s.images.map(i => i.asset.url))
+      ]);
 
-      await preloadImgs(allImgs);
+      addImg(wraps.hero, heroImgs, 'About Hero');
+      addImg(wraps.cont, contImgs, 'Contact');
+      addImg(wraps.ths,  thsImgs,  'THS');
+      addImg(wraps.os,   osImgs,   'OS');
+      addImg(wraps.e2e,  e2eImgs,  'E2E');
 
-      function styleImg(el, { absolute = false } = {}) {
-        if (absolute) {
-          el.style.position = 'absolute';
-          el.style.top = 0;
-          el.style.left = 0;
-        }
-        el.style.width = '100%';
-        el.style.height = '100%';
-        el.style.maxWidth = 'none';
-        el.style.objectFit = 'cover';
-      }
-
-      function addImg(wrap, arr, label = 'Media') {
-        if (!wrap || !arr.length) return;
-        const media = arr[0];
-        if (media.asset._type === 'sanity.imageAsset') {
-          const img = document.createElement('img');
-          img.src = media.asset.url;
-          img.alt = label;
-          styleImg(img);
-          wrap.appendChild(img);
-        }
-      }
-
-      addImg(heroWrap, heroImgs, 'About Hero');
-      addImg(contWrap, contImgs, 'Contact');
-      addImg(thsWrap,  thsImgs,  'THS');
-      addImg(osWrap,   osImgs,   'OS');
-      addImg(e2eWrap,  e2eImgs,  'E2E');
-
-      let idx = 0;
+      let i = 0;
       teamSecs.forEach(sec => {
         sec.images.forEach(imgObj => {
-          if (idx >= teamCards.length) return;
+          if (i >= cards.length) return;
 
-          const card = teamCards[idx];
-          const title = document.createElement('h4');
+          const card = cards[i++];
+          const h4 = document.createElement('h4');
           const img = document.createElement('img');
 
-          title.textContent = sec.title;
+          h4.textContent = sec.title;
           img.src = imgObj.asset.url;
           img.alt = sec.title;
           styleImg(img);
 
-          card.innerHTML = '';
-          card.appendChild(title);
-          card.appendChild(img);
-
-          idx++;
+          card.replaceChildren(h4, img);
         });
       });
 
-      const baseCards = Array.from(sliderElm.querySelectorAll('.card'));
-      baseCards.forEach(card => {
-        sliderElm.appendChild(card.cloneNode(true));
-      });
+      slider.querySelectorAll('.card').forEach(c =>
+        slider.appendChild(c.cloneNode(true))
+      );
 
-      const cards = sliderElm.querySelectorAll('.card');
-      const count = cards.length;
-      let rot = 0;
+      const allCards = slider.querySelectorAll('.card');
+      const total = allCards.length;
+      let angle = 0;
 
-      gsap.set(cards, {
-        rotationY: i => i * (360 / count),
+      gsap.set(allCards, {
+        rotationY: i => i * (360 / total),
         transformOrigin: "50% 50% 880px"
       });
 
-      const rotSpeed = 360 / 40;
-      let prev = performance.now();
+      const speed = 360 / 40;
+      let last = performance.now();
 
-      function spin(now) {
-        const diff = (now - prev) / 1000;
-        prev = now;
-        rot += rotSpeed * diff;
+      const loop = now => {
+        const dt = (now - last) / 1000;
+        last = now;
+        angle += speed * dt;
 
-        gsap.set(cards, {
-          rotationY: i => rot + i * (360 / count),
-          transformOrigin: "50% 50% 880px"
+        gsap.set(allCards, {
+          rotationY: i => angle + i * (360 / total)
         });
 
-        requestAnimationFrame(spin);
-      }
+        requestAnimationFrame(loop);
+      };
 
-      requestAnimationFrame(spin);
+      requestAnimationFrame(loop);
 
-    } catch (err) {
-      console.error('❌ Sanity fetch error:', err);
+    } catch (e) {
+      console.error('❌ Sanity fetch error:', e);
     }
   });
 </script>
+
 
 </body>
 
