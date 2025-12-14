@@ -20,11 +20,6 @@ html {
 .w-webflow-badge {
   display: none !important;
 }
-  .word {
-  display: inline-block;
-  will-change: clip-path;
-}
-
     [data-entry-anim] {
       scale: 0;
       filter: grayscale(100%);
@@ -276,17 +271,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadEl = document.querySelector(".loader");
   const easeFx = "power2.inOut";
   const loadTime = 1000;
-
   if (!loadEl) {
     window.loadDone = true;
     return;
   }
-
   gsap.set(loadEl, {
     display: "flex",
     clipPath: "inset(0% 0% 0% 0%)"
   });
-
   function hideLoad() {
     gsap.to(loadEl, {
       clipPath: "inset(0% 0% 100% 0%)",
@@ -298,7 +290,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
   function showLoad(cb) {
     loadEl.style.display = "flex";
     gsap.set(loadEl, { clipPath: "inset(100% 0% 0% 0%)" });
@@ -310,15 +301,12 @@ document.addEventListener("DOMContentLoaded", () => {
       onComplete: cb
     });
   }
-
   setTimeout(hideLoad, loadTime);
-
   document.querySelectorAll("a").forEach(lnk => {
     if (!lnk.href) return;
     if (!lnk.href.startsWith(location.origin)) return;
     if (lnk.target === "_blank") return;
     if (lnk.href.includes("#")) return;
-
     lnk.addEventListener("click", e => {
       e.preventDefault();
       showLoad(() => {
@@ -327,7 +315,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-
 window.addEventListener("pageshow", e => {
   if (!e.persisted) return;
   const loadEl = document.querySelector(".loader");
@@ -349,21 +336,17 @@ window.addEventListener("pageshow", e => {
     runAnim();
   }
 })();
-
 function runAnim() {
   const easeFx = "power2.out";
-
   ScrollTrigger.batch("[data-entry-anim]", {
     onEnter: grp => {
       grp.forEach(el => {
         const dly = parseFloat(el.dataset.entryDelay) || 0;
-
         gsap.fromTo(
           el,
           { scale: 0 },
           { scale: 1, duration: 1, ease: easeFx, delay: dly }
         );
-
         gsap.to(el, {
           filter: "grayscale(0%)",
           duration: 0.6,
@@ -374,7 +357,6 @@ function runAnim() {
     },
     once: true
   });
-
   ScrollTrigger.batch("[scale-anim]", {
     onEnter: grp => {
       gsap.fromTo(
@@ -385,11 +367,9 @@ function runAnim() {
     },
     once: true
   });
-
   document.querySelectorAll("[slide-up-anim]").forEach((wrap, wIdx) => {
     const kids = wrap.querySelectorAll(":scope > *");
     if (!kids.length) return;
-
     kids.forEach((kid, i) => {
       gsap.fromTo(
         kid,
@@ -409,21 +389,17 @@ function runAnim() {
       );
     });
   });
-
   document.querySelectorAll("[opacity-anim]").forEach(wrap => {
     const kids = [...wrap.children].filter(el => !el.classList.contains("overlay"));
     if (!kids.length) return;
-
     ScrollTrigger.batch(kids, {
       onEnter: grp => gsap.to(grp, { opacity: 1 }),
       once: true
     });
   });
-
   document.querySelectorAll("[scale-opacity-anim]").forEach(wrap => {
     const kids = [...wrap.children];
     if (!kids.length) return;
-
     ScrollTrigger.batch(kids, {
       onEnter: grp =>
         gsap.fromTo(
@@ -434,7 +410,6 @@ function runAnim() {
       once: true
     });
   });
-
   ScrollTrigger.batch("[data-scale-img] img", {
     onEnter: grp =>
       gsap.to(grp, {
@@ -445,7 +420,6 @@ function runAnim() {
       }),
     once: true
   });
-
   const animLine = (sel, axis) => {
     document.querySelectorAll(sel).forEach(line => {
       gsap.fromTo(
@@ -464,7 +438,6 @@ function runAnim() {
       );
     });
   };
-
   animLine(".nav-line", "scaleX");
   animLine(".vertical-line", "scaleY");
 }
@@ -474,7 +447,6 @@ function runAnim() {
 
 
 
-  
   
 
 
@@ -518,13 +490,9 @@ gsap.fromTo(
   }
 );
   });
-  ScrollTrigger.refresh();
+  //ScrollTrigger.refresh();
 }
 </script>
-
-
-
-
 
 
 
@@ -539,26 +507,21 @@ gsap.fromTo(
   document.addEventListener("DOMContentLoaded", () => {
     const hdrs = document.querySelectorAll(".header");
     if (!hdrs.length) return;
-
     hdrs.forEach(hdr => {
       const hdrH = hdr.offsetHeight;
       let lastY = window.scrollY;
-
       const animHdr = () => {
         const curY = window.scrollY;
         const isDown = curY > lastY;
-
         gsap.to(hdr, {
           top: isDown ? -hdrH : 0,
           ease: "power2.out",
           duration: 0.6
         });
-
         lastY = curY;
       };
 
       window.addEventListener("scroll", animHdr);
-
       ScrollTrigger.create({
         trigger: hdr,
         start: `top top+=${hdrH}`,
@@ -664,42 +627,33 @@ gsap.fromTo(
                     will-change: transform, opacity !important;
                     transition: transform 0.3s ease, opacity 0.3s ease !important;
                 }
-
                 .header {
                     background: transparent;
                     margin: 1rem 1rem 0 1rem;
                     transition: margin 0.3s ease;
                     overflow: hidden !important;
                 }
-
                 .header.vis {
                     overflow: visible !important;
                 }
-
-
-
                 @media screen and (max-width: 991px) {
                     .header .nav-inr-wrp {
                         margin: 1rem;
                         transition: margin 0.3s ease;
                     }
                 }
-
                 .nav-wrp {
                     height: 0vh;
                     transition: height 0.5s ease;
                 }
-
                 .nav-link-div .nav-links {
                     color: #c3c3c3 !important;
                     transition: color 0.3s ease;
                 }
-
                 .nav-link-div.w--current .nav-links,
                 .nav-link-div:hover .nav-links {
                     color: #373737 !important;
                 }
-
                 .overlay {
                     position: fixed;
                     top: 0;
@@ -712,7 +666,6 @@ gsap.fromTo(
                     visibility: hidden;
                     display: block;
                 }
-
                 @media screen and (max-width: 991px) {
                     .nav-inr-wrp {
                         opacity: 0 !important;
@@ -722,7 +675,6 @@ gsap.fromTo(
                         overflow: hidden;
                         transition: opacity 0.4s ease, max-height 0.4s ease, padding 0.4s ease;
                     }
-
                     .overlay {
                         position: fixed;
                         top: 0;
@@ -734,14 +686,12 @@ gsap.fromTo(
                         z-index: -1 !important;
                         visibility: hidden;
                     }
-
                     .nav-inr-wrp.active {
                         opacity: 1 !important;
                         visibility: visible;
                         min-height: 35vh;
                         padding: 1rem;
                     }
-
                     .overlay.oveactive {
                         display: block;
                         opacity: 1 !important;
@@ -765,11 +715,9 @@ gsap.fromTo(
     const navWrp  = document.querySelector(".nav-inr-wrp");
     const ovl     = document.querySelector(".overlay");
     const hdr     = document.querySelector(".header");
-
     function isMob() {
       return window.innerWidth <= 991;
     }
-
     function closeNav() {
       if (isMob()) {
         navWrp.classList.remove("active");
@@ -780,7 +728,6 @@ gsap.fromTo(
         hdr.classList.remove("vis");
       }
     }
-
     if (menuBtn && clsBtn && navWrp && ovl) {
       menuBtn.addEventListener("click", () => {
         if (isMob()) {
@@ -789,10 +736,8 @@ gsap.fromTo(
           hdr.classList.add("vis");
         }
       });
-
       clsBtn.addEventListener("click", closeNav);
       ovl.addEventListener("click", closeNav);
-
       navWrp.querySelectorAll("a").forEach(link => {
         link.addEventListener("click", closeNav);
       });
@@ -896,7 +841,7 @@ gsap.fromTo(
         <div class="w-layout-hflex flex-block-3">
             <h1 stagger-animation="" text-split="" class="heading-5">The Happening Story</h1>
             <div class="w-layout-vflex ver-flex">
-                <p stagger-animation="" text-split="" class="inst-link">
+                <p slide-up-anim="" class="inst-link">
                     Coimbatore-based cinematic wedding photography and films crafted with emotion and artistry.
                     <br /><br />
                     At The Happening Story, we transform real emotions into timeless visual memories.
@@ -931,7 +876,7 @@ gsap.fromTo(
         <div class="w-layout-hflex flex-block-5">
             <h1 stagger-animation="" text-split="" class="heading-6">Octane Space</h1>
             <div class="w-layout-vflex ver-flex">
-                <p stagger-animation="" text-split="" class="inst-link">
+                <p slide-up-anim="" class="inst-link">
                     A Coimbatore-based contemporary creative studio and event space designed to inspire imagination.
                     <br /><br />
                     Whether it's photoshoots, film productions, YouTube content, or intimate gatherings, Octane Space
@@ -966,7 +911,7 @@ gsap.fromTo(
         <div class="w-layout-hflex flex-block-6">
             <h1 stagger-animation="" text-split="" class="heading-7">End to end creatives</h1>
             <div class="w-layout-vflex ver-flex">
-                <p stagger-animation="" text-split="" class="inst-link">
+                <p slide-up-anim="" class="inst-link">
                     A Coimbatore-based full-service creative and marketing team that brings ideas to life — from concept
                     to final production.
                     <br /><br />
@@ -1112,163 +1057,6 @@ gsap.fromTo(
 
 
 
-<script src="../cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-<script type="module">
-  import { createClient } from 'https://esm.sh/@sanity/client';
-
-  const client = createClient({
-    projectId: 'n7jjk6nd',
-    dataset: 'production',
-    useCdn: true,
-    apiVersion: '2023-01-01'
-  });
-
-  const qs = sel => document.querySelector(sel);
-
-  const preloadImgs = urls =>
-    Promise.all(
-      urls.map(url =>
-        new Promise(res => {
-          const img = new Image();
-          img.onload = res;
-          img.onerror = res;
-          img.src = url;
-        })
-      )
-    );
-
-  const styleImg = (el, abs = false) => {
-    if (abs) {
-      el.style.position = 'absolute';
-      el.style.top = 0;
-      el.style.left = 0;
-    }
-    el.style.width = '100%';
-    el.style.height = '100%';
-    el.style.maxWidth = 'none';
-    el.style.objectFit = 'cover';
-  };
-
-  const addImg = (wrap, arr, alt) => {
-    if (!wrap || !arr?.length) return;
-    const m = arr[0];
-    if (m.asset._type !== 'sanity.imageAsset') return;
-
-    const img = document.createElement('img');
-    img.src = m.asset.url;
-    img.alt = alt;
-    styleImg(img);
-    wrap.appendChild(img);
-  };
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const fetch = q => client.fetch(q);
-
-      const [
-        heroRes,
-        contRes,
-        workRes,
-        thsRes,
-        osRes,
-        e2eRes
-      ] = await Promise.all([
-        fetch(`*[_type=="about"]|order(_createdAt asc)[0]{aboutImages[]{asset->{url,_type}}}`),
-        fetch(`*[_type=="home"]|order(_createdAt asc)[7]{heroImages[]{asset->{url,_type}}}`),
-        fetch(`*[_type=="about"]|order(_createdAt asc)[1]{featuredSections[]{title,images[]{asset->{url,_type}}}}`),
-        fetch(`*[_type=="about"]|order(_createdAt asc)[2]{aboutImages[]{asset->{url,_type}}}`),
-        fetch(`*[_type=="about"]|order(_createdAt asc)[3]{aboutImages[]{asset->{url,_type}}}`),
-        fetch(`*[_type=="about"]|order(_createdAt asc)[4]{aboutImages[]{asset->{url,_type}}}`)
-      ]);
-
-      const heroImgs = heroRes?.aboutImages || [];
-      const contImgs = contRes?.heroImages || [];
-      const thsImgs  = thsRes?.aboutImages || [];
-      const osImgs   = osRes?.aboutImages || [];
-      const e2eImgs  = e2eRes?.aboutImages || [];
-      const teamSecs = workRes?.featuredSections || [];
-
-      const wraps = {
-        hero: qs('.abt-img-wrp'),
-        cont: qs('.contact-div'),
-        ths:  qs('.div-block-9'),
-        os:   qs('.div-block-10'),
-        e2e:  qs('.div-block-11')
-      };
-
-      const cards = document.querySelectorAll('.card');
-      const slider = qs('.slider');
-
-      await preloadImgs([
-        ...heroImgs.map(i => i.asset.url),
-        ...contImgs.map(i => i.asset.url),
-        ...teamSecs.flatMap(s => s.images.map(i => i.asset.url))
-      ]);
-
-      addImg(wraps.hero, heroImgs, 'About Hero');
-      addImg(wraps.cont, contImgs, 'Contact');
-      addImg(wraps.ths,  thsImgs,  'THS');
-      addImg(wraps.os,   osImgs,   'OS');
-      addImg(wraps.e2e,  e2eImgs,  'E2E');
-
-      let i = 0;
-      teamSecs.forEach(sec => {
-        sec.images.forEach(imgObj => {
-          if (i >= cards.length) return;
-
-          const card = cards[i++];
-          const h4 = document.createElement('h4');
-          const img = document.createElement('img');
-
-          h4.textContent = sec.title;
-          img.src = imgObj.asset.url;
-          img.alt = sec.title;
-          styleImg(img);
-
-          card.replaceChildren(h4, img);
-        });
-      });
-
-      slider.querySelectorAll('.card').forEach(c =>
-        slider.appendChild(c.cloneNode(true))
-      );
-
-      const allCards = slider.querySelectorAll('.card');
-      const total = allCards.length;
-      let angle = 0;
-
-      gsap.set(allCards, {
-        rotationY: i => i * (360 / total),
-        transformOrigin: "50% 50% 880px"
-      });
-
-      const speed = 360 / 40;
-      let last = performance.now();
-
-      const loop = now => {
-        const dt = (now - last) / 1000;
-        last = now;
-        angle += speed * dt;
-
-        gsap.set(allCards, {
-          rotationY: i => angle + i * (360 / total)
-        });
-
-        requestAnimationFrame(loop);
-      };
-
-      requestAnimationFrame(loop);
-
-    } catch (e) {
-      console.error('❌ Sanity fetch error:', e);
-    }
-  });
-</script>
-
-
-
-
 
 
 <script>
@@ -1306,6 +1094,139 @@ gsap.fromTo(
   window.addEventListener('scroll', onScroll, { passive: true });
   requestAnimationFrame(updateClips);
 </script>
+
+
+  
+
+
+
+<script src="../cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script type="module">
+  import { createClient } from 'https://esm.sh/@sanity/client';
+  const client = createClient({
+    projectId: 'n7jjk6nd',
+    dataset: 'production',
+    useCdn: true,
+    apiVersion: '2023-01-01'
+  });
+  const qs = sel => document.querySelector(sel);
+  const preloadImgs = urls =>
+    Promise.all(
+      urls.map(url =>
+        new Promise(res => {
+          const img = new Image();
+          img.onload = res;
+          img.onerror = res;
+          img.src = url;
+        })
+      )
+    );
+  const styleImg = (el, abs = false) => {
+    if (abs) {
+      el.style.position = 'absolute';
+      el.style.top = 0;
+      el.style.left = 0;
+    }
+    el.style.width = '100%';
+    el.style.height = '100%';
+    el.style.maxWidth = 'none';
+    el.style.objectFit = 'cover';
+  };
+  const addImg = (wrap, arr, alt) => {
+    if (!wrap || !arr?.length) return;
+    const m = arr[0];
+    if (m.asset._type !== 'sanity.imageAsset') return;
+    const img = document.createElement('img');
+    img.src = m.asset.url;
+    img.alt = alt;
+    styleImg(img);
+    wrap.appendChild(img);
+  };
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const fetch = q => client.fetch(q);
+      const [
+        heroRes,
+        contRes,
+        workRes,
+        thsRes,
+        osRes,
+        e2eRes
+      ] = await Promise.all([
+        fetch(`*[_type=="about"]|order(_createdAt asc)[0]{aboutImages[]{asset->{url,_type}}}`),
+        fetch(`*[_type=="home"]|order(_createdAt asc)[7]{heroImages[]{asset->{url,_type}}}`),
+        fetch(`*[_type=="about"]|order(_createdAt asc)[1]{featuredSections[]{title,images[]{asset->{url,_type}}}}`),
+        fetch(`*[_type=="about"]|order(_createdAt asc)[2]{aboutImages[]{asset->{url,_type}}}`),
+        fetch(`*[_type=="about"]|order(_createdAt asc)[3]{aboutImages[]{asset->{url,_type}}}`),
+        fetch(`*[_type=="about"]|order(_createdAt asc)[4]{aboutImages[]{asset->{url,_type}}}`)
+      ]);
+      const heroImgs = heroRes?.aboutImages || [];
+      const contImgs = contRes?.heroImages || [];
+      const thsImgs  = thsRes?.aboutImages || [];
+      const osImgs   = osRes?.aboutImages || [];
+      const e2eImgs  = e2eRes?.aboutImages || [];
+      const teamSecs = workRes?.featuredSections || [];
+      const wraps = {
+        hero: qs('.abt-img-wrp'),
+        cont: qs('.contact-div'),
+        ths:  qs('.div-block-9'),
+        os:   qs('.div-block-10'),
+        e2e:  qs('.div-block-11')
+      };
+      const cards = document.querySelectorAll('.card');
+      const slider = qs('.slider');
+      await preloadImgs([
+        ...heroImgs.map(i => i.asset.url),
+        ...contImgs.map(i => i.asset.url),
+        ...teamSecs.flatMap(s => s.images.map(i => i.asset.url))
+      ]);
+      addImg(wraps.hero, heroImgs, 'About Hero');
+      addImg(wraps.cont, contImgs, 'Contact');
+      addImg(wraps.ths,  thsImgs,  'THS');
+      addImg(wraps.os,   osImgs,   'OS');
+      addImg(wraps.e2e,  e2eImgs,  'E2E');
+      let i = 0;
+      teamSecs.forEach(sec => {
+        sec.images.forEach(imgObj => {
+          if (i >= cards.length) return;
+          const card = cards[i++];
+          const h4 = document.createElement('h4');
+          const img = document.createElement('img');
+          h4.textContent = sec.title;
+          img.src = imgObj.asset.url;
+          img.alt = sec.title;
+          styleImg(img);
+          card.replaceChildren(h4, img);
+        });
+      });
+      slider.querySelectorAll('.card').forEach(c =>
+        slider.appendChild(c.cloneNode(true))
+      );
+      const allCards = slider.querySelectorAll('.card');
+      const total = allCards.length;
+      let angle = 0;
+      gsap.set(allCards, {
+        rotationY: i => i * (360 / total),
+        transformOrigin: "50% 50% 880px"
+      });
+      const speed = 360 / 40;
+      let last = performance.now();
+      const loop = now => {
+        const dt = (now - last) / 1000;
+        last = now;
+        angle += speed * dt;
+        gsap.set(allCards, {
+          rotationY: i => angle + i * (360 / total)
+        });
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+    } catch (e) {
+      console.error('❌ Sanity fetch error:', e);
+    }
+  });
+</script>
+
 
 
 
