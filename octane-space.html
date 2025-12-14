@@ -406,7 +406,39 @@ function runAnim() {
 <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/split-type"></script>
 <script>
+let splitReady = false;
+
+function initSplitEarly() {
+  if (splitReady) return;
+  splitReady = true;
+
+  new SplitType("[text-split]", {
+    types: "lines",
+    tagName: "span"
+  });
+
+  // 🔑 Apply FROM state immediately (no animation)
+  document.querySelectorAll("[text-split] .line").forEach(line => {
+    gsap.set(line, {
+      clipPath: "inset(0% 0% 100% 0%)",
+      yPercent: 40,
+      rotationZ: 2,
+      transformOrigin: "left center"
+    });
+  });
+}
+
+// Run ASAP
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initSplitEarly);
+} else {
+  initSplitEarly();
+}
+
+
+  
 gsap.registerPlugin(ScrollTrigger);
+
 (function waitLoad() {
   if (!window.loadDone) {
     requestAnimationFrame(waitLoad);
@@ -414,38 +446,28 @@ gsap.registerPlugin(ScrollTrigger);
     initST();
   }
 })();
+
 function initST() {
   if (initST.done) return;
   initST.done = true;
-  const split = new SplitType("[text-split]", {
-    types: "lines",
-    tagName: "span"
-  });
-gsap.utils.toArray("[text-split]").forEach(el => {
-  const lines = el.querySelectorAll(".line");
-  const lineCount = lines.length;
 
-  const duration = gsap.utils.clamp(
-    0.6,
-    1.1,
-    1.2 - lineCount * 0.08
-  );
+  gsap.utils.toArray("[text-split]").forEach(el => {
+    const lines = el.querySelectorAll(".line");
+    const lineCount = lines.length;
 
-  const stagger = gsap.utils.clamp(
-    0.04, 
-    0.1, 
-    0.15 - lineCount * 0.01
-  );
+    const duration = gsap.utils.clamp(
+      0.6,
+      1.1,
+      1.2 - lineCount * 0.08
+    );
 
-  gsap.fromTo(
-    lines,
-    {
-      clipPath: "inset(0% 0% 100% 0%)",
-      yPercent: 40,
-      rotationZ: 2,
-      transformOrigin: "left center"
-    },
-    {
+    const stagger = gsap.utils.clamp(
+      0.04,
+      0.1,
+      0.15 - lineCount * 0.01
+    );
+
+    gsap.to(lines, {
       clipPath: "inset(0% 0% 0% 0%)",
       yPercent: 0,
       rotationZ: 0,
@@ -457,9 +479,8 @@ gsap.utils.toArray("[text-split]").forEach(el => {
         start: "top 100%",
         once: true
       }
-    }
-  );
-});
+    });
+  });
 
   ScrollTrigger.refresh();
 }
