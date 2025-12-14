@@ -12,7 +12,8 @@
 <script src="https://cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 
 
-  <style>
+  
+<style>
 html {
   scroll-behavior: smooth;
 }
@@ -493,51 +494,36 @@ function initST() {
   if (initST.done) return;
   initST.done = true;
 
-  // Split lines + words
   const split = new SplitType("[text-split]", {
-    types: "lines, words",
+    types: "words",
     tagName: "span"
   });
 
   gsap.utils.toArray("[text-split]").forEach(el => {
-    const lines = el.querySelectorAll(".line");
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: el,
-        start: "top 85%",
-        once: true
-      }
-    });
-
-    lines.forEach((line, lineIndex) => {
-      const words = line.querySelectorAll(".word");
-
-      // Set initial state
-      gsap.set(words, {
-        clipPath: "inset(0% 0% 100% 0%)",
-        yPercent: 100
-      });
-
-      // Animate words inside each line
-      tl.to(
-        words,
-        {
-          clipPath: "inset(0% 0% 0% 0%)",
-          yPercent: 0,
-          duration: 0.6,
-          ease: "power2.out",
-          stagger: 0.03 // ✅ WORD STAGGER
-        },
-        lineIndex * 0.15 // ✅ LINE STAGGER
-      );
-    });
+    const words = el.querySelectorAll(".word");
+gsap.fromTo(
+  words,
+  {
+    clipPath: "inset(0% 0% 100% 0%)",
+    yPercent: 100
+  },
+  {
+    clipPath: "inset(0% 0% 0% 0%)", 
+    yPercent: 0,
+    duration: 0.6,
+    ease: "power2.out",
+    stagger: 0.01,
+    scrollTrigger: {
+      trigger: el,
+      start: "top 85%",
+      once: true
+    }
+  }
+);
   });
-
   ScrollTrigger.refresh();
 }
 </script>
-
 
 
 
