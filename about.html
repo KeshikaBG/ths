@@ -466,72 +466,44 @@ function runAnim() {
 
 
 <script>
-(function waitLoad() {
-  if (!window.loadDone) {
-    requestAnimationFrame(waitLoad);
-  } else {
-    initST();
-  }
-})();
+gsap.registerPlugin(ScrollTrigger);
 
-function initST() {
+let splitInstance;
 
-  // Kill previous instances (hot reload safety)
-  ScrollTrigger.getAll().forEach(st => st.kill());
+function initSplitText() {
 
-  new SplitType("[text-split]", {
-    types: "lines, words, chars",
+  if (splitInstance) return; // prevent re-run
+
+  splitInstance = new SplitType("[text-split]", {
+    types: "lines, words",
     tagName: "span"
   });
 
-  document.querySelectorAll("[text-split] .line").forEach(line => {
-    if (!line.parentElement.classList.contains("line-wrap")) {
-      const wrap = document.createElement("div");
-      wrap.className = "line-wrap";
-      wrap.style.overflow = "hidden";
-      line.parentNode.insertBefore(wrap, line);
-      wrap.appendChild(line);
-    }
-  });
+  gsap.utils.toArray("[text-split]").forEach(el => {
 
-  document.querySelectorAll("[stagger-animation]").forEach(el => {
-    const delay = parseFloat(el.dataset.delay || 0.01);
-    const lines = el.querySelectorAll(".line");
+    const words = el.querySelectorAll(".word");
 
-    const tl = gsap.timeline({ paused: true, delay });
-
-    lines.forEach((line, i) => {
-      tl.from(line, {
-        yPercent: 100,
-        duration: 0.6,
-        ease: "power2.out"
-      }, i * 0.05);
-
-      tl.from(line.querySelectorAll(".word, .char"), {
-        yPercent: 100,
-        duration: 0.5,
-        ease: "power2.out",
-        stagger: 0.01
-      }, i * 0.05);
-    });
-
-    ScrollTrigger.create({
-      trigger: el,
-      start: "top 90%",
-      once: true,
-      onEnter: () => {
-        gsap.set(el, { opacity: 1 });
-        tl.play();
+    gsap.from(words, {
+      yPercent: 100,
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.out",
+      stagger: 0.03,
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        once: true
       }
     });
+
   });
 
-  // 🔑 VERY IMPORTANT
+  // IMPORTANT: sync layout once
   ScrollTrigger.refresh();
-
-  // 🔑 SIGNAL CLIP SYSTEM IT IS SAFE
-  window.dispatchEvent(new Event("layout-ready"));
 }
+
+// Run after page layout is stable
+window.addEventListener("load", initSplitText);
 </script>
 
 
