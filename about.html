@@ -389,6 +389,21 @@ function runAnim() {
       );
     });
   });
+  document.querySelectorAll("[self-opacity-anim]").forEach(el => {
+  gsap.fromTo(el,
+    { opacity: 0 },
+    {
+      opacity: 1,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        once: true
+      }
+    }
+  );
+});
   document.querySelectorAll("[opacity-anim]").forEach(wrap => {
     const kids = [...wrap.children].filter(el => !el.classList.contains("overlay"));
     if (!kids.length) return;
