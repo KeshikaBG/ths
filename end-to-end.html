@@ -44,7 +44,6 @@
       opacity: 0;
     }
 
-    [text-split] span,
     [scale-opacity-anim]>*,
     [scale-anim],
     [opacity-anim]>*:not(.overlay),
@@ -138,7 +137,6 @@
       background: #ffffff;
       z-index: 9999;
     }
-    [text-split],
     [scale-opacity-anim]>*,
     [opacity-anim]>*:not(.overlay) {
       opacity: 0;
@@ -278,7 +276,6 @@
         width: calc(100% - 2rem) !important;
     }
 }
-
   .stages-img-div {
     bottom: var(--rem-sizes--1rem);
     border-radius: var(--px-sizes--10px);
@@ -438,7 +435,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/* 🔥 KEY FIX */
 window.addEventListener("pageshow", e => {
   if (!e.persisted) return;
   const loader = document.querySelector(".loader");
@@ -519,7 +515,6 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
     }
   );
 });
-
       document.querySelectorAll("[opacity-anim]").forEach(container => {
         const children = [...container.children].filter(el => !el.classList.contains("overlay"));
         if (children.length) {
@@ -566,53 +561,67 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
 
 
   <!-- SplitType animations with debounce -->
-  <script>
-    (function waitForLoader() {
-      if (!window.loaderFinished) {
-        requestAnimationFrame(waitForLoader);
-      } else {
-        initSplitType();
+ <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/split-type"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+(function waitLoad() {
+  if (!window.loadDone) {
+    requestAnimationFrame(waitLoad);
+  } else {
+    initST();
+  }
+})();
+function initST() {
+  if (initST.done) return;
+  initST.done = true;
+  const split = new SplitType("[text-split]", {
+    types: "lines",
+    tagName: "span"
+  });
+gsap.utils.toArray("[text-split]").forEach(el => {
+  const lines = el.querySelectorAll(".line");
+  const lineCount = lines.length;
+
+  const duration = gsap.utils.clamp(
+    0.6,
+    1.1,
+    1.2 - lineCount * 0.08
+  );
+
+  const stagger = gsap.utils.clamp(
+    0.04, 
+    0.1, 
+    0.15 - lineCount * 0.01
+  );
+
+  gsap.fromTo(
+    lines,
+    {
+      clipPath: "inset(0% 0% 100% 0%)",
+      yPercent: 40,
+      rotationZ: 2,
+      transformOrigin: "left center"
+    },
+    {
+      clipPath: "inset(0% 0% 0% 0%)",
+      yPercent: 0,
+      rotationZ: 0,
+      duration,
+      ease: "power2.out",
+      stagger,
+      scrollTrigger: {
+        trigger: el,
+        start: "top 100%",
+        once: true
       }
-    })();
-    function initSplitType() {
-      function initSplit() {
-        new SplitType("[text-split]", { types: "lines, words, chars", tagName: "span" });
-        document.querySelectorAll("[text-split] .line").forEach(line => {
-          const wrapper = document.createElement("div");
-          wrapper.style.overflow = "hidden";
-          line.parentNode.insertBefore(wrapper, line);
-          wrapper.appendChild(line);
-        });
-        document.querySelectorAll("[stagger-animation]").forEach(el => {
-          const delay = parseFloat(el.getAttribute("data-delay") || 0.01);
-          const lines = el.querySelectorAll(".line");
-          const tl = gsap.timeline({ paused: true, delay });
-          lines.forEach((line, i) => {
-            tl.from(line, {
-              yPercent: 100,
-              duration: 0.6,
-              ease: "power2.out"
-            }, i * 0.05);
-            tl.from(line.querySelectorAll(".word, .char"), {
-              yPercent: 100,
-              duration: 0.5,
-              ease: "power2.out",
-              stagger: 0.01
-            }, i * 0.05);
-          });
-          ScrollTrigger.create({
-            trigger: el,
-            start: "top 90%",
-            once: true,
-            onEnter: () => {
-              gsap.to(el, { opacity: 1, duration: 0.1 });
-              tl.play();
-            }
-          });
-        });
-      } initSplit();
     }
-  </script>
+  );
+});
+
+  ScrollTrigger.refresh();
+}
+</script>
 
 
 
@@ -929,12 +938,12 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
             }
           </style>
           
-          <h1 stagger-animation text-split data-delay="0.2" class="h1">
+          <h1 text-split data-delay="0.2" class="h1">
             <span class="word">End<span class="gradient-line"></span></span><span class="word">to<span
                 class="gradient-line"></span></span><span class="word">end</span>
           </h1>
 
-          <h1 stagger-animation text-split data-delay="0.3" class="h1">
+          <h1 text-split data-delay="0.3" class="h1">
             creatives
           </h1>
         </div>
@@ -967,14 +976,14 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
     <div class="w-layout-blockcontainer about-cont e2e w-container">
         <div class="w-layout-vflex about-flex">
             <div class="about-img-div"></div>
-            <div stagger-animation="" text-split="" class="caption">[ About Us – End to End Creatives ]</div>
+            <div text-split="" class="caption">[ About Us – End to End Creatives ]</div>
             <p data-reveal="" class="about-text st6">Based in Coimbatore, End to End Creatives is a full-service
                 branding and marketing agency built on one belief:<br /> <br />Every brand has a powerful story waiting
                 to be told. Our mission is to guide businesses from concept to industry leadership through strategic
                 precision, creative excellence, and result-driven execution.</p>
         </div>
         <div class="w-layout-vflex about-flex _1rem-g t-m">
-            <div stagger-animation="" text-split="" class="caption">[ We specialize in ]</div>
+            <div text-split="" class="caption">[ We specialize in ]</div>
             <div class="w-layout-hflex mission-div-sp t-m">
                 <h1 class="h1 no-ch"><strong data-reveal="">brand identity &amp; naming</strong></h1>
                 <div class="mission-line-hor gradient"></div>
@@ -1072,8 +1081,8 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
     <div class="w-layout-blockcontainer m-mm-cont w-container">
       <div class="w-layout-vflex m-mm-div">
         <div class="w-layout-vflex inr-flex">
-          <div stagger-animation="" text-split="" class="caption">[ Creative Showcase ]</div>
-          <h1 stagger-animation="" text-split="" class="h1">Delivering Impact Through Design</h1>
+          <div text-split="" class="caption">[ Creative Showcase ]</div>
+          <h1 text-split="" class="h1">Delivering Impact Through Design</h1>
         </div>
         <div class="w-layout-hflex m-mm-swiper">
           <div scale-opacity-anim="" class="w-layout-hflex swiper-wrapper m-mm black p-b">
@@ -1501,8 +1510,8 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
         </div>
         <div slide-up-anim="" class="w-layout-vflex stage-contact-div">
           <div class="w-layout-vflex inr-flex l-a _2">
-            <div stagger-animation="" text-split="" class="caption">[ Get in Touch ]</div>
-            <h2 stagger-animation="" text-split="" class="h2 white l-a ch2">Let’s Bring Your Brand Vision to Life — Connect With Us</h2>
+            <div text-split="" class="caption">[ Get in Touch ]</div>
+            <h2 text-split="" class="h2 white l-a ch2">Let’s Bring Your Brand Vision to Life — Connect With Us</h2>
           </div>
         </div>
       </div>
@@ -1881,5 +1890,4 @@ document.querySelectorAll("[self-opacity-anim]").forEach(el => {
     });
   </script>
 </body>
-
 </html>
