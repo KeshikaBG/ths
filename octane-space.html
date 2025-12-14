@@ -208,69 +208,58 @@
 
 
 <script>
-window.loaderFinished = false;
-
+window.loadDone = false;
 document.addEventListener("DOMContentLoaded", () => {
-  const loader = document.querySelector(".loader");
-  const ease = "power2.inOut";
-  const loaderVisibleTime = 1000;
-
-  if (!loader) {
-    window.loaderFinished = true;
+  const loadEl = document.querySelector(".loader");
+  const easeFx = "power2.inOut";
+  const loadTime = 1000;
+  if (!loadEl) {
+    window.loadDone = true;
     return;
   }
-
-  gsap.set(loader, {
+  gsap.set(loadEl, {
     display: "flex",
     clipPath: "inset(0% 0% 0% 0%)"
   });
-
-  function hideLoader() {
-    gsap.to(loader, {
+  function hideLoad() {
+    gsap.to(loadEl, {
       clipPath: "inset(0% 0% 100% 0%)",
       duration: 1.2,
-      ease,
+      ease: easeFx,
       onComplete: () => {
-        loader.style.display = "none";
-        window.loaderFinished = true;
+        loadEl.style.display = "none";
+        window.loadDone = true;
       }
     });
   }
-
-  function showLoader(cb) {
-    loader.style.display = "flex";
-    gsap.set(loader, { clipPath: "inset(100% 0% 0% 0%)" });
-
-    gsap.to(loader, {
+  function showLoad(cb) {
+    loadEl.style.display = "flex";
+    gsap.set(loadEl, { clipPath: "inset(100% 0% 0% 0%)" });
+    gsap.to(loadEl, {
       clipPath: "inset(0% 0% 0% 0%)",
       duration: 0.8,
-      ease,
+      ease: easeFx,
       onComplete: cb
     });
   }
-
-  setTimeout(hideLoader, loaderVisibleTime);
-
-  document.querySelectorAll("a").forEach(link => {
-    if (!link.href) return;
-    if (!link.href.startsWith(location.origin)) return;
-    if (link.target === "_blank") return;
-    if (link.href.includes("#")) return;
-
-    link.addEventListener("click", e => {
+  setTimeout(hideLoad, loadTime);
+  document.querySelectorAll("a").forEach(lnk => {
+    if (!lnk.href) return;
+    if (!lnk.href.startsWith(location.origin)) return;
+    if (lnk.target === "_blank") return;
+    if (lnk.href.includes("#")) return;
+    lnk.addEventListener("click", e => {
       e.preventDefault();
-      showLoader(() => {
-        location.href = link.href;
+      showLoad(() => {
+        location.href = lnk.href;
       });
     });
   });
 });
-
-/* 🔥 KEY FIX */
 window.addEventListener("pageshow", e => {
   if (!e.persisted) return;
-  const loader = document.querySelector(".loader");
-  if (loader) loader.style.display = "none";
+  const loadEl = document.querySelector(".loader");
+  if (loadEl) loadEl.style.display = "none";
 });
 </script>
 
@@ -280,101 +269,135 @@ window.addEventListener("pageshow", e => {
 
 
   <!-- Entry animations -->
-  <script>
-    (function waitForLoader() {
-      if (!window.loaderFinished) { requestAnimationFrame(waitForLoader); }
-      else { runGsapAnimations(); }
-    })();
-    function runGsapAnimations() {
-      const easeType = "power2.out";
-      ScrollTrigger.batch("[data-entry-anim]", {
-        onEnter: batch => {
-          batch.forEach(el => {
-            const delay = parseFloat(el.dataset.entryDelay) || 0;
-            gsap.fromTo(el,
-              { scale: 0 },
-              { scale: 1, duration: 1, ease: easeType, delay: delay }
-            );
-            gsap.to(el, {
-              filter: "grayscale(0%)", duration: 0.6, ease: easeType, delay: delay + 0.01
-            });
-          });
-        },
-        once: true
-      });
-      ScrollTrigger.batch("[scale-anim]", {
-        onEnter: batch => {
-          gsap.fromTo(batch,
-            { scale: 0, },
-            { scale: 1, duration: 0.6, ease: easeType, stagger: 0.15 }
-          );
-        },
-        once: true
-      });
-      document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex) => {
-        const children = container.querySelectorAll(":scope > *");
-        if (!children.length) return;
-
-        children.forEach((child, i) => {
-          gsap.fromTo(child,
-            { y: 80, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: "power2.out",
-              delay: containerIndex * 0.3 + i * 0.15,
-              scrollTrigger: {
-                trigger: child,
-                start: "top 90%",
-                once: true
-              }
-            }
-          );
+<script>
+(function waitLoad() {
+  if (!window.loadDone) {
+    requestAnimationFrame(waitLoad);
+  } else {
+    runAnim();
+  }
+})();
+function runAnim() {
+  const easeFx = "power2.out";
+  ScrollTrigger.batch("[data-entry-anim]", {
+    onEnter: grp => {
+      grp.forEach(el => {
+        const dly = parseFloat(el.dataset.entryDelay) || 0;
+        gsap.fromTo(
+          el,
+          { scale: 0 },
+          { scale: 1, duration: 1, ease: easeFx, delay: dly }
+        );
+        gsap.to(el, {
+          filter: "grayscale(0%)",
+          duration: 0.6,
+          ease: easeFx,
+          delay: dly + 0.01
         });
       });
-
-      document.querySelectorAll("[opacity-anim]").forEach(container => {
-        const children = [...container.children].filter(el => !el.classList.contains("overlay"));
-        if (children.length) {
-          ScrollTrigger.batch(children, {
-            onEnter: batch => gsap.to(batch, { opacity: 1 }),
+    },
+    once: true
+  });
+  ScrollTrigger.batch("[scale-anim]", {
+    onEnter: grp => {
+      gsap.fromTo(
+        grp,
+        { scale: 0 },
+        { scale: 1, duration: 0.6, ease: easeFx, stagger: 0.15 }
+      );
+    },
+    once: true
+  });
+  document.querySelectorAll("[slide-up-anim]").forEach((wrap, wIdx) => {
+    const kids = wrap.querySelectorAll(":scope > *");
+    if (!kids.length) return;
+    kids.forEach((kid, i) => {
+      gsap.fromTo(
+        kid,
+        { y: 80, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: easeFx,
+          delay: wIdx * 0.3 + i * 0.15,
+          scrollTrigger: {
+            trigger: kid,
+            start: "top 90%",
             once: true
-          });
+          }
         }
-      });
-      document.querySelectorAll("[scale-opacity-anim]").forEach(container => {
-        const children = [...container.children];
-        if (children.length) {
-          ScrollTrigger.batch(children, {
-            onEnter: batch => gsap.fromTo(batch,
-              { scale: 0, opacity: 0 },
-              { scale: 1, opacity: 1, duration: 0.6, ease: easeType, stagger: 0.15 }
-            ),
-            once: true
-          });
-        }
-      });
-      ScrollTrigger.batch("[data-scale-img] img", {
-        onEnter: batch => gsap.to(batch, {
-          opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03
-        }),
+      );
+    });
+  });
+  document.querySelectorAll("[self-opacity-anim]").forEach(el => {
+  gsap.fromTo(el,
+    { opacity: 0 },
+    {
+      opacity: 1,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
         once: true
-      });
-      const animDvdr = (sel, axis) => {
-        document.querySelectorAll(sel).forEach(dvdr => {
-          gsap.fromTo(dvdr, { [axis]: 0 }, {
-            [axis]: 1,
-            duration: 0.6,
-            ease: easeType,
-            scrollTrigger: { trigger: dvdr, start: "top 90%", once: true }
-          });
-        });
-      };
-      animDvdr('.nav-line', "scaleX");
-      animDvdr('.vertical-line', "scaleY");
+      }
     }
-  </script>
+  );
+});
+  document.querySelectorAll("[opacity-anim]").forEach(wrap => {
+    const kids = [...wrap.children].filter(el => !el.classList.contains("overlay"));
+    if (!kids.length) return;
+    ScrollTrigger.batch(kids, {
+      onEnter: grp => gsap.to(grp, { opacity: 1 }),
+      once: true
+    });
+  });
+  document.querySelectorAll("[scale-opacity-anim]").forEach(wrap => {
+    const kids = [...wrap.children];
+    if (!kids.length) return;
+    ScrollTrigger.batch(kids, {
+      onEnter: grp =>
+        gsap.fromTo(
+          grp,
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.6, ease: easeFx, stagger: 0.15 }
+        ),
+      once: true
+    });
+  });
+  ScrollTrigger.batch("[data-scale-img] img", {
+    onEnter: grp =>
+      gsap.to(grp, {
+        opacity: 1,
+        duration: 0.6,
+        ease: easeFx,
+        stagger: 0.03
+      }),
+    once: true
+  });
+  const animLine = (sel, axis) => {
+    document.querySelectorAll(sel).forEach(line => {
+      gsap.fromTo(
+        line,
+        { [axis]: 0 },
+        {
+          [axis]: 1,
+          duration: 0.6,
+          ease: easeFx,
+          scrollTrigger: {
+            trigger: line,
+            start: "top 90%",
+            once: true
+          }
+        }
+      );
+    });
+  };
+  animLine(".nav-line", "scaleX");
+  animLine(".vertical-line", "scaleY");
+}
+</script>
 
 
 
