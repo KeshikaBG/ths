@@ -45,7 +45,6 @@
       opacity: 0;
     }
 
-    [text-split] span,
     [scale-opacity-anim]>*,
     [scale-anim],
     [opacity-anim]>*:not(.overlay),
@@ -149,7 +148,6 @@
       z-index: 9999;
     }
 
-    [text-split],
     [scale-opacity-anim]>*,
     [opacity-anim]>*:not(.overlay) {
       opacity: 0;
@@ -333,7 +331,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/* 🔥 KEY FIX */
 window.addEventListener("pageshow", e => {
   if (!e.persisted) return;
   const loader = document.querySelector(".loader");
@@ -447,53 +444,67 @@ window.addEventListener("pageshow", e => {
 
 
   <!-- SplitType animations with debounce -->
-  <script>
-    (function waitForLoader() {
-      if (!window.loaderFinished) {
-        requestAnimationFrame(waitForLoader);
-      } else {
-        initSplitType();
+<script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/split-type"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+(function waitLoad() {
+  if (!window.loadDone) {
+    requestAnimationFrame(waitLoad);
+  } else {
+    initST();
+  }
+})();
+function initST() {
+  if (initST.done) return;
+  initST.done = true;
+  const split = new SplitType("[text-split]", {
+    types: "lines",
+    tagName: "span"
+  });
+gsap.utils.toArray("[text-split]").forEach(el => {
+  const lines = el.querySelectorAll(".line");
+  const lineCount = lines.length;
+
+  const duration = gsap.utils.clamp(
+    0.6,
+    1.1,
+    1.2 - lineCount * 0.08
+  );
+
+  const stagger = gsap.utils.clamp(
+    0.04, 
+    0.1, 
+    0.15 - lineCount * 0.01
+  );
+
+  gsap.fromTo(
+    lines,
+    {
+      clipPath: "inset(0% 0% 100% 0%)",
+      yPercent: 40,
+      rotationZ: 2,
+      transformOrigin: "left center"
+    },
+    {
+      clipPath: "inset(0% 0% 0% 0%)",
+      yPercent: 0,
+      rotationZ: 0,
+      duration,
+      ease: "power2.out",
+      stagger,
+      scrollTrigger: {
+        trigger: el,
+        start: "top 100%",
+        once: true
       }
-    })();
-    function initSplitType() {
-      function initSplit() {
-        new SplitType("[text-split]", { types: "lines, words, chars", tagName: "span" });
-        document.querySelectorAll("[text-split] .line").forEach(line => {
-          const wrapper = document.createElement("div");
-          wrapper.style.overflow = "hidden";
-          line.parentNode.insertBefore(wrapper, line);
-          wrapper.appendChild(line);
-        });
-        document.querySelectorAll("[stagger-animation]").forEach(el => {
-          const delay = parseFloat(el.getAttribute("data-delay") || 0.01);
-          const lines = el.querySelectorAll(".line");
-          const tl = gsap.timeline({ paused: true, delay });
-          lines.forEach((line, i) => {
-            tl.from(line, {
-              yPercent: 100,
-              duration: 0.6,
-              ease: "power2.out"
-            }, i * 0.05);
-            tl.from(line.querySelectorAll(".word, .char"), {
-              yPercent: 100,
-              duration: 0.5,
-              ease: "power2.out",
-              stagger: 0.01
-            }, i * 0.05);
-          });
-          ScrollTrigger.create({
-            trigger: el,
-            start: "top 90%",
-            once: true,
-            onEnter: () => {
-              gsap.to(el, { opacity: 1, duration: 0.1 });
-              tl.play();
-            }
-          });
-        });
-      } initSplit();
     }
-  </script>
+  );
+});
+
+  ScrollTrigger.refresh();
+}
+</script>
 
 
 
@@ -604,9 +615,6 @@ window.addEventListener("pageshow", e => {
     position: absolute;
     bottom: auto;
 }
-
-
-    
   </style>
 </head>
 
@@ -669,28 +677,23 @@ window.addEventListener("pageshow", e => {
           will-change: transform, opacity !important;
           transition: transform 0.3s ease, opacity 0.3s ease !important;
         }
-
         .header {
           background: transparent;
           margin: 1rem 1rem 0 1rem;
           transition: margin 0.3s ease;
           overflow: hidden !important;
         }
-
         .header.vis {
           overflow: visible !important;
         }
-
         .header.scrolled {
           background: white;
           margin: 0;
         }
-
         .header .nav-line {
           background-color: white;
           transition: background-color 0.3s ease;
         }
-
         .header.scrolled .nav-line {
           background-color: #c3c3c3;
         }
@@ -702,35 +705,28 @@ window.addEventListener("pageshow", e => {
             margin: 0rem;
             transition: margin 0.3s ease;
           }
-
           .header.scrolled .nav-inr-wrp {
             margin: 1rem;
           }
         }
 
-
         .header.scrolled .menu {
           background-color: #373737;
         }
-
         .header.scrolled .menu:hover {
           background-color: #454545 !important;
         }
-
         .header .menu-line {
           background-color: #373737;
           transition: background-color 0.3s ease;
         }
-
         .header.scrolled .menu-lines {
           background-color: white;
         }
-
         .mm-logo {
           transition: filter 0.3s ease;
           filter: invert(0%);
         }
-
         .header.scrolled .mm-logo {
           filter: invert(100%);
         }
@@ -741,19 +737,14 @@ window.addEventListener("pageshow", e => {
           height: 0vh;
           transition: height 0.5s ease;
         }
-
         .nav-link-div .nav-links {
           color: #c3c3c3 !important;
           transition: color 0.3s ease;
         }
-
         .nav-link-div.w--current .nav-links,
         .nav-link-div:hover .nav-links {
           color: #373737 !important;
         }
-
-
-
 
 
 
@@ -769,7 +760,6 @@ window.addEventListener("pageshow", e => {
           z-index: -1 !important;
           visibility: hidden;
         }
-
         @media screen and (max-width: 991px) {
           .nav-inr-wrp {
             opacity: 0 !important;
@@ -779,7 +769,6 @@ window.addEventListener("pageshow", e => {
             overflow: hidden;
             transition: opacity 0.4s ease, max-height 0.4s ease, padding 0.4s ease;
           }
-
           .overlay {
             position: fixed;
             top: 0;
@@ -791,14 +780,12 @@ window.addEventListener("pageshow", e => {
             z-index: -1 !important;
             visibility: hidden;
           }
-
           .nav-inr-wrp.active {
             opacity: 1 !important;
             visibility: visible;
             min-height: 35vh;
             padding: 1rem;
           }
-
           .overlay.oveactive {
             display: block;
             position: fixed;
@@ -879,10 +866,10 @@ window.addEventListener("pageshow", e => {
         </div>
         <div class="w-layout-vflex hero-main-texts-div">
           <div class="w-layout-vflex hero-inr-flex">
-            <div data-delay="0.3" text-split="" stagger-animation="" class="caption">[ Our Work ]</div>
-            <h1 data-delay="0.5" text-split="" stagger-animation="" class="h1">Where every frame holds a feeling.</h1>
+            <div data-delay="0.3" text-split="" class="caption">[ Our Work ]</div>
+            <h1 data-delay="0.5" text-split="" class="h1">Where every frame holds a feeling.</h1>
           </div>
-          <p data-delay="0.7" text-split="" stagger-animation="" class="b2 ch">A curated collection of love, laughter, and fleeting moments — captured with heart, crafted with precision, and preserved to remind you why we do what we do.
+          <p data-delay="0.7" text-split="" class="b2 ch">A curated collection of love, laughter, and fleeting moments — captured with heart, crafted with precision, and preserved to remind you why we do what we do.
 </p>
         </div>
       </div>
@@ -892,7 +879,7 @@ window.addEventListener("pageshow", e => {
     <div class="w-layout-blockcontainer work-cont w-container">
       <div class="w-layout-vflex wrk-div">
         <div class="w-layout-grid wrk-flex">
-          <p stagger-animation="" text-split="" id="w-node-_4e4b8c25-cafd-8186-81ef-7ec6b0bea0f6-ce6c35d9"
+          <p text-split="" id="w-node-_4e4b8c25-cafd-8186-81ef-7ec6b0bea0f6-ce6c35d9"
             class="sh1 right">Our Showcase</p>
           <div opacity-anim="" id="w-node-_84b4f7aa-1542-d043-da00-8fe799c023ff-ce6c35d9"
             class="w-layout-hflex work-chip-wrp">
@@ -947,8 +934,8 @@ window.addEventListener("pageshow", e => {
       <div data-entry-anim="" class="contact-div">
         <div class="w-layout-vflex contact-main-div">
           <div class="w-layout-vflex inr-flex">
-            <div data-delay="0.2" text-split="" stagger-animation="" class="caption">[ Reach Out ]</div>
-            <h2 data-delay="0.3" text-split="" stagger-animation="" class="h2 white">“Let’s create something beautiful together. Contact us today.”</h2>
+            <div data-delay="0.2" text-split="" class="caption">[ Reach Out ]</div>
+            <h2 data-delay="0.3" text-split="" class="h2 white">“Let’s create something beautiful together. Contact us today.”</h2>
           </div><a href="contact.html" class="btn w-inline-block">
             <div class="btn-txt">Work With Us</div>
             <div class="btn-arr w-embed"><svg width="16" height="11" viewBox="0 0 16 11" fill="none"
@@ -1042,23 +1029,18 @@ window.addEventListener("pageshow", e => {
   </script>
 
 
-
-
-
   
   
 
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@sanity/client';
-
   const client = createClient({
     projectId: 'n7jjk6nd',
     dataset: 'production',
     useCdn: true,
     apiVersion: '2023-01-01'
   });
-
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const works = await client.fetch(`
@@ -1070,8 +1052,6 @@ window.addEventListener("pageshow", e => {
           }
         }
       `);
-
-
       const container = document.querySelector('.work-img-wrpr-div');
       const parents = document.querySelectorAll('.work-divs-wrpr');
       const separateWorkDiv = document.querySelector('.separate-work-div');
@@ -1085,23 +1065,17 @@ window.addEventListener("pageshow", e => {
 
       let usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
       usedParents.forEach(p => p.innerHTML = '');
-
       chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(chip => chip.remove());
-
       const allClones = [];
-
 
       works.forEach((work, workIndex) => {
         if (!work.heroTitle) return;
-
         const chip = document.createElement('div');
         chip.classList.add('wrk-chip');
         chip.dataset.index = workIndex;
-
         const chipText = document.createElement('div');
         chipText.classList.add('chip-text');
         chipText.textContent = work.heroTitle;
-
         chip.appendChild(chipText);
         chipWrapper.appendChild(chip);
       });
@@ -1116,21 +1090,17 @@ window.addEventListener("pageshow", e => {
 
           section.preloadedImages = images.map((imgObj, i) => {
             const img = document.createElement('img');
-
             const lowRes = `${imgObj.asset?.url}?w=60&blur=30&auto=format`;
             const highRes = `${imgObj.asset?.url}?w=1000&auto=format&fit=crop`;
-
             img.src = lowRes;
             img.dataset.src = highRes;
             img.alt = section.title || '';
             img.loading = 'lazy';
-
             img.style.height = '40vh';
             img.style.width = 'auto';
             img.style.objectFit = 'cover';
             img.style.marginRight = '1rem';
             img.style.filter = 'blur(10px)';
-
             const full = new Image();
             full.src = highRes;
             full.onload = () => {
@@ -1138,16 +1108,13 @@ window.addEventListener("pageshow", e => {
               img.style.transition = 'filter 0.6s ease';
               img.style.filter = 'blur(0px)';
             };
-
             return img;
           });
 
-          /* Lazy load for modal images */
           section.preloadedImages.forEach(img => {
             const highRes = img.dataset.src;
             if (highRes) {
               img.classList.add('lazy-img');
-
               const full = new Image();
               full.src = highRes;
               full.onload = () => {
@@ -1167,7 +1134,6 @@ window.addEventListener("pageshow", e => {
           const titleEl = clone.querySelector('.title-img');
           if (titleEl) titleEl.textContent = section.title || '';
 
-          /* -------- CLICK → OPEN MODAL --------*/
           const overlayEl = clone.querySelector('.overlay-div');
           if (overlayEl) {
             overlayEl.style.opacity = '0';
@@ -1186,7 +1152,7 @@ window.addEventListener("pageshow", e => {
   flex.innerHTML = '';
   section.preloadedImages.forEach(preImg => {
     const el = preImg.cloneNode(true);
-    el.classList.add("work-img");   // ⭐ REQUIRED FOR LIGHTBOX
+    el.classList.add("work-img");
     flex.appendChild(el);
   });
 });
@@ -1201,7 +1167,7 @@ if (!img) {
   clone.prepend(img);
 }
 
-img.classList.add("work-img");   // ⭐ required for lightbox
+img.classList.add("work-img");
 
 const lowRes = `${imgUrl}?w=120&blur=30&auto=format`;
 //const highRes = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
@@ -1275,10 +1241,8 @@ enableLightbox();
         chip.addEventListener('click', () => {
           const chipIndex = Number(chip.dataset.index);
           const filtered = allClones.filter(div => Number(div.dataset.chipIndex) === chipIndex);
-
           distribute(filtered);
           filtered.forEach(f => lazyLoadVisibleImages(f));
-
           chips.forEach(c => c.classList.remove('selected'));
           allChip.classList.remove('selected');
           chip.classList.add('selected');
@@ -1288,11 +1252,9 @@ enableLightbox();
       allChip.addEventListener('click', () => {
         distribute(allClones);
         allClones.forEach(f => lazyLoadVisibleImages(f));
-
         chips.forEach(c => c.classList.remove('selected'));
         allChip.classList.add('selected');
       });
-
 
       [overlayWork, wrkClose].forEach(el => {
         el.addEventListener('click', () => {
@@ -1309,17 +1271,13 @@ enableLightbox();
 const lightbox = document.getElementById("lightbox");
 const lightboxImg = document.getElementById("lightboxImg");
 const lightboxClose = document.getElementById("lightboxClose");
-
 function enableLightbox() {
   const galleryImages = document.querySelectorAll(".work-img");
-
   galleryImages.forEach(img => {
     img.style.cursor = "zoom-in";
-
     img.addEventListener("click", () => {
       lightboxImg.src = img.src;
       lightbox.classList.add("active");
-
       lightboxImg.style.height = "calc(100vh - 2rem)";
       lightboxImg.style.width = "auto";
       lightboxImg.style.objectFit = "contain";
@@ -1382,7 +1340,6 @@ lightbox.addEventListener("click", (e) => {
 function insertImageOrVideo(container, mediaArr, label = 'Media') {
   if (container && mediaArr.length > 0) {
     const media = mediaArr[0];
-
     if (media.asset._type === 'sanity.imageAsset') {
       const img = document.createElement('img');
       img.src = `${media.asset.url}?w=800&auto=format&q=75`; 
