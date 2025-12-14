@@ -34,7 +34,6 @@
       opacity: 0;
     }
 
-    [text-split] span,
     [scale-opacity-anim]>*,
     [scale-anim],
     [opacity-anim]>*:not(.overlay),
@@ -138,7 +137,6 @@
       z-index: 9999;
     }
 
-    [text-split],
     [scale-opacity-anim]>*,
     [opacity-anim]>*:not(.overlay) {
       opacity: 0;
@@ -382,53 +380,67 @@ window.addEventListener("pageshow", e => {
 
 
   <!-- SplitType animations with debounce -->
-  <script>
-    (function waitForLoader() {
-      if (!window.loaderFinished) {
-        requestAnimationFrame(waitForLoader);
-      } else {
-        initSplitType();
+<script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/split-type"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+(function waitLoad() {
+  if (!window.loadDone) {
+    requestAnimationFrame(waitLoad);
+  } else {
+    initST();
+  }
+})();
+function initST() {
+  if (initST.done) return;
+  initST.done = true;
+  const split = new SplitType("[text-split]", {
+    types: "lines",
+    tagName: "span"
+  });
+gsap.utils.toArray("[text-split]").forEach(el => {
+  const lines = el.querySelectorAll(".line");
+  const lineCount = lines.length;
+
+  const duration = gsap.utils.clamp(
+    0.6,
+    1.1,
+    1.2 - lineCount * 0.08
+  );
+
+  const stagger = gsap.utils.clamp(
+    0.04, 
+    0.1, 
+    0.15 - lineCount * 0.01
+  );
+
+  gsap.fromTo(
+    lines,
+    {
+      clipPath: "inset(0% 0% 100% 0%)",
+      yPercent: 40,
+      rotationZ: 2,
+      transformOrigin: "left center"
+    },
+    {
+      clipPath: "inset(0% 0% 0% 0%)",
+      yPercent: 0,
+      rotationZ: 0,
+      duration,
+      ease: "power2.out",
+      stagger,
+      scrollTrigger: {
+        trigger: el,
+        start: "top 100%",
+        once: true
       }
-    })();
-    function initSplitType() {
-      function initSplit() {
-        new SplitType("[text-split]", { types: "lines, words, chars", tagName: "span" });
-        document.querySelectorAll("[text-split] .line").forEach(line => {
-          const wrapper = document.createElement("div");
-          wrapper.style.overflow = "hidden";
-          line.parentNode.insertBefore(wrapper, line);
-          wrapper.appendChild(line);
-        });
-        document.querySelectorAll("[stagger-animation]").forEach(el => {
-          const delay = parseFloat(el.getAttribute("data-delay") || 0.01);
-          const lines = el.querySelectorAll(".line");
-          const tl = gsap.timeline({ paused: true, delay });
-          lines.forEach((line, i) => {
-            tl.from(line, {
-              yPercent: 100,
-              duration: 0.6,
-              ease: "power2.out"
-            }, i * 0.05);
-            tl.from(line.querySelectorAll(".word, .char"), {
-              yPercent: 100,
-              duration: 0.5,
-              ease: "power2.out",
-              stagger: 0.01
-            }, i * 0.05);
-          });
-          ScrollTrigger.create({
-            trigger: el,
-            start: "top 90%",
-            once: true,
-            onEnter: () => {
-              gsap.to(el, { opacity: 1, duration: 0.1 });
-              tl.play();
-            }
-          });
-        });
-      } initSplit();
     }
-  </script>
+  );
+});
+
+  ScrollTrigger.refresh();
+}
+</script>
 
 
 
@@ -808,9 +820,9 @@ window.addEventListener("pageshow", e => {
       <div class="w-layout-hflex octane-hero-div">
         <div class="w-layout-vflex abt-hero-flex">
           <div class="w-layout-vflex hero-inr-flex">
-            <div data-delay="0.3" text-split="" stagger-animation="" class="caption-black">[ A SPACE FOR CREATIVITY ]
+            <div data-delay="0.3" text-split="" class="caption-black">[ A SPACE FOR CREATIVITY ]
             </div>
-            <h1 data-delay="" text-split="" stagger-animation="" class="h1 black ch2">Octane Space — Where Vision Meets Storytelling.</h1>
+            <h1 data-delay="" text-split="" class="h1 black ch2">Octane Space — Where Vision Meets Storytelling.</h1>
           </div>
           <div class="w-layout-hflex os-swiper">
             <div scale-opacity-anim="" class="w-layout-hflex swiper-wrapper white">
@@ -821,7 +833,7 @@ window.addEventListener("pageshow", e => {
               <div class="w-layout-vflex swiper-slide os"></div>
             </div>
           </div>
-          <p stagger-animation="" text-split="" class="p1 width1">
+          <p text-split="" class="p1 width1">
           A modern studio crafted for creators, dreamers, and storytellers.
           Welcome to Octane Space, the creative heart of The Happening Story — a fully equipped, contemporary studio based in Coimbatore, designed to turn imagination into imagery. From portraits and pre-wedding sessions to product shoots and commercial productions, every corner of Octane Space is built for comfort, creativity, and flawless execution in an inspiring environment.
           </p>
@@ -860,7 +872,7 @@ window.addEventListener("pageshow", e => {
   <section class="del-sec">
     <div class="w-layout-blockcontainer del-cont w-container">
       <div class="w-layout-vflex del-div">
-        <h2 stagger-animation="" text-split="" class="h2 black ch">What Awaits You at Octane Space</h2>
+        <h2 text-split="" class="h2 black ch">What Awaits You at Octane Space</h2>
         <div data-entry-anim="" class="camera-ill oct w-embed"><svg width="171" height="128" viewBox="0 0 171 128"
             fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -898,36 +910,36 @@ window.addEventListener("pageshow", e => {
           <div id="w-node-f9de8887-c0dd-f89f-df3a-cc29f47ff83b-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Fully air-conditioned creative studio</p>
-              <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 01 ]</p>
+              <p text-split="" class="b1 caps black">Fully air-conditioned creative studio</p>
+              <p text-split="" class="sh3 r-a ch2">[ 01 ]</p>
             </div>
           </div>
           <div id="w-node-_79435bf5-ad1d-0326-66c1-04f178ccfb68-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Custom-designed backdrops & props</p>
-              <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 02 ]</p>
+              <p text-split="" class="b1 caps black">Custom-designed backdrops & props</p>
+              <p text-split="" class="sh3 r-a ch2">[ 02 ]</p>
             </div>
           </div>
           <div id="w-node-f5c24b1e-a944-dc2c-55bb-cd6a92b0e01d-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Advanced professional lighting systems</p>
-              <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 03 ]</p>
+              <p text-split="" class="b1 caps black">Advanced professional lighting systems</p>
+              <p text-split="" class="sh3 r-a ch2">[ 03 ]</p>
             </div>
           </div>
           <div id="w-node-e8c936b9-5a27-008e-f132-1d2fb2900a32-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Private dressing & makeup suite</p>
-              <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 04 ]</p>
+              <p text-split="" class="b1 caps black">Private dressing & makeup suite</p>
+              <p text-split="" class="sh3 r-a ch2">[ 04 ]</p>
             </div>
           </div>
           <div id="w-node-_3a932a19-3209-9674-1d0a-7a8ff9c41efa-94be42a9" class="w-layout-vflex del-card">
             <div class="del-img-wrp"></div>
             <div class="w-layout-hflex os-inr-flex">
-              <p stagger-animation="" text-split="" class="b1 caps black">Comfortable client viewing lounge</p>
-              <p stagger-animation="" text-split="" class="sh3 r-a ch2">[ 05 ]</p>
+              <p text-split="" class="b1 caps black">Comfortable client viewing lounge</p>
+              <p text-split="" class="sh3 r-a ch2">[ 05 ]</p>
             </div>
           </div>
         </div>
@@ -937,7 +949,7 @@ window.addEventListener("pageshow", e => {
   <section class="sess-sec">
     <div class="w-layout-blockcontainer sess-cont w-container">
       <div class="w-layout-vflex sess-flex">
-        <h2 stagger-animation="" text-split="" class="h2 white">Perfect for Your Next Session</h2>
+        <h2 text-split="" class="h2 white">Perfect for Your Next Session</h2>
         <div class="hori-scroll-div sticky">
           <div slide-up-anim="" class="w-layout-hflex sess-cards-wrp">
             <div class="w-layout-vflex sess-card">
@@ -1025,8 +1037,8 @@ window.addEventListener("pageshow", e => {
                 d="M14 0C10.2007 0 9.723 0.0175 8.23025 0.084C6.7375 0.154 5.72075 0.3885 4.83 0.735C3.89523 1.08557 3.04875 1.63695 2.35025 2.35025C1.63695 3.04875 1.08557 3.89523 0.735 4.83C0.3885 5.719 0.15225 6.7375 0.084 8.225C0.0175 9.72125 0 10.1973 0 14.0018C0 17.8028 0.0175 18.2788 0.084 19.7715C0.154 21.2625 0.3885 22.2792 0.735 23.17C1.09375 24.0905 1.5715 24.871 2.35025 25.6497C3.12725 26.4285 3.90775 26.908 4.82825 27.265C5.72075 27.6115 6.73575 27.8477 8.22675 27.916C9.72125 27.9825 10.1972 28 14 28C17.8028 28 18.277 27.9825 19.7715 27.916C21.2608 27.846 22.281 27.6115 23.1718 27.265C24.1059 26.9142 24.9518 26.3628 25.6497 25.6497C26.4285 24.871 26.9062 24.0905 27.265 23.17C27.6097 22.2792 27.846 21.2625 27.916 19.7715C27.9825 18.2788 28 17.8028 28 14C28 10.1972 27.9825 9.72125 27.916 8.22675C27.846 6.7375 27.6097 5.719 27.265 4.83C26.9144 3.89523 26.3631 3.04875 25.6497 2.35025C24.9513 1.63695 24.1048 1.08557 23.17 0.735C22.2775 0.3885 21.259 0.15225 19.7697 0.084C18.2752 0.0175 17.801 0 13.9965 0H14ZM12.7452 2.5235H14.0018C17.7398 2.5235 18.1825 2.53575 19.6577 2.604C21.0227 2.66525 21.7647 2.8945 22.2582 3.08525C22.911 3.339 23.3782 3.6435 23.8682 4.1335C24.3582 4.6235 24.661 5.089 24.9148 5.7435C25.1073 6.23525 25.3348 6.97725 25.396 8.34225C25.4643 9.8175 25.4783 10.2603 25.4783 13.9965C25.4783 17.7328 25.4643 18.1772 25.396 19.6525C25.3348 21.0175 25.1055 21.7578 24.9148 22.2513C24.6887 22.8583 24.3307 23.4076 23.8665 23.8595C23.3765 24.3495 22.911 24.6523 22.2565 24.906C21.7665 25.0985 21.0245 25.326 19.6577 25.389C18.1825 25.4555 17.7398 25.4713 14.0018 25.4713C10.2638 25.4713 9.81925 25.4555 8.344 25.389C6.979 25.326 6.23875 25.0985 5.74525 24.906C5.13771 24.6807 4.5878 24.3233 4.13525 23.8595C3.67023 23.4073 3.31157 22.8574 3.08525 22.2495C2.8945 21.7577 2.66525 21.0158 2.604 19.6508C2.5375 18.1755 2.5235 17.7327 2.5235 13.993C2.5235 10.2532 2.5375 9.814 2.604 8.33875C2.667 6.97375 2.8945 6.23175 3.087 5.73825C3.34075 5.0855 3.64525 4.61825 4.13525 4.12825C4.62525 3.63825 5.09075 3.3355 5.74525 3.08175C6.23875 2.88925 6.979 2.66175 8.344 2.59875C9.6355 2.53925 10.136 2.52175 12.7452 2.52V2.5235ZM21.4742 4.8475C21.2536 4.8475 21.0352 4.89095 20.8313 4.97538C20.6275 5.05981 20.4423 5.18356 20.2863 5.33956C20.1303 5.49556 20.0066 5.68076 19.9221 5.88459C19.8377 6.08842 19.7942 6.30688 19.7942 6.5275C19.7942 6.74812 19.8377 6.96658 19.9221 7.17041C20.0066 7.37423 20.1303 7.55944 20.2863 7.71544C20.4423 7.87144 20.6275 7.99519 20.8313 8.07962C21.0352 8.16405 21.2536 8.2075 21.4742 8.2075C21.9198 8.2075 22.3471 8.0305 22.6622 7.71544C22.9773 7.40038 23.1542 6.97306 23.1542 6.5275C23.1542 6.08194 22.9773 5.65462 22.6622 5.33956C22.3471 5.0245 21.9198 4.8475 21.4742 4.8475ZM14.0018 6.811C13.0481 6.79612 12.1011 6.9711 11.2157 7.32575C10.3304 7.68039 9.5244 8.20762 8.84476 8.87674C8.16513 9.54586 7.62539 10.3435 7.25697 11.2232C6.88856 12.1029 6.69883 13.0471 6.69883 14.0009C6.69883 14.9546 6.88856 15.8988 7.25697 16.7785C7.62539 17.6583 8.16513 18.4559 8.84476 19.125C9.5244 19.7941 10.3304 20.3214 11.2157 20.676C12.1011 21.0306 13.0481 21.2056 14.0018 21.1908C15.8892 21.1613 17.6894 20.3908 19.0137 19.0457C20.338 17.7005 21.0803 15.8886 21.0803 14.0009C21.0803 12.1132 20.338 10.3012 19.0137 8.95606C17.6894 7.6109 15.8892 6.84045 14.0018 6.811ZM14.0018 9.33275C14.6147 9.33275 15.2216 9.45347 15.7878 9.68802C16.3541 9.92257 16.8686 10.2664 17.302 10.6998C17.7354 11.1332 18.0792 11.6477 18.3137 12.2139C18.5483 12.7802 18.669 13.3871 18.669 14C18.669 14.6129 18.5483 15.2198 18.3137 15.7861C18.0792 16.3523 17.7354 16.8668 17.302 17.3002C16.8686 17.7336 16.3541 18.0774 15.7878 18.312C15.2216 18.5465 14.6147 18.6672 14.0018 18.6672C12.7639 18.6672 11.5768 18.1755 10.7015 17.3002C9.82623 16.425 9.3345 15.2378 9.3345 14C9.3345 12.7622 9.82623 11.575 10.7015 10.6998C11.5768 9.82448 12.7639 9.33275 14.0018 9.33275Z"
                 fill="#373737" />
             </svg></div>
-          <h3 stagger-animation="" text-split="" class="h3 center">Catch Every Moment — Join Us on Instagram!</h3>
-          <p stagger-animation="" text-split="" class="b2-black ch center">Every frame has a story. Follow us to watch ideas, moments, and creations come alive.</p>
+          <h3 text-split="" class="h3 center">Catch Every Moment — Join Us on Instagram!</h3>
+          <p text-split="" class="b2-black ch center">Every frame has a story. Follow us to watch ideas, moments, and creations come alive.</p>
         </div>
       </div>
     </div>
@@ -1036,11 +1048,11 @@ window.addEventListener("pageshow", e => {
       <div class="w-layout-grid booking-main-flex">
         <div id="w-node-_4c567294-330e-df0b-e670-fdcf1e942cde-94be42a9" class="w-layout-vflex book-wrp1">
           <div class="w-layout-vflex inr-flex2">
-            <div stagger-animation="" text-split="" class="caption-black">[ Book Octane space ]</div>
-            <p stagger-animation="" text-split="" class="sh1 right">Reserve Your Spot Today</p>
+            <div text-split="" class="caption-black">[ Book Octane space ]</div>
+            <p text-split="" class="sh1 right">Reserve Your Spot Today</p>
           </div>
           <div class="w-layout-vflex book-outer-flex">
-            <p stagger-animation="" text-split="" class="b2-black ch">Available for photographers, brands, creators, and production teams.<br /><br />Send us a DM to secure your session at Octane Space, Coimbatore!</p>
+            <p text-split="" class="b2-black ch">Available for photographers, brands, creators, and production teams.<br /><br />Send us a DM to secure your session at Octane Space, Coimbatore!</p>
             <div slide-up-anim="" class="w-layout-vflex book-flex">
               <div class="w-layout-vflex book-link-flex">
                 <p class="b2-black ch dull">WhatsApp:</p><a href="https://wa.me/9384446512" class="b2-black ch">+91
@@ -1088,7 +1100,6 @@ window.addEventListener("pageshow", e => {
                       width: 100%;
                       height: 100%;
                     }
-
                     .input-field::placeholder {
                       color: #c3c3c3 !important;
                       font-size: 14px;
