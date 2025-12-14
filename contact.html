@@ -43,7 +43,6 @@
       opacity: 0;
     }
 
-    [text-split] span,
     [scale-opacity-anim]>*,
     [scale-anim],
     [opacity-anim]>*:not(.overlay),
@@ -147,7 +146,6 @@
       z-index: 9999;
     }
 
-    [text-split],
     [scale-opacity-anim]>*,
     [opacity-anim]>*:not(.overlay) {
       opacity: 0;
@@ -270,8 +268,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-
-/* 🔥 KEY FIX */
 window.addEventListener("pageshow", e => {
   if (!e.persisted) return;
   const loader = document.querySelector(".loader");
@@ -384,53 +380,67 @@ window.addEventListener("pageshow", e => {
 
 
   <!-- SplitType animations with debounce -->
-  <script>
-    (function waitForLoader() {
-      if (!window.loaderFinished) {
-        requestAnimationFrame(waitForLoader);
-      } else {
-        initSplitType();
+ <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/split-type"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+(function waitLoad() {
+  if (!window.loadDone) {
+    requestAnimationFrame(waitLoad);
+  } else {
+    initST();
+  }
+})();
+function initST() {
+  if (initST.done) return;
+  initST.done = true;
+  const split = new SplitType("[text-split]", {
+    types: "lines",
+    tagName: "span"
+  });
+gsap.utils.toArray("[text-split]").forEach(el => {
+  const lines = el.querySelectorAll(".line");
+  const lineCount = lines.length;
+
+  const duration = gsap.utils.clamp(
+    0.6,
+    1.1,
+    1.2 - lineCount * 0.08
+  );
+
+  const stagger = gsap.utils.clamp(
+    0.04, 
+    0.1, 
+    0.15 - lineCount * 0.01
+  );
+
+  gsap.fromTo(
+    lines,
+    {
+      clipPath: "inset(0% 0% 100% 0%)",
+      yPercent: 40,
+      rotationZ: 2,
+      transformOrigin: "left center"
+    },
+    {
+      clipPath: "inset(0% 0% 0% 0%)",
+      yPercent: 0,
+      rotationZ: 0,
+      duration,
+      ease: "power2.out",
+      stagger,
+      scrollTrigger: {
+        trigger: el,
+        start: "top 100%",
+        once: true
       }
-    })();
-    function initSplitType() {
-      function initSplit() {
-        new SplitType("[text-split]", { types: "lines, words, chars", tagName: "span" });
-        document.querySelectorAll("[text-split] .line").forEach(line => {
-          const wrapper = document.createElement("div");
-          wrapper.style.overflow = "hidden";
-          line.parentNode.insertBefore(wrapper, line);
-          wrapper.appendChild(line);
-        });
-        document.querySelectorAll("[stagger-animation]").forEach(el => {
-          const delay = parseFloat(el.getAttribute("data-delay") || 0.01);
-          const lines = el.querySelectorAll(".line");
-          const tl = gsap.timeline({ paused: true, delay });
-          lines.forEach((line, i) => {
-            tl.from(line, {
-              yPercent: 100,
-              duration: 0.6,
-              ease: "power2.out"
-            }, i * 0.05);
-            tl.from(line.querySelectorAll(".word, .char"), {
-              yPercent: 100,
-              duration: 0.5,
-              ease: "power2.out",
-              stagger: 0.01
-            }, i * 0.05);
-          });
-          ScrollTrigger.create({
-            trigger: el,
-            start: "top 90%",
-            once: true,
-            onEnter: () => {
-              gsap.to(el, { opacity: 1, duration: 0.1 });
-              tl.play();
-            }
-          });
-        });
-      } initSplit();
     }
-  </script>
+  );
+});
+
+  ScrollTrigger.refresh();
+}
+</script>
 
 
 
@@ -728,8 +738,8 @@ window.addEventListener("pageshow", e => {
         </div>
         <div id="w-node-e4a2403d-5530-c637-69f8-13490a206682-d49fc102" class="booking-form-wrpr contact w-form">
           <div class="w-layout-vflex inr-flex">
-            <div data-delay="0.3" text-split="" stagger-animation="" class="caption-black">[ Get in Touch ]</div>
-            <p data-delay="0.5" text-split="" stagger-animation="" class="sh1">Let’s Bring Your Brand Vision to Life — Connect With Us</p>
+            <div data-delay="0.3" text-split=""class="caption-black">[ Get in Touch ]</div>
+            <p data-delay="0.5" text-split="" class="sh1">Let’s Bring Your Brand Vision to Life — Connect With Us</p>
           </div>
           <form id="enquiryForm" name="email-form" data-name="Email Form" method="get" class="form-inr-wrp"
             data-wf-page-id="686fb1fdabfe928bd49fc102" data-wf-element-id="e4a2403d-5530-c637-69f8-13490a206683">
@@ -1006,17 +1016,17 @@ window.addEventListener("pageshow", e => {
             opacity: 1;
           }
 select.input-field {
-  appearance: none;           /* resets native rendering so we can move the arrow */
-  -webkit-appearance: none;   /* Safari / Chrome */
-  -moz-appearance: none;      /* Firefox */
+  appearance: none;        
+  -webkit-appearance: none; 
+  -moz-appearance: none; 
   
   background-color: white;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6H0z' fill='%23333'/%3E%3C/svg%3E"); /* small arrow SVG (same look as native) */
   background-repeat: no-repeat;
-  background-position: right 12px center;  /* move inward */
+  background-position: right 12px center; 
   background-size: 10px 6px;
 
-  padding-right: 2rem;  /* give space for arrow */
+  padding-right: 2rem; 
   border: 1px solid #ccc;
   border-radius: 4px;
 }
