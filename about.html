@@ -465,7 +465,6 @@ function runAnim() {
 
 
 
-  <!-- SplitType animations with debounce
 <script>
 (function waitLoad() {
   if (!window.loadDone) {
@@ -474,59 +473,67 @@ function runAnim() {
     initST();
   }
 })();
-function initST() {
-  function runSplit() {
-    new SplitType("[text-split]", {
-      types: "lines, words, chars",
-      tagName: "span"
-    });
-    document.querySelectorAll("[text-split] .line").forEach(ln => {
-      const wrap = document.createElement("div");
-      wrap.style.overflow = "hidden";
-      ln.parentNode.insertBefore(wrap, ln);
-      wrap.appendChild(ln);
-    });
-    document.querySelectorAll("[stagger-animation]").forEach(el => {
-      const dly = parseFloat(el.getAttribute("data-delay") || 0.01);
-      const lns = el.querySelectorAll(".line");
-      const tl = gsap.timeline({ paused: true, delay: dly });
 
-      lns.forEach((ln, i) => {
-        tl.from(
-          ln,
-          {
-            yPercent: 100,
-            duration: 0.6,
-            ease: "power2.out"
-          },
-          i * 0.05
-        );
-        tl.from(
-          ln.querySelectorAll(".word, .char"),
-          {
-            yPercent: 100,
-            duration: 0.5,
-            ease: "power2.out",
-            stagger: 0.01
-          },
-          i * 0.05
-        );
-      });
-      ScrollTrigger.create({
-        trigger: el,
-        start: "top 90%",
-        once: true,
-        onEnter: () => {
-          gsap.to(el, { opacity: 1, duration: 0.1 });
-          tl.play();
-        }
-      });
+function initST() {
+
+  // Kill previous instances (hot reload safety)
+  ScrollTrigger.getAll().forEach(st => st.kill());
+
+  new SplitType("[text-split]", {
+    types: "lines, words, chars",
+    tagName: "span"
+  });
+
+  document.querySelectorAll("[text-split] .line").forEach(line => {
+    if (!line.parentElement.classList.contains("line-wrap")) {
+      const wrap = document.createElement("div");
+      wrap.className = "line-wrap";
+      wrap.style.overflow = "hidden";
+      line.parentNode.insertBefore(wrap, line);
+      wrap.appendChild(line);
+    }
+  });
+
+  document.querySelectorAll("[stagger-animation]").forEach(el => {
+    const delay = parseFloat(el.dataset.delay || 0.01);
+    const lines = el.querySelectorAll(".line");
+
+    const tl = gsap.timeline({ paused: true, delay });
+
+    lines.forEach((line, i) => {
+      tl.from(line, {
+        yPercent: 100,
+        duration: 0.6,
+        ease: "power2.out"
+      }, i * 0.05);
+
+      tl.from(line.querySelectorAll(".word, .char"), {
+        yPercent: 100,
+        duration: 0.5,
+        ease: "power2.out",
+        stagger: 0.01
+      }, i * 0.05);
     });
-  }
-  runSplit();
+
+    ScrollTrigger.create({
+      trigger: el,
+      start: "top 90%",
+      once: true,
+      onEnter: () => {
+        gsap.set(el, { opacity: 1 });
+        tl.play();
+      }
+    });
+  });
+
+  // 🔑 VERY IMPORTANT
+  ScrollTrigger.refresh();
+
+  // 🔑 SIGNAL CLIP SYSTEM IT IS SAFE
+  window.dispatchEvent(new Event("layout-ready"));
 }
 </script>
- -->
+
 
 
 
@@ -1315,15 +1322,12 @@ function initST() {
     }
   }
 
-  // Keep viewport height fresh
   window.addEventListener('resize', () => {
     vh = window.innerHeight;
-    onScroll(); // re-sync on resize
+    onScroll();
   });
 
   window.addEventListener('scroll', onScroll, { passive: true });
-
-  // Initial render
   requestAnimationFrame(updateClips);
 </script>
 
