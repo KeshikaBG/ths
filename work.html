@@ -345,8 +345,8 @@ window.addEventListener("pageshow", e => {
 
   <!-- Entry animations -->
   <script>
-    (function waitForLoader() {
-      if (!window.loaderFinished) { requestAnimationFrame(waitForLoader); }
+    (function waitLoad() {
+      if (!window.loaderFinished) { requestAnimationFrame(waitLoad); }
       else { runGsapAnimations(); }
     })();
     function runGsapAnimations() {
