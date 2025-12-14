@@ -480,39 +480,31 @@ function runAnim() {
 <script src="https://unpkg.com/split-type"></script>
 <script>
 gsap.registerPlugin(ScrollTrigger);
-
 (function waitLoad() {
-  if (!window.loadDone) {
-    requestAnimationFrame(waitLoad);
-  } else {
-    initST();
-  }
+  if (!window.loadDone) { requestAnimationFrame(waitLoad); }
+  else { initST(); }
 })();
-
 function initST() {
-
   if (initST.done) return;
   initST.done = true;
-
   const split = new SplitType("[text-split]", {
     types: "words",
     tagName: "span"
   });
-
   gsap.utils.toArray("[text-split]").forEach(el => {
     const words = el.querySelectorAll(".word");
 gsap.fromTo(
   words,
   {
     clipPath: "inset(0% 0% 100% 0%)",
-    yPercent: 100
+    yPercent: 60
   },
   {
     clipPath: "inset(0% 0% 0% 0%)", 
     yPercent: 0,
     duration: 0.6,
     ease: "power2.out",
-    stagger: 0.01,
+    stagger: 0.02,
     scrollTrigger: {
       trigger: el,
       start: "top 85%",
@@ -521,11 +513,9 @@ gsap.fromTo(
   }
 );
   });
-  ScrollTrigger.refresh();
+  //ScrollTrigger.refresh();
 }
 </script>
-
-
 
 
 
@@ -572,11 +562,9 @@ gsap.fromTo(
       position: fixed;
       z-index: 9;
     }
-
     .clip-section {
       display: block !important;
     }
-
     .slider {
       position: relative;
       width: 96vw;
@@ -587,7 +575,6 @@ gsap.fromTo(
       justify-content: center;
       align-items: center;
     }
-
     .card {
       will-change: transform;
       position: absolute;
@@ -701,13 +688,6 @@ gsap.fromTo(
                 .nav-link-div:hover .nav-links {
                     color: #373737 !important;
                 }
-
-
-
-
-
-
-
 
                 .overlay {
                     position: fixed;
@@ -1279,50 +1259,38 @@ gsap.fromTo(
 <script>
   const fixedEls = document.querySelectorAll('.fixed-element');
   const clipSecs = document.querySelectorAll('.clip-section');
-
   let ticking = false;
   let vh = window.innerHeight;
-
   function updateClips() {
     clipSecs.forEach((sec, idx) => {
       const fixedEl = fixedEls[idx];
       if (!fixedEl) return;
-
       const rect = sec.getBoundingClientRect();
-
       if (rect.bottom > 0 && rect.top < vh) {
         const topVal = rect.top < 0 ? 0 : rect.top;
         const botVal = rect.bottom > vh ? vh : rect.bottom;
-
         const topPct = (topVal / vh) * 100;
         const botPct = 100 - (botVal / vh) * 100;
-
         fixedEl.style.clipPath = `inset(${topPct}% 0% ${botPct}% 0%)`;
       } else {
         fixedEl.style.clipPath = `inset(100% 0% 0% 0%)`;
       }
     });
-
     ticking = false;
   }
-
   function onScroll() {
     if (!ticking) {
       requestAnimationFrame(updateClips);
       ticking = true;
     }
   }
-
   window.addEventListener('resize', () => {
     vh = window.innerHeight;
     onScroll();
   });
-
   window.addEventListener('scroll', onScroll, { passive: true });
   requestAnimationFrame(updateClips);
 </script>
-
-
 
 
 
