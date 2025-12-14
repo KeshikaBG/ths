@@ -484,44 +484,23 @@ function runAnim() {
 <script>
 gsap.registerPlugin(ScrollTrigger);
 
-(function waitLoad() {
-  if (!window.loadDone) {
-    requestAnimationFrame(waitLoad);
-  } else {
-    initST();
-  }
-})();
+gsap.utils.toArray("[text-split]").forEach(el => {
 
-function initST() {
-
-  if (initST.done) return;
-  initST.done = true;
-
-  const split = new SplitType("[text-split]", {
-    types: "words",
-    tagName: "span"
-  });
-
-  gsap.utils.toArray("[text-split]").forEach(el => {
-    const words = el.querySelectorAll(".word");
-
-gsap.fromTo(
-  words,
-  { clipPath: "inset(100% 0% 0% 0%)", yPercent: 30 },
-  {
-    clipPath: "inset(0% 0% 0% 0%)",
-    yPercent: 0,
-    duration: 0.7,
+  gsap.from(el, {
+    opacity: 0,
+    y: 32,
+    duration: 0.75,
     ease: "power2.out",
-    stagger: 0.03,
-    scrollTrigger: { trigger: el, start: "top 100%", once: true }
-  }
-);
-
+    scrollTrigger: {
+      trigger: el,
+      start: "top 85%",
+      once: true
+    }
   });
-  ScrollTrigger.refresh();
-}
+
+});
 </script>
+
 
 
 
