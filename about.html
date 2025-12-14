@@ -492,23 +492,19 @@ function initST() {
   gsap.utils.toArray("[text-split]").forEach(el => {
     const words = el.querySelectorAll(".word");
 
-    // Set initial clip state (hidden from bottom)
-    gsap.set(words, {
-      clipPath: "inset(100% 0% 0% 0%)"
-    });
+    gsap.fromTo(
+  words,
+  { clipPath: "inset(100% 0% 0% 0%)", yPercent: 30 },
+  {
+    clipPath: "inset(0% 0% 0% 0%)",
+    yPercent: 0,
+    duration: 0.7,
+    ease: "power2.out",
+    stagger: 0.03,
+    scrollTrigger: { trigger: el, start: "top 85%", once: true }
+  }
+);
 
-    gsap.to(words, {
-      clipPath: "inset(0% 0% 0% 0%)",
-      duration: 0.7,
-      ease: "power2.out",
-      stagger: 0.03,
-      scrollTrigger: {
-        trigger: el,
-        start: "top 85%",
-        once: true
-      }
-    });
-  });
 
   // Sync layout once after split
   ScrollTrigger.refresh();
@@ -809,8 +805,7 @@ function initST() {
                         <div data-delay="0.3" text-split="" stagger-animation="" class="caption-black">[ About the
                             Founder &amp;
                             The Happening Story ]</div>
-                        <h3 data-delay="0.5" text-split="" stagger-animation="" class="h3 left-align">Meet the Founder —
-                            Sarankarthick Santhi</h3>
+                        <h3 data-delay="0.5" text-split="" stagger-animation="" class="h3 left-align">Meet the Founder — Sarankarthick Santhi</h3>
                     </div>
                     <p data-delay="0.7" text-split="" stagger-animation="" class="b2-black">A creator at heart, an
                         engineer by
