@@ -43,7 +43,6 @@
       opacity: 0;
     }
 
-    [text-split] span,
     [scale-opacity-anim]>*,
     [scale-anim],
     [opacity-anim]>*:not(.overlay),
@@ -147,7 +146,6 @@
       z-index: 9999;
     }
 
-    [text-split],
     [scale-opacity-anim]>*,
     [opacity-anim]>*:not(.overlay) {
       opacity: 0;
@@ -594,53 +592,67 @@ window.addEventListener("pageshow", e => {
 
 
   <!-- SplitType animations with debounce -->
-  <script>
-    (function waitForLoader() {
-      if (!window.loaderFinished) {
-        requestAnimationFrame(waitForLoader);
-      } else {
-        initSplitType();
+<script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/split-type"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+(function waitLoad() {
+  if (!window.loadDone) {
+    requestAnimationFrame(waitLoad);
+  } else {
+    initST();
+  }
+})();
+function initST() {
+  if (initST.done) return;
+  initST.done = true;
+  const split = new SplitType("[text-split]", {
+    types: "lines",
+    tagName: "span"
+  });
+gsap.utils.toArray("[text-split]").forEach(el => {
+  const lines = el.querySelectorAll(".line");
+  const lineCount = lines.length;
+
+  const duration = gsap.utils.clamp(
+    0.6,
+    1.1,
+    1.2 - lineCount * 0.08
+  );
+
+  const stagger = gsap.utils.clamp(
+    0.04, 
+    0.1, 
+    0.15 - lineCount * 0.01
+  );
+
+  gsap.fromTo(
+    lines,
+    {
+      clipPath: "inset(0% 0% 100% 0%)",
+      yPercent: 40,
+      rotationZ: 2,
+      transformOrigin: "left center"
+    },
+    {
+      clipPath: "inset(0% 0% 0% 0%)",
+      yPercent: 0,
+      rotationZ: 0,
+      duration,
+      ease: "power2.out",
+      stagger,
+      scrollTrigger: {
+        trigger: el,
+        start: "top 100%",
+        once: true
       }
-    })();
-    function initSplitType() {
-      function initSplit() {
-        new SplitType("[text-split]", { types: "lines, words, chars", tagName: "span" });
-        document.querySelectorAll("[text-split] .line").forEach(line => {
-          const wrapper = document.createElement("div");
-          wrapper.style.overflow = "hidden";
-          line.parentNode.insertBefore(wrapper, line);
-          wrapper.appendChild(line);
-        });
-        document.querySelectorAll("[stagger-animation]").forEach(el => {
-          const delay = parseFloat(el.getAttribute("data-delay") || 0.01);
-          const lines = el.querySelectorAll(".line");
-          const tl = gsap.timeline({ paused: true, delay });
-          lines.forEach((line, i) => {
-            tl.from(line, {
-              yPercent: 100,
-              duration: 0.6,
-              ease: "power2.out"
-            }, i * 0.05);
-            tl.from(line.querySelectorAll(".word, .char"), {
-              yPercent: 100,
-              duration: 0.5,
-              ease: "power2.out",
-              stagger: 0.01
-            }, i * 0.05);
-          });
-          ScrollTrigger.create({
-            trigger: el,
-            start: "top 90%",
-            once: true,
-            onEnter: () => {
-              gsap.to(el, { opacity: 1, duration: 0.1 });
-              tl.play();
-            }
-          });
-        });
-      } initSplit();
     }
-  </script>
+  );
+});
+
+  ScrollTrigger.refresh();
+}
+</script>
 
 
 
@@ -924,8 +936,8 @@ window.addEventListener("pageshow", e => {
     <div class="w-layout-blockcontainer m-mm-cont w-container">
         <div class="blog-div">
             <div class="w-layout-vflex inr-flex">
-                <div stagger-animation="" text-split="" class="caption-black">[ blogs ]</div>
-                <h1 stagger-animation="" text-split="" class="h1 black">Explore Our Latest insights</h1>
+                <div text-split="" class="caption-black">[ blogs ]</div>
+                <h1 text-split="" class="h1 black">Explore Our Latest insights</h1>
             </div>
             <div scale-opacity-anim="" class="w-layout-hflex blogs-wrpr">
                 <div class="w-layout-vflex blog-card">
@@ -942,9 +954,9 @@ window.addEventListener("pageshow", e => {
                             </div></div>
                     </div>
                     <div class="w-layout-hflex blog-inr-flex">
-                        <p stagger-animation="" text-split="" class="b1 caps black heading">&quot;How to Plan a Perfect Outdoor
+                        <p text-split="" class="b1 caps black heading">&quot;How to Plan a Perfect Outdoor
                             Pre-Wedding Shoot&quot;</p>
-                        <p stagger-animation="" text-split="" class="b2-black _14 s-para">From concept to execution, we make
+                        <p text-split="" class="b2-black _14 s-para">From concept to execution, we make
                             your brand impossible to ignore.</p>
                     </div>
                 </div>
@@ -986,8 +998,8 @@ window.addEventListener("pageshow", e => {
       <div data-entry-anim="" class="contact-div">
         <div class="w-layout-vflex contact-main-div">
           <div class="w-layout-vflex inr-flex">
-            <div data-delay="0.2" text-split="" stagger-animation="" class="caption">[ Reach Out ]</div>
-            <h2 data-delay="0.3" text-split="" stagger-animation="" class="h2 white">“Let’s create something beautiful together. Contact us today.”</h2>
+            <div data-delay="0.2" text-split="" class="caption">[ Reach Out ]</div>
+            <h2 data-delay="0.3" text-split="" class="h2 white">“Let’s create something beautiful together. Contact us today.”</h2>
           </div><a href="contact.html" class="btn w-inline-block">
             <div class="btn-txt">Work With Us</div>
             <div class="btn-arr w-embed"><svg width="16" height="11" viewBox="0 0 16 11" fill="none"
@@ -1249,8 +1261,6 @@ if (overlayWork && separateDiv) {
 
 
 
-
-
   async function loadOtherSections() {
     try {
       const [contData] = await Promise.all([
@@ -1270,7 +1280,5 @@ if (overlayWork && separateDiv) {
 
 
 
-
 </body>
-
 </html>
