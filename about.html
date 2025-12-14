@@ -494,18 +494,26 @@ function initST() {
   gsap.utils.toArray("[text-split]").forEach(el => {
     const words = el.querySelectorAll(".word");
 
-    gsap.fromTo(
+gsap.fromTo(
   words,
-  { clipPath: "inset(100% 0% 0% 0%)", yPercent: 30 },
   {
-    clipPath: "inset(0% 0% 0% 0%)",
-    yPercent: 0,
-    duration: 0.7,
+    clipPath: "inset(0% 0% 100% 0%)", // hidden from TOP
+    yPercent: 100                      // start lower
+  },
+  {
+    clipPath: "inset(0% 0% 0% 0%)",   // fully revealed
+    yPercent: 0,                      // slide up
+    duration: 0.4,
     ease: "power2.out",
-    stagger: 0.03,
-    scrollTrigger: { trigger: el, start: "top 85%", once: true }
+    stagger: 0.001,
+    scrollTrigger: {
+      trigger: el,
+      start: "top 85%",
+      once: true
+    }
   }
 );
+
   });
 
   // Sync layout once after split
