@@ -417,9 +417,19 @@ function initSplitEarly() {
     types: "lines",
     tagName: "span"
   });
+
+  // 🔑 Apply FROM state immediately (no animation)
+  document.querySelectorAll("[text-split] .line").forEach(line => {
+    gsap.set(line, {
+      clipPath: "inset(0% 0% 100% 0%)",
+      yPercent: 40,
+      rotationZ: 2,
+      transformOrigin: "left center"
+    });
+  });
 }
 
-// Run as early as possible
+// Run ASAP
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initSplitEarly);
 } else {
@@ -427,8 +437,8 @@ if (document.readyState === "loading") {
 }
 
 
-
-  gsap.registerPlugin(ScrollTrigger);
+  
+gsap.registerPlugin(ScrollTrigger);
 
 (function waitLoad() {
   if (!window.loadDone) {
@@ -458,11 +468,10 @@ function initST() {
       0.15 - lineCount * 0.01
     );
 
-    gsap.from(lines, {
-      clipPath: "inset(0% 0% 100% 0%)",
-      yPercent: 40,
-      rotationZ: 2,
-      transformOrigin: "left center",
+    gsap.to(lines, {
+      clipPath: "inset(0% 0% 0% 0%)",
+      yPercent: 0,
+      rotationZ: 0,
       duration,
       ease: "power2.out",
       stagger,
@@ -476,7 +485,6 @@ function initST() {
 
   ScrollTrigger.refresh();
 }
-
 
 </script>
 
