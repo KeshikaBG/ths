@@ -9,6 +9,14 @@
 
 <style>
 
+@media (prefers-reduced-motion: reduce) {
+  [text-split] .line {
+  clip-path: inset(0% 0% 100% 0%);
+  transform: translateY(40%) rotate(2deg);
+  transform-origin: left center;
+  will-change: clip-path, transform;
+  }
+}
 
 
   .long-content {
