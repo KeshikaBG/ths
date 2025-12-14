@@ -469,6 +469,7 @@ function runAnim() {
 <script src="https://unpkg.com/split-type"></script>
 <script>
 gsap.registerPlugin(ScrollTrigger);
+
 (function waitLoad() {
   if (!window.loadDone) {
     requestAnimationFrame(waitLoad);
@@ -476,38 +477,48 @@ gsap.registerPlugin(ScrollTrigger);
     initST();
   }
 })();
+
 function initST() {
   if (initST.done) return;
   initST.done = true;
+
+  // LINE ONLY split
   const split = new SplitType("[text-split]", {
-    types: "words",
+    types: "lines",
     tagName: "span"
   });
+
   gsap.utils.toArray("[text-split]").forEach(el => {
-    const words = el.querySelectorAll(".word");
-gsap.fromTo(
-  words,
-  {
-    clipPath: "inset(0% 0% 100% 0%)",
-    yPercent: 60
-  },
-  {
-    clipPath: "inset(0% 0% 0% 0%)",
-    yPercent: 0,
-    duration: 0.4,
-    ease: "power2.out",
-    stagger: 0.02,
-    scrollTrigger: {
-      trigger: el,
-      start: "top 100%",
-      once: true
-    }
-  }
-);
+    const lines = el.querySelectorAll(".line");
+
+    gsap.fromTo(
+      lines,
+      {
+        clipPath: "inset(0% 0% 100% 0%)", // hidden from top
+        yPercent: 40,
+        rotationZ: 5,
+        transformOrigin: "left center"
+      },
+      {
+        clipPath: "inset(0% 0% 0% 0%)",
+        yPercent: 0,
+        rotationZ: 0,
+        duration: 0.5,
+        ease: "power2.out",
+        stagger: 0.08,
+        scrollTrigger: {
+          trigger: el,
+          start: "top 100%",
+          once: true
+        }
+      }
+    );
   });
-  //ScrollTrigger.refresh();
+
+  ScrollTrigger.refresh();
 }
 </script>
+
 
 
 
