@@ -468,31 +468,46 @@ function initST() {
     types: "lines",
     tagName: "span"
   });
-  gsap.utils.toArray("[text-split]").forEach(el => {
-    const lines = el.querySelectorAll(".line");
-    gsap.fromTo(
-      lines,
-      {
-        clipPath: "inset(0% 0% 100% 0%)",
-        yPercent: 40,
-        rotationZ: 2,
-        transformOrigin: "left center"
-      },
-      {
-        clipPath: "inset(0% 0% 0% 0%)",
-        yPercent: 0,
-        rotationZ: 0,
-        duration: 0.8,
-        ease: "power2.out",
-        stagger: 0.06,
-        scrollTrigger: {
-          trigger: el,
-          start: "top 100%",
-          once: true
-        }
+gsap.utils.toArray("[text-split]").forEach(el => {
+  const lines = el.querySelectorAll(".line");
+  const lineCount = lines.length;
+
+  const duration = gsap.utils.clamp(
+    0.6,
+    1.1,
+    1.2 - lineCount * 0.08
+  );
+
+  const stagger = gsap.utils.clamp(
+    0.04, 
+    0.1, 
+    0.15 - lineCount * 0.01
+  );
+
+  gsap.fromTo(
+    lines,
+    {
+      clipPath: "inset(0% 0% 100% 0%)",
+      yPercent: 40,
+      rotationZ: 2,
+      transformOrigin: "left center"
+    },
+    {
+      clipPath: "inset(0% 0% 0% 0%)",
+      yPercent: 0,
+      rotationZ: 0,
+      duration,
+      ease: "power2.out",
+      stagger,
+      scrollTrigger: {
+        trigger: el,
+        start: "top 100%",
+        once: true
       }
-    );
-  });
+    }
+  );
+});
+
   ScrollTrigger.refresh();
 }
 </script>
