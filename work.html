@@ -344,101 +344,135 @@ window.addEventListener("pageshow", e => {
 
 
   <!-- Entry animations -->
-  <script>
-    (function waitLoad() {
-      if (!window.loaderFinished) { requestAnimationFrame(waitLoad); }
-      else { runGsapAnimations(); }
-    })();
-    function runGsapAnimations() {
-      const easeType = "power2.out";
-      ScrollTrigger.batch("[data-entry-anim]", {
-        onEnter: batch => {
-          batch.forEach(el => {
-            const delay = parseFloat(el.dataset.entryDelay) || 0;
-            gsap.fromTo(el,
-              { scale: 0 },
-              { scale: 1, duration: 1, ease: easeType, delay: delay }
-            );
-            gsap.to(el, {
-              filter: "grayscale(0%)", duration: 0.6, ease: easeType, delay: delay + 0.01
-            });
-          });
-        },
-        once: true
-      });
-      ScrollTrigger.batch("[scale-anim]", {
-        onEnter: batch => {
-          gsap.fromTo(batch,
-            { scale: 0, },
-            { scale: 1, duration: 0.6, ease: easeType, stagger: 0.15 }
-          );
-        },
-        once: true
-      });
-      document.querySelectorAll("[slide-up-anim]").forEach((container, containerIndex) => {
-        const children = container.querySelectorAll(":scope > *");
-        if (!children.length) return;
-
-        children.forEach((child, i) => {
-          gsap.fromTo(child,
-            { y: 80, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: "power2.out",
-              delay: containerIndex * 0.3 + i * 0.15,
-              scrollTrigger: {
-                trigger: child,
-                start: "top 90%",
-                once: true
-              }
-            }
-          );
+<script>
+(function waitLoad() {
+  if (!window.loadDone) {
+    requestAnimationFrame(waitLoad);
+  } else {
+    runAnim();
+  }
+})();
+function runAnim() {
+  const easeFx = "power2.out";
+  ScrollTrigger.batch("[data-entry-anim]", {
+    onEnter: grp => {
+      grp.forEach(el => {
+        const dly = parseFloat(el.dataset.entryDelay) || 0;
+        gsap.fromTo(
+          el,
+          { scale: 0 },
+          { scale: 1, duration: 1, ease: easeFx, delay: dly }
+        );
+        gsap.to(el, {
+          filter: "grayscale(0%)",
+          duration: 0.6,
+          ease: easeFx,
+          delay: dly + 0.01
         });
       });
-
-      document.querySelectorAll("[opacity-anim]").forEach(container => {
-        const children = [...container.children].filter(el => !el.classList.contains("overlay"));
-        if (children.length) {
-          ScrollTrigger.batch(children, {
-            onEnter: batch => gsap.to(batch, { opacity: 1 }),
+    },
+    once: true
+  });
+  ScrollTrigger.batch("[scale-anim]", {
+    onEnter: grp => {
+      gsap.fromTo(
+        grp,
+        { scale: 0 },
+        { scale: 1, duration: 0.6, ease: easeFx, stagger: 0.15 }
+      );
+    },
+    once: true
+  });
+  document.querySelectorAll("[slide-up-anim]").forEach((wrap, wIdx) => {
+    const kids = wrap.querySelectorAll(":scope > *");
+    if (!kids.length) return;
+    kids.forEach((kid, i) => {
+      gsap.fromTo(
+        kid,
+        { y: 80, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: easeFx,
+          delay: wIdx * 0.3 + i * 0.15,
+          scrollTrigger: {
+            trigger: kid,
+            start: "top 90%",
             once: true
-          });
+          }
         }
-      });
-      document.querySelectorAll("[scale-opacity-anim]").forEach(container => {
-        const children = [...container.children];
-        if (children.length) {
-          ScrollTrigger.batch(children, {
-            onEnter: batch => gsap.fromTo(batch,
-              { scale: 0, opacity: 0 },
-              { scale: 1, opacity: 1, duration: 0.6, ease: easeType, stagger: 0.15 }
-            ),
-            once: true
-          });
-        }
-      });
-      ScrollTrigger.batch("[data-scale-img] img", {
-        onEnter: batch => gsap.to(batch, {
-          opacity: 1, duration: 0.6, ease: easeType, stagger: 0.03
-        }),
+      );
+    });
+  });
+  document.querySelectorAll("[self-opacity-anim]").forEach(el => {
+  gsap.fromTo(el,
+    { opacity: 0 },
+    {
+      opacity: 1,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
         once: true
-      });
-      const animDvdr = (sel, axis) => {
-        document.querySelectorAll(sel).forEach(dvdr => {
-          gsap.fromTo(dvdr, { [axis]: 0 }, {
-            [axis]: 1,
-            duration: 0.6,
-            ease: easeType,
-            scrollTrigger: { trigger: dvdr, start: "top 90%", once: true }
-          });
-        });
-      };
-      animDvdr('.nav-line', "scaleX");
-      animDvdr('.vertical-line', "scaleY");
+      }
     }
-  </script>
+  );
+});
+  document.querySelectorAll("[opacity-anim]").forEach(wrap => {
+    const kids = [...wrap.children].filter(el => !el.classList.contains("overlay"));
+    if (!kids.length) return;
+    ScrollTrigger.batch(kids, {
+      onEnter: grp => gsap.to(grp, { opacity: 1 }),
+      once: true
+    });
+  });
+  document.querySelectorAll("[scale-opacity-anim]").forEach(wrap => {
+    const kids = [...wrap.children];
+    if (!kids.length) return;
+    ScrollTrigger.batch(kids, {
+      onEnter: grp =>
+        gsap.fromTo(
+          grp,
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.6, ease: easeFx, stagger: 0.15 }
+        ),
+      once: true
+    });
+  });
+  ScrollTrigger.batch("[data-scale-img] img", {
+    onEnter: grp =>
+      gsap.to(grp, {
+        opacity: 1,
+        duration: 0.6,
+        ease: easeFx,
+        stagger: 0.03
+      }),
+    once: true
+  });
+  const animLine = (sel, axis) => {
+    document.querySelectorAll(sel).forEach(line => {
+      gsap.fromTo(
+        line,
+        { [axis]: 0 },
+        {
+          [axis]: 1,
+          duration: 0.6,
+          ease: easeFx,
+          scrollTrigger: {
+            trigger: line,
+            start: "top 90%",
+            once: true
+          }
+        }
+      );
+    });
+  };
+  animLine(".nav-line", "scaleX");
+  animLine(".vertical-line", "scaleY");
+}
+</script>
 
 
 
