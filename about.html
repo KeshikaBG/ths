@@ -475,6 +475,7 @@ function runAnim() {
 
 
   
+  
 
 
 <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
@@ -493,11 +494,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 function initST() {
 
-  // Prevent double init
   if (initST.done) return;
   initST.done = true;
 
-  // Efficient SplitType (WORDS ONLY)
   const split = new SplitType("[text-split]", {
     types: "words",
     tagName: "span"
@@ -506,25 +505,20 @@ function initST() {
   gsap.utils.toArray("[text-split]").forEach(el => {
     const words = el.querySelectorAll(".word");
 
-    // Set initial clip state (hidden from bottom)
-    gsap.set(words, {
-      clipPath: "inset(100% 0% 0% 0%)"
-    });
+gsap.fromTo(
+  words,
+  { clipPath: "inset(100% 0% 0% 0%)", yPercent: 30 },
+  {
+    clipPath: "inset(0% 0% 0% 0%)",
+    yPercent: 0,
+    duration: 0.7,
+    ease: "power2.out",
+    stagger: 0.03,
+    scrollTrigger: { trigger: el, start: "top 100%", once: true }
+  }
+);
 
-    gsap.to(words, {
-      clipPath: "inset(0% 0% 0% 0%)",
-      duration: 0.7,
-      ease: "power2.out",
-      stagger: 0.03,
-      scrollTrigger: {
-        trigger: el,
-        start: "top 85%",
-        once: true
-      }
-    });
   });
-
-  // Sync layout once after split
   ScrollTrigger.refresh();
 }
 </script>
