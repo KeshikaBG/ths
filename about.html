@@ -466,6 +466,9 @@ function runAnim() {
 
 
 
+
+  
+
 <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/split-type"></script>
 <script>
@@ -503,9 +506,9 @@ gsap.fromTo(
   {
     clipPath: "inset(0% 0% 0% 0%)",   // fully revealed
     yPercent: 0,                      // slide up
-    duration: 0.4,
+    duration: 0.6,
     ease: "power2.out",
-    stagger: 0.001,
+    stagger: 0.01,
     scrollTrigger: {
       trigger: el,
       start: "top 85%",
