@@ -1566,6 +1566,30 @@ function initST() {
         el.style.maxWidth = 'none';
         el.style.objectFit = 'cover';
       }
+      function createMedia(asset, alt = '') {
+  if (!asset?.url) return null;
+
+  // IMAGE
+  if (asset._type === 'sanity.imageAsset') {
+    const img = document.createElement('img');
+    img.src = asset.url;
+    img.alt = alt;
+    applyImageStyles(img);
+    return img;
+  }
+
+  // VIDEO
+  const video = document.createElement('video');
+  video.src = asset.url;
+  video.autoplay = true;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = 'auto';
+  applyImageStyles(video);
+  return video;
+}
+
       let osheroImages = [];
       try {
         const [workData, osheroData, sesData, contData, insData] = await Promise.all([
@@ -1637,19 +1661,20 @@ function initST() {
         if (osheroImages.length === 0) { return; }
         if (swiperWrappers.length === 0) { return; }
         slideTemplate.remove();
-        osheroImages.forEach((media, index) => {
-          if (media.asset._type !== 'sanity.imageAsset') { return; }
-          const slideContent = document.createElement('img');
-          slideContent.src = media.asset.url;
-          slideContent.alt = `Munchkin Image ${index + 1}`;
-          applyImageStyles(slideContent);
-          swiperWrappers.forEach(wrapper => {
-            const slide = slideTemplate.cloneNode(true);
-            slide.innerHTML = '';
-            slide.appendChild(slideContent.cloneNode(true));
-            wrapper.appendChild(slide);
-          });
-        });
+        osheroImages.forEach((m, index) => {
+  if (!m.asset) return;
+
+  swiperWrappers.forEach(wrapper => {
+    const slide = slideTemplate.cloneNode(true);
+    slide.innerHTML = '';
+
+    const media = createMedia(m.asset, `OS Media ${index + 1}`);
+    if (media) slide.appendChild(media);
+
+    wrapper.appendChild(slide);
+  });
+});
+
         swiperWrappers.forEach(wrapper => {
           wrapper.querySelectorAll('.swiper-slide.os').forEach(slide => {
             if (!slide.hasChildNodes()) { slide.remove(); }
