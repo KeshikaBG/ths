@@ -3815,7 +3815,7 @@ a.s1 {
     padding: var(--rem-sizes--1rem);
     aspect-ratio: 3/1.8;
     border-radius: var(--px-sizes--5px);
-    background-color: var(--color--sandal);
+    background-color: var(--color--black);
     flex: 1;
     justify-content: space-between;
     align-self: stretch;
