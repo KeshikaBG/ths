@@ -3436,7 +3436,7 @@ p {
 }
 
 .footer-sec {
-    background-color: var(--color--sandal);
+    background-color: var(--color--red);
     height: 40vh;
     position: relative;
     overflow: hidden
