@@ -2724,10 +2724,12 @@ a.s1 {
 
 .arr-down {
     width: 12px;
+    filter: invert();
 }
 
 .arr-down.up {
     transform: rotate(180deg);
+    filter: invert();
 }
 
 .b1.sandal.width-75 {
