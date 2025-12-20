@@ -2430,7 +2430,7 @@ p {
     grid-column-gap: var(--px-sizes--8px);
     grid-row-gap: var(--px-sizes--8px);
     border-radius: var(--px-sizes--5px);
-    background-color: var(--color--green);
+    background-color: var(--color--red);
     justify-content: center;
     align-items: center;
     text-decoration: none;
@@ -3022,7 +3022,7 @@ p {
     grid-column-gap: var(--px-sizes--8px);
     grid-row-gap: var(--px-sizes--8px);
     border-radius: var(--px-sizes--10px);
-    background-color: var(--color--orange);
+    background-color: var(--color--red);
     flex-flow: row;
     align-self: stretch;
     position: relative;
