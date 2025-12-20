@@ -2638,13 +2638,13 @@ a.s1 {
     text-align: left;
 }
 
-.b1.sandal.width-75.close {
+.b1.width-75.close {
     height: 0;
     overflow: hidden;
     transition: height 0.35s ease;
 }
 
-.b1.sandal.width-75.ans.close {
+.b1.width-75.ans.close {
     margin-bottom: -1rem;
     transition: height 0.35s ease;
 }
