@@ -2355,7 +2355,7 @@ p {
 .abt-cont {
     padding: var(--rem-sizes--5rem)var(--rem-sizes--3rem);
     border-radius: var(--px-sizes--10px);
-    background-color: var(--color--sandal);
+    background-color: var(--color--black);
     width: 80%;
     max-width: none
 }
