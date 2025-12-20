@@ -2716,7 +2716,7 @@ a.s1 {
 .faq-arr-div {
     padding: var(--px-sizes--5px);
     aspect-ratio: 1;
-    border: var(--px-sizes--1px) solid var(--color--white);
+    border: var(--px-sizes--1px) solid var(--color--black);
     border-radius: var(--px-sizes--5px);
     justify-content: center;
     align-items: center;
