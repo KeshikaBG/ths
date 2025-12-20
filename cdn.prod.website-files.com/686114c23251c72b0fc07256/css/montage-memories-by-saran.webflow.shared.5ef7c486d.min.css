@@ -3319,7 +3319,7 @@ p {
 }
 
 .s1 {
-    color: var(--color--black);
+    color: var(--color--white);
     font-size: 10px;
     line-height: 1.4em
 }
@@ -3338,7 +3338,7 @@ p {
 
 .s1.caps.head {
     margin-bottom: var(--px-sizes--12px);
-    color: var(--color--black)
+    color: var(--color--red)
 }
 
 .s1.white {
