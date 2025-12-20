@@ -2376,6 +2376,10 @@ p {
     font-size: 16px
 }
 
+.s1.white.ch {
+    width: 28ch;
+}
+
 .b2-black.ch {
     width: 45ch;
     text-decoration: none
@@ -5407,6 +5411,10 @@ p {
 }
 
 @media screen and (max-width: 991px) {
+    .s1.white.ch {
+        width: auto;
+    }
+    
     .menu.none {
         display:flex
     }
@@ -5789,6 +5797,10 @@ p {
 }
 
 @media screen and (max-width: 767px) {
+    .s1.white.ch {
+        width: auto;
+    }
+    
     .btn-txt {
         font-size:12px
     }
@@ -6020,6 +6032,10 @@ p {
 }
 
 @media screen and (max-width: 479px) {
+    .s1.white.ch {
+        width: auto;
+    }
+    
     .hero-main-texts-div {
         width:100%;
         padding-left: 1rem;
