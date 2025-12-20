@@ -2140,6 +2140,11 @@ p {
     inset: 0% 0% auto
 }
 
+a.s1 {
+    color: #ffffff;
+    transition: color 0.3s ease;
+}
+
 .header._1rem-p {
     margin-top: var(--rem-sizes--1rem);
     margin-right: var(--rem-sizes--1rem);
