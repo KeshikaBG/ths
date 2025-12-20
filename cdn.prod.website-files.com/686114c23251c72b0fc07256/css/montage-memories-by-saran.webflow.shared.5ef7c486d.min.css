@@ -3420,7 +3420,7 @@ p {
 }
 
 .contact-sec {
-    background-color: var(--color--sandal);
+    background-color: var(--color--red);
     height: 80vh;
     overflow: hidden
 }
