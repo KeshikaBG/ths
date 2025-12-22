@@ -1344,7 +1344,7 @@ async function loadHeroSwiper() {
         imgEl.onerror = resolve;
 
         const overlayEl = document.createElement('div');
-
+        overlayEl.classList.add('overlay-el');
         slideEl.appendChild(overlayEl);
         slideEl.appendChild(imgEl);
         wrapEl.appendChild(slideEl);
