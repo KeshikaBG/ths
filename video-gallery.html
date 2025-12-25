@@ -950,32 +950,54 @@ function initST() {
       el.style.maxWidth = 'none';
       el.style.objectFit = 'cover';
     }
-    function insertImageOrVideo(container, mediaArr, label = 'Media') {
-      if (container && mediaArr.length > 0) {
-        const media = mediaArr[0];
-        if (!media.asset) {
-          console.warn(`⚠️ No asset in ${label}:`, media);
-          return;
-        }
-        const { _type, mimeType, url } = media.asset;
-        if (_type === 'sanity.imageAsset' || mimeType?.startsWith('image/')) {
-          const img = document.createElement('img');
-          img.src = url;
-          img.alt = label;
-          applyImageStyles(img);
-          container.appendChild(img);
-        } else if (_type === 'sanity.fileAsset' && mimeType?.startsWith('video/')) {
-          const video = document.createElement('video');
-          video.src = url;
-          video.autoplay = true;
-          video.loop = true;
-          video.muted = true;
-          video.playsInline = true;
-          applyImageStyles(video);
-          container.appendChild(video);
-        } else { console.warn(`⚠️ Unknown type in ${label}:`, media.asset); }
-      } else { console.warn(`⚠️ No ${label} found or container missing.`); }
+    function insertImageOrVideo(container, media, label = 'Media') {
+  if (!container || !media) return;
+
+  // IMAGE or UPLOADED VIDEO
+  if (media.asset) {
+    const { url, _type, mimeType } = media.asset;
+
+    if (_type === 'sanity.imageAsset' || mimeType?.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = label;
+      applyImageStyles(img);
+      container.appendChild(img);
+      return;
     }
+
+    if (_type === 'sanity.fileAsset' && mimeType?.startsWith('video/')) {
+      const video = document.createElement('video');
+      video.src = url;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.controls = true;
+      applyImageStyles(video);
+      container.appendChild(video);
+      return;
+    }
+  }
+
+  // YOUTUBE
+  if (media.youtubeUrl) {
+    const iframe = document.createElement('iframe');
+    const urlObj = new URL(media.youtubeUrl);
+    const id = urlObj.hostname.includes('youtu.be')
+      ? urlObj.pathname.slice(1)
+      : urlObj.searchParams.get('v');
+
+    iframe.src = `https://www.youtube.com/embed/${id}`;
+    iframe.allow =
+      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+
+    container.appendChild(iframe);
+  }
+}
 
     document.addEventListener('DOMContentLoaded', async () => {
       try {
@@ -1016,7 +1038,7 @@ function initST() {
         const heroImgDiv = document.querySelector('.swiper');
         insertImageOrVideo(contImgDiv, contImages, 'Contact Media');
         if (heroImages[0]?.video) {
-          insertImageOrVideo(heroImgDiv, [heroImages[0].video], 'Hero Media');
+          insertImageOrVideo(heroImgDiv, heroImages[0].video, 'Hero Media');
         }
 
         // ----- Second script functionality -----
@@ -1024,57 +1046,19 @@ function initST() {
         const parent = document.querySelector('.wrk-grid');
         parent.innerHTML = '';
         videosData.featuredSections?.forEach(section => {
-          const { asset, youtubeUrl } = section.video || {};
-          if (!asset && !youtubeUrl) return;
-          const clone = container.cloneNode(true);
-          const titleEl = clone.querySelector('.video-title');
-          if (titleEl) titleEl.textContent = section.title || '';
-          const wrp = clone.querySelector('.video-wrp');
-          if (wrp) {
-            wrp.innerHTML = '';
-            if (asset) {
-              const { url, _type, mimeType } = asset;
-              if (_type === 'sanity.imageAsset' || mimeType?.startsWith('image/index.html')) {
-                const img = document.createElement('img');
-                img.src = url;
-                img.alt = section.title || '';
-                img.style.width = '100%';
-                img.style.height = 'auto';
-                img.style.objectFit = 'cover';
-                wrp.appendChild(img);
-              } else if (_type === 'sanity.fileAsset' && mimeType?.startsWith('video/index.html')) {
-                const video = document.createElement('video');
-                video.src = url;
-                video.controls = true;
-                video.style.width = '100%';
-                video.style.height = 'auto';
-                wrp.appendChild(video);
-              } else { console.warn('⚠️ Unknown asset type:', asset); }
-            } else if (youtubeUrl) {
-              let videoId = null;
-              try {
-                const urlObj = new URL(youtubeUrl);
-                if (urlObj.hostname.includes('youtu.be')) {
-                  videoId = urlObj.pathname.slice(1);
-                } else {
-                  videoId = urlObj.searchParams.get('v');
-                }
-              } catch (e) { console.warn('Invalid YouTube URL:', youtubeUrl); }
-              if (videoId) {
-                const iframe = document.createElement('iframe');
-                iframe.src = `https://www.youtube.com/embed/${videoId}`;
-                iframe.width = '100%';
-                iframe.height = '100%';
-                iframe.frameBorder = '0';
-                iframe.allow =
-                  'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-                iframe.allowFullscreen = true;
-                wrp.appendChild(iframe);
-              }
-            }
-          }
-          parent.appendChild(clone);
-        });
+  const clone = container.cloneNode(true);
+  const titleEl = clone.querySelector('.video-title');
+  if (titleEl) titleEl.textContent = section.title || '';
+
+  const wrp = clone.querySelector('.video-wrp');
+  if (wrp) {
+    wrp.innerHTML = '';
+    insertImageOrVideo(wrp, section.video, section.title);
+  }
+
+  parent.appendChild(clone);
+});
+
         container.style.display = 'none';
       } catch (err) { console.error('❌ Sanity fetch error:', err); }
     });
