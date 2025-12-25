@@ -4832,7 +4832,7 @@ a.s1 {
 }
 
 .stage-card.black {
-    background-color: #000;
+    background-color: var(--color--white);
     flex: 1
 }
 
