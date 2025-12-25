@@ -934,16 +934,18 @@ function initST() {
 <script type="module">
   import { createClient } from 'https://esm.sh/@sanity/client';
 
+  /* ------------------ SANITY CLIENT ------------------ */
+
   const client = createClient({
     projectId: 'n7jjk6nd',
     dataset: 'production',
+    apiVersion: '2023-01-01',
     useCdn: true,
-    apiVersion: '2023-01-01'
   });
 
   /* ------------------ HELPERS ------------------ */
 
-  function applyMediaStyles(el, { absolute = false } = {}) {
+  function applyMediaStyles(el, absolute = false) {
     if (absolute) {
       el.style.position = 'absolute';
       el.style.top = 0;
@@ -954,51 +956,50 @@ function initST() {
     el.style.objectFit = 'cover';
   }
 
-  function insertMedia(container, media, label = '') {
-    if (!container || !media) return;
+  function getYoutubeId(url) {
+    try {
+      const u = new URL(url);
+      return u.hostname.includes('youtu.be')
+        ? u.pathname.slice(1)
+        : u.searchParams.get('v');
+    } catch {
+      return null;
+    }
+  }
 
-    // IMAGE or FILE VIDEO
-    if (media.asset) {
-      const { url, _type, mimeType } = media.asset;
+  function insertMedia(container, item, label = '') {
+    if (!container || !item) return;
 
-      // IMAGE
-      if (_type === 'sanity.imageAsset' || mimeType?.startsWith('image/')) {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = label;
-        applyMediaStyles(img);
-        container.appendChild(img);
-        return;
-      }
-
-      // VIDEO FILE
-      if (_type === 'sanity.fileAsset' && mimeType?.startsWith('video/')) {
-        const video = document.createElement('video');
-        video.src = url;
-        video.autoplay = true;
-        video.loop = true;
-        video.muted = true;
-        video.playsInline = true;
-        applyMediaStyles(video);
-        container.appendChild(video);
-        return;
-      }
+    /* IMAGE */
+    if (item.type === 'image' && item.image?.asset?.url) {
+      const img = document.createElement('img');
+      img.src = item.image.asset.url;
+      img.alt = label;
+      applyMediaStyles(img);
+      container.appendChild(img);
+      return;
     }
 
-    // YOUTUBE
-    if (media.youtubeUrl) {
-      let videoId = null;
-      try {
-        const u = new URL(media.youtubeUrl);
-        videoId = u.hostname.includes('youtu.be')
-          ? u.pathname.slice(1)
-          : u.searchParams.get('v');
-      } catch (e) {}
+    /* MP4 */
+    if (item.type === 'mp4' && item.videoFile?.asset?.url) {
+      const video = document.createElement('video');
+      video.src = item.videoFile.asset.url;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      applyMediaStyles(video);
+      container.appendChild(video);
+      return;
+    }
 
-      if (!videoId) return;
+    /* YOUTUBE */
+    if (item.type === 'youtube' && item.youtubeUrl) {
+      const id = getYoutubeId(item.youtubeUrl);
+      if (!id) return;
 
       const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${videoId}`;
+      iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&rel=0`;
       iframe.allow =
         'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
       iframe.allowFullscreen = true;
@@ -1016,65 +1017,69 @@ function initST() {
     try {
       const [contData, heroData, videosData] = await Promise.all([
 
-        // CONTACT SECTION
+        /* ---------- CONTACT ---------- */
         client.fetch(`
-          *[_type == "home"] | order(_createdAt asc)[7] {
+          *[_type == "home"] | order(_createdAt asc)[0] {
             heroImages[] {
-              asset->{ url, _type, mimeType }
+              asset->{ url, mimeType, _type }
             }
           }
         `),
 
-        // HERO SECTION
+        /* ---------- HERO ---------- */
         client.fetch(`
           *[_type == "video"] | order(_createdAt asc)[1] {
             featuredSections[] {
-              video {
-                asset->{ url, _type, mimeType }
+              type,
+              youtubeUrl,
+              videoFile {
+                asset->{ url }
+              },
+              image {
+                asset->{ url }
               }
             }
           }
         `),
 
-        // FEATURED VIDEOS (IMAGE / VIDEO / YOUTUBE – ONLY ONE)
+        /* ---------- FEATURED GRID ---------- */
         client.fetch(`
           *[_type == "video"] | order(_createdAt asc)[0] {
             featuredSections[] {
               title,
-              video {
-                _type == "videoFile" => {
-                  "asset": file.asset->{
-                    url, _type, mimeType
-                  }
-                },
-                _type == "youtubeLink" => {
-                  "youtubeUrl": url
-                },
-                _type == "image" => {
-                  "asset": asset->{
-                    url, _type, mimeType
-                  }
-                }
+              type,
+              youtubeUrl,
+              videoFile {
+                asset->{ url }
+              },
+              image {
+                asset->{ url }
               }
             }
           }
-        `)
+        `),
       ]);
 
       /* ---------- CONTACT MEDIA ---------- */
 
-      const contImgDiv = document.querySelector('.contact-div');
+      const contDiv = document.querySelector('.contact-div');
       const contMedia = contData?.heroImages?.[0];
-      if (contImgDiv && contMedia) {
-        insertMedia(contImgDiv, contMedia, 'Contact Media');
+      if (contDiv && contMedia?.asset?.url) {
+        insertMedia(contDiv, {
+          type: contMedia.asset.mimeType?.startsWith('video/')
+            ? 'mp4'
+            : 'image',
+          videoFile: contMedia,
+          image: contMedia,
+        });
       }
 
       /* ---------- HERO MEDIA ---------- */
 
-      const heroImgDiv = document.querySelector('.swiper');
-      const heroMedia = heroData?.featuredSections?.[0]?.video;
-      if (heroImgDiv && heroMedia) {
-        insertMedia(heroImgDiv, heroMedia, 'Hero Media');
+      const heroDiv = document.querySelector('.swiper');
+      const heroMedia = heroData?.featuredSections?.[0];
+      if (heroDiv && heroMedia) {
+        insertMedia(heroDiv, heroMedia);
       }
 
       /* ---------- FEATURED GRID ---------- */
@@ -1086,18 +1091,16 @@ function initST() {
 
       grid.innerHTML = '';
 
-      videosData?.featuredSections?.forEach(section => {
-        if (!section.video) return;
-
+      videosData?.featuredSections?.forEach(item => {
         const clone = template.cloneNode(true);
 
         const titleEl = clone.querySelector('.video-title');
-        if (titleEl) titleEl.textContent = section.title || '';
+        if (titleEl) titleEl.textContent = item.title || '';
 
         const mediaWrp = clone.querySelector('.video-wrp');
         if (mediaWrp) {
           mediaWrp.innerHTML = '';
-          insertMedia(mediaWrp, section.video, section.title);
+          insertMedia(mediaWrp, item, item.title);
         }
 
         grid.appendChild(clone);
@@ -1110,6 +1113,7 @@ function initST() {
     }
   });
 </script>
+
 
 </body>
 </html>
