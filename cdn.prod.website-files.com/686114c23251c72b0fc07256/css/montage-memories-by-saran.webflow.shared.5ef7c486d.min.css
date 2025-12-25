@@ -4832,12 +4832,13 @@ a.s1 {
 }
 
 .stage-card.black {
-    background-color: var(--color--white);
+    background-color: var(--color--white)!important;
     flex: 1
 }
 
 .stage-card.black.radius {
-    border-radius: var(--rem-sizes--16rem)
+    border-radius: var(--rem-sizes--16rem);
+    background-color: var(--color--white);
 }
 
 .image-3 {
