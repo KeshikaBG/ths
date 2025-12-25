@@ -931,137 +931,185 @@ function initST() {
 
 
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@sanity/client';
-    const client = createClient({
-      projectId: 'n7jjk6nd',
-      dataset: 'production',
-      useCdn: true,
-      apiVersion: '2023-01-01'
-    });
-    function applyImageStyles(el, { absolute = false } = {}) {
-      if (absolute) {
-        el.style.position = 'absolute';
-        el.style.top = 0;
-        el.style.left = 0;
+<script type="module">
+  import { createClient } from 'https://esm.sh/@sanity/client';
+
+  const client = createClient({
+    projectId: 'n7jjk6nd',
+    dataset: 'production',
+    useCdn: true,
+    apiVersion: '2023-01-01'
+  });
+
+  /* ------------------ HELPERS ------------------ */
+
+  function applyMediaStyles(el, { absolute = false } = {}) {
+    if (absolute) {
+      el.style.position = 'absolute';
+      el.style.top = 0;
+      el.style.left = 0;
+    }
+    el.style.width = '100%';
+    el.style.height = '100%';
+    el.style.objectFit = 'cover';
+  }
+
+  function insertMedia(container, media, label = '') {
+    if (!container || !media) return;
+
+    // IMAGE or FILE VIDEO
+    if (media.asset) {
+      const { url, _type, mimeType } = media.asset;
+
+      // IMAGE
+      if (_type === 'sanity.imageAsset' || mimeType?.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = label;
+        applyMediaStyles(img);
+        container.appendChild(img);
+        return;
       }
-      el.style.width = '100%';
-      el.style.height = '100%';
-      el.style.maxWidth = 'none';
-      el.style.objectFit = 'cover';
-    }
-    function insertImageOrVideo(container, media, label = 'Media') {
-  if (!container || !media) return;
 
-  // IMAGE or UPLOADED VIDEO
-  if (media.asset) {
-    const { url, _type, mimeType } = media.asset;
-
-    if (_type === 'sanity.imageAsset' || mimeType?.startsWith('image/')) {
-      const img = document.createElement('img');
-      img.src = url;
-      img.alt = label;
-      applyImageStyles(img);
-      container.appendChild(img);
-      return;
+      // VIDEO FILE
+      if (_type === 'sanity.fileAsset' && mimeType?.startsWith('video/')) {
+        const video = document.createElement('video');
+        video.src = url;
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        applyMediaStyles(video);
+        container.appendChild(video);
+        return;
+      }
     }
 
-    if (_type === 'sanity.fileAsset' && mimeType?.startsWith('video/')) {
-      const video = document.createElement('video');
-      video.src = url;
-      video.autoplay = true;
-      video.loop = true;
-      video.muted = true;
-      video.playsInline = true;
-      video.controls = true;
-      applyImageStyles(video);
-      container.appendChild(video);
-      return;
-    }
-  }
-
-  // YOUTUBE
-  if (media.youtubeUrl) {
-    const iframe = document.createElement('iframe');
-    const urlObj = new URL(media.youtubeUrl);
-    const id = urlObj.hostname.includes('youtu.be')
-      ? urlObj.pathname.slice(1)
-      : urlObj.searchParams.get('v');
-
-    iframe.src = `https://www.youtube.com/embed/${id}`;
-    iframe.allow =
-      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    iframe.allowFullscreen = true;
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-
-    container.appendChild(iframe);
-  }
-}
-
-    document.addEventListener('DOMContentLoaded', async () => {
+    // YOUTUBE
+    if (media.youtubeUrl) {
+      let videoId = null;
       try {
-        const [contData, heroData, videosData] = await Promise.all([
-          client.fetch(`*[_type == "home"] | order(_createdAt asc)[7] {
-          heroImages[] { asset->{ url, _type } }
-        }`),
-          client.fetch(`*[_type == "video"] | order(_createdAt asc)[1] {
-          featuredSections[] {
-            video[0]{ asset->{ url, _type, mimeType } }
-          }
-        }`),
-          client.fetch(`*[_type == "video"] | order(_createdAt asc)[0] {
-  featuredSections[] {
-    title,
-    video[0]{
-      _type == "videoFile" => {
-        "asset": file.asset->{
-          url, _type, mimeType
-        }
-      },
-      _type == "youtubeLink" => {
-        "youtubeUrl": url
-      },
-      _type == "image" => {
-        "asset": asset->{
-          url, _type, mimeType
-        }
-      }
+        const u = new URL(media.youtubeUrl);
+        videoId = u.hostname.includes('youtu.be')
+          ? u.pathname.slice(1)
+          : u.searchParams.get('v');
+      } catch (e) {}
+
+      if (!videoId) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}`;
+      iframe.allow =
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = '0';
+
+      container.appendChild(iframe);
     }
   }
-}`)
-        ]);
-        // ----- First script functionality -----
-        const contImages = contData?.heroImages || [];
-        const heroImages = heroData?.featuredSections || [];
-        const contImgDiv = document.querySelector('.contact-div');
-        const heroImgDiv = document.querySelector('.swiper');
-        insertImageOrVideo(contImgDiv, contImages, 'Contact Media');
-        if (heroImages[0]?.video) {
-          insertImageOrVideo(heroImgDiv, heroImages[0].video, 'Hero Media');
+
+  /* ------------------ MAIN ------------------ */
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const [contData, heroData, videosData] = await Promise.all([
+
+        // CONTACT SECTION
+        client.fetch(`
+          *[_type == "home"] | order(_createdAt asc)[7] {
+            heroImages[] {
+              asset->{ url, _type, mimeType }
+            }
+          }
+        `),
+
+        // HERO SECTION
+        client.fetch(`
+          *[_type == "video"] | order(_createdAt asc)[1] {
+            featuredSections[] {
+              video {
+                asset->{ url, _type, mimeType }
+              }
+            }
+          }
+        `),
+
+        // FEATURED VIDEOS (IMAGE / VIDEO / YOUTUBE – ONLY ONE)
+        client.fetch(`
+          *[_type == "video"] | order(_createdAt asc)[0] {
+            featuredSections[] {
+              title,
+              video {
+                _type == "videoFile" => {
+                  "asset": file.asset->{
+                    url, _type, mimeType
+                  }
+                },
+                _type == "youtubeLink" => {
+                  "youtubeUrl": url
+                },
+                _type == "image" => {
+                  "asset": asset->{
+                    url, _type, mimeType
+                  }
+                }
+              }
+            }
+          }
+        `)
+      ]);
+
+      /* ---------- CONTACT MEDIA ---------- */
+
+      const contImgDiv = document.querySelector('.contact-div');
+      const contMedia = contData?.heroImages?.[0];
+      if (contImgDiv && contMedia) {
+        insertMedia(contImgDiv, contMedia, 'Contact Media');
+      }
+
+      /* ---------- HERO MEDIA ---------- */
+
+      const heroImgDiv = document.querySelector('.swiper');
+      const heroMedia = heroData?.featuredSections?.[0]?.video;
+      if (heroImgDiv && heroMedia) {
+        insertMedia(heroImgDiv, heroMedia, 'Hero Media');
+      }
+
+      /* ---------- FEATURED GRID ---------- */
+
+      const template = document.querySelector('.vid-outer-wrp');
+      const grid = document.querySelector('.wrk-grid');
+
+      if (!template || !grid) return;
+
+      grid.innerHTML = '';
+
+      videosData?.featuredSections?.forEach(section => {
+        if (!section.video) return;
+
+        const clone = template.cloneNode(true);
+
+        const titleEl = clone.querySelector('.video-title');
+        if (titleEl) titleEl.textContent = section.title || '';
+
+        const mediaWrp = clone.querySelector('.video-wrp');
+        if (mediaWrp) {
+          mediaWrp.innerHTML = '';
+          insertMedia(mediaWrp, section.video, section.title);
         }
 
-        // ----- Second script functionality -----
-        const container = document.querySelector('.vid-outer-wrp');
-        const parent = document.querySelector('.wrk-grid');
-        parent.innerHTML = '';
-        videosData.featuredSections?.forEach(section => {
-  const clone = container.cloneNode(true);
-  const titleEl = clone.querySelector('.video-title');
-  if (titleEl) titleEl.textContent = section.title || '';
+        grid.appendChild(clone);
+      });
 
-  const wrp = clone.querySelector('.video-wrp');
-  if (wrp) {
-    wrp.innerHTML = '';
-    insertImageOrVideo(wrp, section.video, section.title);
-  }
+      template.style.display = 'none';
 
-  parent.appendChild(clone);
-});
+    } catch (err) {
+      console.error('❌ Sanity fetch error:', err);
+    }
+  });
+</script>
 
-        container.style.display = 'none';
-      } catch (err) { console.error('❌ Sanity fetch error:', err); }
-    });
-  </script>
 </body>
 </html>
