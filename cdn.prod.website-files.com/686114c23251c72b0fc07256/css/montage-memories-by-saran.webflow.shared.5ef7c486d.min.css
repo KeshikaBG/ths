@@ -4800,7 +4800,8 @@ a.s1 {
 .stage-sec {
     height: 100vh;
     position: relative;
-    overflow: hidden
+    overflow: hidden;
+    background-color: black
 }
 
 .stage-cont {
