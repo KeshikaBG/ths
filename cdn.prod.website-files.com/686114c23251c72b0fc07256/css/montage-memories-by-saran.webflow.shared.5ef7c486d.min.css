@@ -3318,7 +3318,8 @@ a.s1 {
 }
 
 .b1.caps.cmt {
-    width: 30ch
+    width: 30ch;
+    text-align: center!important;
 }
 
 .b1.caps.black {
