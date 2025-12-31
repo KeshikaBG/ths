@@ -3818,8 +3818,8 @@ a.s1 {
     background-color: var(--color--black);
     flex: 1;
     justify-content: space-between;
-    align-self: stretch;
-    align-items: flex-start;
+    align-self: center;
+    align-items: center;
     position: relative
 }
 
