@@ -1828,19 +1828,16 @@ function initST() {
         const heroImgDiv = document.querySelector('.e2e-img-wrp3');
         const contImgDiv = document.querySelector('.e2e-cont-img');
         const aboutImgDiv = document.querySelector('.bg-img-div');
-        function applyImageStyles(el) {
-  el.style.width = '100%';
-
-  if (el.parentElement.classList.contains('hero-media')) {
-    el.style.height = 'auto';       // 👈 NOT 100%
-    el.style.objectFit = 'cover';   // or 'contain'
-  } else {
-    el.style.height = '100%';
-    el.style.objectFit = 'cover';
-  }
-
-  el.style.display = 'block';
-}
+        function applyImageStyles(el, { absolute = false } = {}) {
+          if (absolute) {
+            el.style.position = 'absolute';
+            el.style.top = 0;
+            el.style.left = 0;
+          }
+          el.style.width = '100%';
+          el.style.maxWidth = 'none';
+          el.style.objectFit = 'cover';
+        }
 
         const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
         const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
