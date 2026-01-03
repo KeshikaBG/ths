@@ -19,6 +19,10 @@
 .mission-line.gradient.neg-mrg {
     margin-left: -1rem !important;
 }
+  .e2e-img-wrp3 {
+  background: transparent !important;
+}
+
 .neg-mrg {
     margin-left: -1rem !important;
 }
@@ -1828,17 +1832,32 @@ function initST() {
         const heroImgDiv = document.querySelector('.e2e-img-wrp3');
         const contImgDiv = document.querySelector('.e2e-cont-img');
         const aboutImgDiv = document.querySelector('.bg-img-div');
-        function applyImageStyles(el, { absolute = false } = {}) {
-          if (absolute) {
-            el.style.position = 'absolute';
-            el.style.top = 0;
-            el.style.left = 0;
-          }
-          el.style.width = '100%';
-          el.style.height= '100%';
-          el.style.maxWidth = 'none';
-          el.style.objectFit = 'cover';
-        }
+        function applyImageStyles(
+  el,
+  {
+    absolute = false,
+    fullHeight = true,
+    objectFit = 'cover'
+  } = {}
+) {
+  if (absolute) {
+    el.style.position = 'absolute';
+    el.style.top = 0;
+    el.style.left = 0;
+  }
+
+  el.style.width = '100%';
+  el.style.maxWidth = 'none';
+
+  if (fullHeight) {
+    el.style.height = '100%';
+    el.style.objectFit = objectFit;
+  } else {
+    el.style.height = 'auto';
+    el.style.objectFit = 'contain';
+  }
+}
+
 
         const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
         const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
@@ -1885,26 +1904,44 @@ function initST() {
           },
         });
         function insertImageOrVideo(container, mediaArr, label = 'Media') {
-          if (container && mediaArr.length > 0) {
-            const media = mediaArr[0];
-            if (media.asset._type === 'sanity.imageAsset') {
-              const img = document.createElement('img');
-              img.src = media.asset.url;
-              img.alt = label;
-              applyImageStyles(img);
-              container.appendChild(img);
-            } else if (media.asset._type === 'sanity.fileAsset') {
-              const video = document.createElement('video');
-              video.src = media.asset.url;
-              video.autoplay = true;
-              video.loop = true;
-              video.muted = true;
-              video.playsInline = true;
-              applyImageStyles(video);
-              container.appendChild(video);
-            } else { console.warn(`⚠️ Unknown asset type in ${label}`); }
-          } else { console.warn(`⚠️ No ${label} found or container missing.`); }
-        }
+  if (container && mediaArr.length > 0) {
+    const media = mediaArr[0];
+    const isHero = container === heroImgDiv;
+
+    if (media.asset._type === 'sanity.imageAsset') {
+      const img = document.createElement('img');
+      img.src = media.asset.url;
+      img.alt = label;
+
+      applyImageStyles(img, {
+        fullHeight: !isHero,   // ❌ height 100% only for non-hero
+        objectFit: isHero ? 'contain' : 'cover'
+      });
+
+      container.appendChild(img);
+
+    } else if (media.asset._type === 'sanity.fileAsset') {
+      const video = document.createElement('video');
+      video.src = media.asset.url;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+
+      applyImageStyles(video, {
+        fullHeight: !isHero,
+        objectFit: isHero ? 'contain' : 'cover'
+      });
+
+      container.appendChild(video);
+    } else {
+      console.warn(`⚠️ Unknown asset type in ${label}`);
+    }
+  } else {
+    console.warn(`⚠️ No ${label} found or container missing.`);
+  }
+}
+
         insertImageOrVideo(heroImgDiv, heroImages, 'About Hero Media');
         insertImageOrVideo(contImgDiv, contImages, 'Contact Image');
         insertImageOrVideo(aboutImgDiv, aboutImages, 'Contact Image');
