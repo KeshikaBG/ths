@@ -3818,7 +3818,7 @@ a.s1 {
     border-radius: var(--px-sizes--5px);
     background-color: var(--color--black);
     flex: 1;
-    justify-content: space-between;
+    justify-content: center;
     align-self: center;
     align-items: center;
     position: relative
