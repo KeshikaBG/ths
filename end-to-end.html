@@ -1063,7 +1063,6 @@ function initST() {
 <br /><br />Outcome:<br />A well-defined strategic roadmap that provides direction, consistency, and clarity—serving as the foundation for all branding, design, content, and marketing efforts, and ensuring your brand communicates with confidence and purpose.
 </p>
                 </div>
-                <div class="stages-img-div"></div>
             </div>
             <div class="w-layout-vflex stage-card black radius">
                 <div class="w-layout-vflex stages-cont-wrp">
@@ -1078,7 +1077,6 @@ function initST() {
 <br /><br />Outcome:<br />A cohesive, recognizable, and compelling brand identity that clearly communicates who you are, builds trust with your audience, and positions your brand confidently in the market—ready to stand out, connect, and leave a lasting impression.
 </p>
                 </div>
-                <div class="stages-img-div"></div>
             </div>
             <div class="w-layout-vflex stage-card black radius">
                 <div class="w-layout-vflex stages-cont-wrp">
@@ -1094,7 +1092,6 @@ function initST() {
 <br /><br />Outcome:<br />A brand that moves beyond visibility to create genuine engagement—strengthening awareness, building trust, and forming meaningful connections with your audience that drive growth and long-term success.
 </p>
                 </div>
-                <div class="stages-img-div"></div>
             </div>
             <div class="w-layout-vflex stage-card black radius">
                 <div class="w-layout-vflex stages-cont-wrp">
@@ -1110,7 +1107,6 @@ function initST() {
 <br /><br />Outcome:<br />A mature, resilient, and future-ready brand that evolves with purpose—maintaining relevance, building lasting loyalty, and standing strong in an ever-changing marketplace.
 </p>
                 </div>
-                <div class="stages-img-div"></div>
             </div>
         </div>
     </div>
@@ -1811,7 +1807,7 @@ function initST() {
     });
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        const [heroData, contData, munData, stageData, aboutData] = await Promise.all([
+        const [heroData, contData, munData, aboutData] = await Promise.all([
           client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[0] {
           heroImages[] { asset->{ url, _type } }
         }`),
@@ -1820,9 +1816,6 @@ function initST() {
         }`),
           client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[2] {
           heroImages[] { asset->{ url, _type } }
-        }`),
-          client.fetch(`*[_type == "munchkins" && defined(heroImages)] | order(_createdAt asc)[1] {
-          "images": heroImages[]{ asset->{ url } }
         }`),
           client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[4] {
           heroImages[] { asset->{ url, _type } }
@@ -1835,8 +1828,6 @@ function initST() {
         const heroImgDiv = document.querySelector('.e2e-img-wrp3');
         const contImgDiv = document.querySelector('.e2e-cont-img');
         const aboutImgDiv = document.querySelector('.bg-img-div');
-        const stageImages = stageData?.images || [];
-        const stageContainers = document.querySelectorAll('.stages-img-div');
         function applyImageStyles(el, { absolute = false } = {}) {
           if (absolute) {
             el.style.position = 'absolute';
@@ -1848,15 +1839,6 @@ function initST() {
           el.style.maxWidth = 'none';
           el.style.objectFit = 'cover';
         }
-        stageContainers.forEach((container, index) => {
-          const imgData = stageImages[index];
-          if (!imgData) { return; }
-          const img = document.createElement('img');
-          img.src = imgData.asset.url;
-          img.alt = `Session Image ${index + 1}`;
-          applyImageStyles(img);
-          container.appendChild(img);
-        });
         const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
         const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
         if (!swiperWrapper || !slideTemplate) {
