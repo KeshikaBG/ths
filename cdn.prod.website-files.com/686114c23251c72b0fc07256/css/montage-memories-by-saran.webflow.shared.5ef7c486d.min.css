@@ -5565,8 +5565,8 @@ a.s1 {
     }
 
     .cmt-card {
-        grid-column-gap: var(--rem-sizes--3rem);
-        grid-row-gap: var(--rem-sizes--3rem);
+        grid-column-gap: var(--rem-sizes--1rem);
+        grid-row-gap: var(--rem-sizes--1rem);
         aspect-ratio: auto
     }
 
@@ -6247,7 +6247,7 @@ a.s1 {
     }
 
     .cmt-card.brwn {
-        align-self: stretch;
+        align-self: center;
         width: 100%
     }
 
