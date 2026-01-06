@@ -1702,7 +1702,7 @@ function initST() {
     });
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        const [heroData, contData, munData, aboutData] = await Promise.all([
+        const [heroData, contData, munData, aboutData, stageData] = await Promise.all([
           client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[0] {
           heroImages[] { asset->{ url, _type } }
         }`),
@@ -1714,15 +1714,22 @@ function initST() {
         }`),
           client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[4] {
           heroImages[] { asset->{ url, _type } }
-        }`)
+        }`),
+          client.fetch(
+      `*[_type == "octane" && defined(heroImages)] | order(_createdAt asc)[1] {
+        "images": heroImages[]{ asset->{ url } }
+      }`
+    )
         ]);
         const heroImages = heroData?.heroImages || [];
         const contImages = contData?.heroImages || [];
         const munImages = munData?.heroImages || [];
         const aboutImages = aboutData?.heroImages || [];
+        const stageImages = stageData?.images || [];
         const heroImgDiv = document.querySelector('.e2e-img-wrp3');
         const contImgDiv = document.querySelector('.e2e-cont-img');
         const aboutImgDiv = document.querySelector('.bg-img-div');
+        const stageContainers = document.querySelectorAll('.stage-icon-wrp');
         function applyImageStyles(
   el,
   {
@@ -1795,14 +1802,11 @@ function initST() {
           },
         });
 function insertImageOrVideo(container, mediaArr, label = 'Media') {
-
-  // If the container itself is not on the page, still warn
   if (!container) {
     console.warn(`⚠️ ${label} container missing.`);
     return;
   }
 
-  // If array is empty – do NOTHING (no error, no warning)
   if (!mediaArr || mediaArr.length === 0) {
     return;
   }
@@ -1842,7 +1846,18 @@ function insertImageOrVideo(container, mediaArr, label = 'Media') {
   }
 }
 
+stageContainers.forEach((container, index) => {
+      const imgData = stageImages[index];
+      if (!imgData) return;
 
+      const img = document.createElement('img');
+      img.src = imgData.asset.url;
+      img.alt = `stage Image ${index + 1}`;
+
+      applyImageStyles(img);
+      container.appendChild(img);
+    });
+        
         insertImageOrVideo(heroImgDiv, heroImages, 'About Hero Media');
         insertImageOrVideo(contImgDiv, contImages, 'Contact Image');
         insertImageOrVideo(aboutImgDiv, aboutImages, 'Contact Image');
