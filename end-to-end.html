@@ -1716,7 +1716,7 @@ function initST() {
           heroImages[] { asset->{ url, _type } }
         }`),
           client.fetch(
-      `*[_type == "octane" && defined(heroImages)] | order(_createdAt asc)[1] {
+      `*[_type == "munchkins" && defined(heroImages)] | order(_createdAt asc)[1] {
         "images": heroImages[]{ asset->{ url } }
       }`
     )
