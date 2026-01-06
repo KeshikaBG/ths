@@ -4570,7 +4570,6 @@ a.s1 {
     grid-column-gap: var(--rem-sizes--1rem);
     grid-row-gap: var(--rem-sizes--1rem);
     align-self: stretch;
-    position: absolute;
     bottom: var(--rem-sizes--1rem);
     right: var(--rem-sizes--1rem);
 }
@@ -4799,7 +4798,6 @@ a.s1 {
 }
 
 .stage-sec {
-    height: 100vh;
     position: relative;
     overflow: hidden;
     background-color: black
