@@ -1197,69 +1197,55 @@ document.addEventListener('DOMContentLoaded', async () => {
       e: q('.div-block-11')
     };
 
-    const cards = document.querySelectorAll('.card');
+    //const cards = document.querySelectorAll('.card');
     const sld = q('.slider');
 
-    await preload([
-      ...hI.map(i => i.asset.url),
-      ...cI.map(i => i.asset.url),
-      ...secs.flatMap(s => s.images.map(i => i.asset.url))
-    ]);
+await preload([
+  ...hI.map(i => i.asset.url),
+  ...cI.map(i => i.asset.url),
+  ...secs.flatMap(s => s.images.map(i => i.asset.url))
+]);
 
-    add(w.h, hI, 'About Hero');
-    add(w.c, cI, 'Contact');
-    add(w.t, tI, 'THS');
-    add(w.o, oI, 'OS');
-    add(w.e, eI, 'E2E');
+add(w.h, hI, 'About Hero');
+add(w.c, cI, 'Contact');
+add(w.t, tI, 'THS');
+add(w.o, oI, 'OS');
+add(w.e, eI, 'E2E');
 
-    let idx = 0;
-    secs.forEach(sec => {
-      sec.images.forEach(im => {
-        if (idx >= cards.length) return;
+// -------- DYNAMIC CARD CREATION --------
+const totalCards = buildCardsFromBackend(secs);
 
-        const cd = cards[idx++];
-        const h4 = document.createElement('h4');
-        const img = document.createElement('img');
+// if no images, stop
+if (!totalCards) return;
 
-        h4.textContent = sec.title;
-        img.src = im.asset.url;
-        img.alt = sec.title;
-        style(img);
+// -------- Apply 3D Carousel --------
+const allCards = document.querySelectorAll('.slider .card');
+let radius = applyDynamicRadius();
 
-        cd.replaceChildren(h4, img);
-      });
-    });
+window.addEventListener('resize', () => {
+  radius = applyDynamicRadius();
+});
 
-    sld.querySelectorAll('.card').forEach(c =>
-      sld.appendChild(c.cloneNode(true))
-    );
+const len = allCards.length;
+let rot = 0;
 
-    const allCards = sld.querySelectorAll('.card');
-    let radius = applyDynamicRadius();
+const spd = 360 / 40;
+let prev = performance.now();
 
-    window.addEventListener('resize', () => {
-      radius = applyDynamicRadius();
-    });
+const tick = now => {
+  const dt = (now - prev) / 1000;
+  prev = now;
+  rot += spd * dt;
 
-    const len = allCards.length;
-    let rot = 0;
+  gsap.set(allCards, {
+    rotationY: i => rot + i * (360 / len)
+  });
 
-    const spd = 360 / 40;
-    let prev = performance.now();
+  requestAnimationFrame(tick);
+};
 
-    const tick = now => {
-      const dt = (now - prev) / 1000;
-      prev = now;
-      rot += spd * dt;
+requestAnimationFrame(tick);
 
-      gsap.set(allCards, {
-        rotationY: i => rot + i * (360 / len)
-      });
-
-      requestAnimationFrame(tick);
-    };
-
-    requestAnimationFrame(tick);
 
   } catch (e) {
     console.error('❌ Sanity fetch error:', e);
