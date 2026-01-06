@@ -670,47 +670,6 @@ function initST() {
 
 
 
-  <!-- lenis -->
-  <script type="module">
-    document.addEventListener("DOMContentLoaded", function () {
-      if (window.innerWidth < 1024) {
-        return;
-      }
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => 1 - Math.pow(1 - t, 3),
-        direction: "vertical",
-        gestureDirection: "vertical",
-        smooth: true,
-        smoothTouch: true,
-        touchMultiplier: 1.4,
-        infinite: false,
-      });
-      function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-      }
-      requestAnimationFrame(raf);
-      let resizeTimeout;
-      function safeResize() {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => lenis.resize(), 80);
-      }
-      window.addEventListener("load", () => {
-        lenis.resize();
-      });
-      if (document.fonts) {
-        document.fonts.ready.then(() => lenis.resize());
-      }
-      document.querySelectorAll("img").forEach((img) => {
-        img.addEventListener("load", safeResize);
-      });
-      const resizeObserver = new ResizeObserver(() => safeResize());
-      resizeObserver.observe(document.body);
-      window.lenis = lenis;
-    });
-  </script>
-
 
 
   <!-- Header ANIMATION -->
