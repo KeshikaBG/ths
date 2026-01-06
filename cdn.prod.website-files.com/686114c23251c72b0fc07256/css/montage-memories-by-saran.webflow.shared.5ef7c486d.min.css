@@ -4570,10 +4570,9 @@ a.s1 {
     grid-column-gap: var(--rem-sizes--1rem);
     grid-row-gap: var(--rem-sizes--1rem);
     align-self: stretch;
-    width: 50%;
     position: absolute;
-    bottom: auto;
-    right: auto
+    bottom: var(--rem-sizes--1rem);
+    right: var(--rem-sizes--1rem);
 }
 
 .clients-flex {
