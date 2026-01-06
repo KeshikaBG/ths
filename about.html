@@ -1196,6 +1196,47 @@ document.addEventListener('DOMContentLoaded', async () => {
       o: q('.div-block-10'),
       e: q('.div-block-11')
     };
+function buildCardsFromBackend(sections) {
+  const slider = document.querySelector('.slider');
+  if (!slider) return;
+
+  const template = slider.querySelector('.card');
+  if (!template) return;
+
+  // collect all images from all sections
+  const allImages = sections.flatMap(sec =>
+    sec.images.map(im => ({
+      title: sec.title,
+      url: im.asset?.url
+    }))
+  ).filter(i => i.url);
+
+  const requiredCount = allImages.length;
+
+  // remove all existing cards
+  slider.innerHTML = '';
+
+  // create exactly as many cards as images in backend
+  for (let i = 0; i < requiredCount; i++) {
+    const card = template.cloneNode(true);
+
+    const h4 = document.createElement('h4');
+    const img = document.createElement('img');
+
+    h4.textContent = allImages[i].title;
+
+    img.src = allImages[i].url;
+    img.alt = allImages[i].title;
+
+    style(img);
+
+    card.replaceChildren(h4, img);
+
+    slider.appendChild(card);
+  }
+
+  return requiredCount;
+}
 
     //const cards = document.querySelectorAll('.card');
     const sld = q('.slider');
