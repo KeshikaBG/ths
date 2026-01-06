@@ -4512,7 +4512,6 @@ a.s1 {
 .end-to-end-herosec {
     z-index: 0;
     background-color: #000;
-    height: 100vh;
     position: relative;
     overflow: hidden
 }
@@ -4879,6 +4878,7 @@ a.s1 {
     grid-row-gap: var(--rem-sizes--1rem);
     align-items: stretch;
     height: 100%
+    position: sticky;
 }
 
 .e2e-grid {
@@ -4899,19 +4899,18 @@ a.s1 {
     background-color: var(--color--black);
     object-fit: contain;
     flex: 1;
-    position: relative;
     overflow: hidden
 }
 
 .div-block-7 {
     height: var(--rem-sizes--4rem);
-    padding-right: var(--rem-sizes--1rem);
-    padding-bottom: var(--rem-sizes--1rem);
-    padding-left: var(--rem-sizes--1rem);
+    padding-right: var(--rem-sizes--2rem);
+    padding-bottom: var(--rem-sizes--2rem);
+    padding-left: var(--rem-sizes--2rem);
     background-image: linear-gradient(#0000,#00000080);
     justify-content: space-between;
     align-items: flex-end;
-    position: absolute;
+    position: fixed;
     inset: auto 0% 0%
 }
 
