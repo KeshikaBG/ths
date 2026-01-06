@@ -4397,7 +4397,9 @@ a.s1 {
 
 .form-inr-wrp.e2e {
     grid-column-gap: var(--px-sizes--8px);
-    grid-row-gap: var(--px-sizes--8px)
+    grid-row-gap: var(--px-sizes--8px);
+    height: 100%;
+    overflow: auto
 }
 
 .err-state-div {
