@@ -1089,158 +1089,9 @@ gsap.utils.toArray("[text-split]").forEach(el => {
 </script>
 
 
-  
-
-<!--
-<script src="../cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-<script type="module">
-  import { createClient } from 'https://esm.sh/@sanity/client';
-
-  const cli = createClient({
-    projectId: 'n7jjk6nd',
-    dataset: 'production',
-    useCdn: true,
-    apiVersion: '2023-01-01'
-  });
-
-  const q = s => document.querySelector(s);
-
-  const preload = urls =>
-    Promise.all(
-      urls.map(u =>
-        new Promise(r => {
-          const i = new Image();
-          i.onload = r;
-          i.onerror = r;
-          i.src = u;
-        })
-      )
-    );
-
-  const style = (el, abs = false) => {
-    if (abs) {
-      el.style.position = 'absolute';
-      el.style.top = 0;
-      el.style.left = 0;
-    }
-    el.style.width = '100%';
-    el.style.height = '100%';
-    el.style.maxWidth = 'none';
-    el.style.objectFit = 'cover';
-  };
-
-  const add = (w, a, alt) => {
-    if (!w || !a?.length) return;
-    const m = a[0];
-    if (m.asset._type !== 'sanity.imageAsset') return;
-
-    const i = document.createElement('img');
-    i.src = m.asset.url;
-    i.alt = alt;
-    style(i);
-    w.appendChild(i);
-  };
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const f = q => cli.fetch(q);
-
-      const [hR, cR, wR, tR, oR, eR] = await Promise.all([
-        f(`*[_type=="about"]|order(_createdAt asc)[0]{aboutImages[]{asset->{url,_type}}}`),
-        f(`*[_type=="home"]|order(_createdAt asc)[7]{heroImages[]{asset->{url,_type}}}`),
-        f(`*[_type=="about"]|order(_createdAt asc)[1]{featuredSections[]{title,images[]{asset->{url,_type}}}}`),
-        f(`*[_type=="about"]|order(_createdAt asc)[2]{aboutImages[]{asset->{url,_type}}}`),
-        f(`*[_type=="about"]|order(_createdAt asc)[3]{aboutImages[]{asset->{url,_type}}}`),
-        f(`*[_type=="about"]|order(_createdAt asc)[4]{aboutImages[]{asset->{url,_type}}}`)
-      ]);
-
-      const hI = hR?.aboutImages || [];
-      const cI = cR?.heroImages || [];
-      const tI = tR?.aboutImages || [];
-      const oI = oR?.aboutImages || [];
-      const eI = eR?.aboutImages || [];
-      const secs = wR?.featuredSections || [];
-
-      const w = {
-        h: q('.abt-img-wrp'),
-        c: q('.contact-div'),
-        t: q('.div-block-9'),
-        o: q('.div-block-10'),
-        e: q('.div-block-11')
-      };
-
-      const cards = document.querySelectorAll('.card');
-      const sld = q('.slider');
-
-      await preload([
-        ...hI.map(i => i.asset.url),
-        ...cI.map(i => i.asset.url),
-        ...secs.flatMap(s => s.images.map(i => i.asset.url))
-      ]);
-
-      add(w.h, hI, 'About Hero');
-      add(w.c, cI, 'Contact');
-      add(w.t, tI, 'THS');
-      add(w.o, oI, 'OS');
-      add(w.e, eI, 'E2E');
-
-      let idx = 0;
-      secs.forEach(sec => {
-        sec.images.forEach(im => {
-          if (idx >= cards.length) return;
-
-          const cd = cards[idx++];
-          const h4 = document.createElement('h4');
-          const img = document.createElement('img');
-
-          h4.textContent = sec.title;
-          img.src = im.asset.url;
-          img.alt = sec.title;
-          style(img);
-
-          cd.replaceChildren(h4, img);
-        });
-      });
-
-      sld.querySelectorAll('.card').forEach(c =>
-        sld.appendChild(c.cloneNode(true))
-      );
-
-      const all = sld.querySelectorAll('.card');
-      const len = all.length;
-      let rot = 0;
-
-      gsap.set(all, {
-        rotationY: i => i * (360 / len),
-        transformOrigin: '50% 50% 880px'
-      });
-
-      const spd = 360 / 40;
-      let prev = performance.now();
-
-      const tick = now => {
-        const dt = (now - prev) / 1000;
-        prev = now;
-        rot += spd * dt;
-
-        gsap.set(all, {
-          rotationY: i => rot + i * (360 / len)
-        });
-
-        requestAnimationFrame(tick);
-      };
-
-      requestAnimationFrame(tick);
-
-    } catch (e) {
-      console.error('❌ Sanity fetch error:', e);
-    }
-  });
-</script>-->
 
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@sanity/client';
@@ -1254,7 +1105,6 @@ const cli = createClient({
 
 const q = s => document.querySelector(s);
 
-// ---------- Preload Images ----------
 const preload = urls =>
   Promise.all(
     urls.map(u =>
@@ -1267,7 +1117,6 @@ const preload = urls =>
     )
   );
 
-// ---------- Apply Styles ----------
 function style(el, abs = false) {
   if (abs) {
     el.style.position = 'absolute';
@@ -1280,10 +1129,9 @@ function style(el, abs = false) {
   el.style.objectFit = 'cover';
 }
 
-// ---------- Silent Insert Helper ----------
 function add(container, arr, alt) {
-  if (!container) return;                 // skip if div not found
-  if (!arr || arr.length === 0) return;   // skip silently if empty
+  if (!container) return;
+  if (!arr || arr.length === 0) return;
   const m = arr[0];
   if (m.asset._type !== 'sanity.imageAsset') return;
 
@@ -1294,7 +1142,6 @@ function add(container, arr, alt) {
   container.appendChild(i);
 }
 
-// ---------- Dynamic Radius Logic ----------
 function applyDynamicRadius() {
   const slider = document.querySelector('.slider');
   if (!slider) return;
@@ -1304,20 +1151,16 @@ function applyDynamicRadius() {
 
   const cardCount = cards.length;
 
-  // measure first card
   const cardWidth = cards[0].offsetWidth;
 
-  // convert 2rem → pixels
   const rootFont = parseFloat(
     getComputedStyle(document.documentElement).fontSize
   );
   const gapPx = rootFont * 2;
 
-  // radius formula so arc length ≈ 2rem
   const angle = Math.PI / cardCount;
   const radius = (cardWidth + gapPx) / (2 * Math.tan(angle));
 
-  // apply GSAP transform origins
   gsap.set(cards, {
     rotationY: i => i * (360 / cardCount),
     transformOrigin: `50% 50% ${radius}px`
@@ -1326,7 +1169,6 @@ function applyDynamicRadius() {
   return radius;
 }
 
-// ---------- Main Script ----------
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     const fetchQ = q => cli.fetch(q);
@@ -1358,21 +1200,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cards = document.querySelectorAll('.card');
     const sld = q('.slider');
 
-    // preload all needed URLs
     await preload([
       ...hI.map(i => i.asset.url),
       ...cI.map(i => i.asset.url),
       ...secs.flatMap(s => s.images.map(i => i.asset.url))
     ]);
 
-    // insert static section images silently
     add(w.h, hI, 'About Hero');
     add(w.c, cI, 'Contact');
     add(w.t, tI, 'THS');
     add(w.o, oI, 'OS');
     add(w.e, eI, 'E2E');
 
-    // fill cards with Sanity featured section images
     let idx = 0;
     secs.forEach(sec => {
       sec.images.forEach(im => {
@@ -1391,21 +1230,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     });
 
-    // clone slides for infinite feel
     sld.querySelectorAll('.card').forEach(c =>
       sld.appendChild(c.cloneNode(true))
     );
 
-    // now apply dynamic radius
     const allCards = sld.querySelectorAll('.card');
     let radius = applyDynamicRadius();
 
-    // re-apply on resize
     window.addEventListener('resize', () => {
       radius = applyDynamicRadius();
     });
 
-    // ---------- Continuous Rotation ----------
     const len = allCards.length;
     let rot = 0;
 
@@ -1431,10 +1266,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 </script>
-
-
-
-
 
 
 
