@@ -1897,44 +1897,54 @@ function initST() {
             disableOnInteraction: false
           },
         });
-        function insertImageOrVideo(container, mediaArr, label = 'Media') {
-  if (container && mediaArr.length > 0) {
-    const media = mediaArr[0];
-    const isHero = container === heroImgDiv;
+function insertImageOrVideo(container, mediaArr, label = 'Media') {
 
-    if (media.asset._type === 'sanity.imageAsset') {
-      const img = document.createElement('img');
-      img.src = media.asset.url;
-      img.alt = label;
+  // If the container itself is not on the page, still warn
+  if (!container) {
+    console.warn(`⚠️ ${label} container missing.`);
+    return;
+  }
 
-      applyImageStyles(img, {
-        fullHeight: !isHero,   // ❌ height 100% only for non-hero
-        objectFit: isHero ? 'contain' : 'cover'
-      });
+  // If array is empty – do NOTHING (no error, no warning)
+  if (!mediaArr || mediaArr.length === 0) {
+    return;
+  }
 
-      container.appendChild(img);
+  const media = mediaArr[0];
+  const isHero = container === heroImgDiv;
 
-    } else if (media.asset._type === 'sanity.fileAsset') {
-      const video = document.createElement('video');
-      video.src = media.asset.url;
-      video.autoplay = true;
-      video.loop = true;
-      video.muted = true;
-      video.playsInline = true;
+  if (media.asset._type === 'sanity.imageAsset') {
+    const img = document.createElement('img');
+    img.src = media.asset.url;
+    img.alt = label;
 
-      applyImageStyles(video, {
-        fullHeight: !isHero,
-        objectFit: isHero ? 'contain' : 'cover'
-      });
+    applyImageStyles(img, {
+      fullHeight: !isHero,
+      objectFit: isHero ? 'contain' : 'cover'
+    });
 
-      container.appendChild(video);
-    } else {
-      console.warn(`⚠️ Unknown asset type in ${label}`);
-    }
+    container.appendChild(img);
+
+  } else if (media.asset._type === 'sanity.fileAsset') {
+    const video = document.createElement('video');
+    video.src = media.asset.url;
+    video.autoplay = true;
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+
+    applyImageStyles(video, {
+      fullHeight: !isHero,
+      objectFit: isHero ? 'contain' : 'cover'
+    });
+
+    container.appendChild(video);
+
   } else {
-    console.warn(`⚠️ No ${label} found or container missing.`);
+    console.warn(`⚠️ Unknown asset type in ${label}`);
   }
 }
+
 
         insertImageOrVideo(heroImgDiv, heroImages, 'About Hero Media');
         insertImageOrVideo(contImgDiv, contImages, 'Contact Image');
