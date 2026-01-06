@@ -1621,55 +1621,6 @@ function initST() {
 
 
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const cards = document.querySelectorAll(".stage-card");
-      if (cards.length) {
-        function getExpandWidth() {
-          return window.innerWidth <= 991 ? "80%" : "50%";
-        }
-        function getCollapseWidth() {
-          if (window.innerWidth <= 991) {
-            const collapsedCount = cards.length - 1;
-            return `calc((100% - 80%) / ${collapsedCount})`;
-          } else {
-            return "calc(50% / 3 - 1rem)";
-          }
-        }
-        function applyInitialState() {
-          cards.forEach((card, index) => {
-            card.style.transition = "max-width 0.5s ease, border-radius 0.5s ease";
-            card.style.maxWidth = index === 0 ? getExpandWidth() : getCollapseWidth();
-            card.style.borderRadius = index === 0 ? "24px" : "16rem";
-            Array.from(card.children).forEach(child => {
-              child.style.transition = "opacity 0.5s ease";
-              child.style.opacity = index === 0 ? "1" : "0";
-            });
-          });
-        }
-        applyInitialState();
-
-        cards.forEach(card => {
-          card.addEventListener("mouseenter", () => {
-            cards.forEach(c => {
-              c.style.maxWidth = getCollapseWidth();
-              c.style.borderRadius = "16rem";
-              Array.from(c.children).forEach(child => child.style.opacity = "0");
-            });
-            card.style.maxWidth = getExpandWidth();
-            card.style.borderRadius = "24px";
-            Array.from(card.children).forEach(child => child.style.opacity = "1");
-          });
-
-          card.addEventListener("mouseleave", () => { applyInitialState(); });
-        });
-
-        window.addEventListener("resize", () => { applyInitialState(); });
-      }
-    });
-  </script>
-
-
 
 
 
