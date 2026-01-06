@@ -22,11 +22,9 @@
 .e2e-img-wrp3 {
   background: transparent!important;
   display: flex!important;
-  align-items: center!important;   /* vertical center */
-  justify-content: center!important; /* horizontal center (optional but recommended) */
+  align-items: center!important;
+  justify-content: center!important;
 }
-
-
 .neg-mrg {
     margin-left: -1rem !important;
 }
@@ -598,7 +596,6 @@ function initSplitEarly() {
     tagName: "span"
   });
 
-  // 🔑 Apply FROM state immediately (no animation)
   document.querySelectorAll("[text-split] .line").forEach(line => {
     gsap.set(line, {
       clipPath: "inset(0% 0% 100% 0%)",
@@ -609,7 +606,6 @@ function initSplitEarly() {
   });
 }
 
-// Run ASAP
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initSplitEarly);
 } else {
