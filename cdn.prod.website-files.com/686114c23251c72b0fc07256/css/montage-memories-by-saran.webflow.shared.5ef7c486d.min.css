@@ -6004,11 +6004,6 @@ a.s1 {
         font-size: 22px
     }
 
-    .stage-flex {
-        grid-column-gap: var(--px-sizes--12px);
-        grid-row-gap: var(--px-sizes--12px)
-    }
-
     .div-block-5 {
         align-self: flex-end
     }
@@ -6400,11 +6395,6 @@ a.s1 {
     .stage-cont {
         padding-top: var(--rem-sizes--6rem);
         padding-bottom: var(--rem-sizes--5rem)
-    }
-
-    .stage-flex {
-        grid-column-gap: var(--px-sizes--5px);
-        grid-row-gap: var(--px-sizes--5px)
     }
 
     .bene-and-test-sec {
