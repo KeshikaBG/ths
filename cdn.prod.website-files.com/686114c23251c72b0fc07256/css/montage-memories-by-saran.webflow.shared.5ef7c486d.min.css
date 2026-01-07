@@ -2367,7 +2367,8 @@ a.s1 {
 
 .abt-div {
     justify-content: space-between;
-    align-items: flex-start
+    align-items: flex-start;
+    gap: var(--rem-sizes--1rem)
 }
 
 .abt-flex {
@@ -4128,7 +4129,7 @@ a.s1 {
 .abt-img-div {
     aspect-ratio: 3/2;
     border-radius: var(--px-sizes--5px);
-    width: 42%;
+    width: 50%;
     overflow: hidden
 }
 
