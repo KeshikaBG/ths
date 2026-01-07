@@ -2373,7 +2373,8 @@ a.s1 {
 
 .abt-flex {
     grid-column-gap: var(--px-sizes--24px);
-    grid-row-gap: var(--px-sizes--24px)
+    grid-row-gap: var(--px-sizes--24px);
+    flex: 1
 }
 
 .b2-black {
@@ -4130,7 +4131,8 @@ a.s1 {
     aspect-ratio: 3/2;
     border-radius: var(--px-sizes--5px);
     width: 50%;
-    overflow: hidden
+    overflow: hidden;
+    flex: 1
 }
 
 .hori-scroll-div {
