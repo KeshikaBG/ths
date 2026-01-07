@@ -6325,12 +6325,6 @@ a.s1 {
         background-image: none
     }
 
-    .clients-inr-wrp {
-        grid-column-gap: var(--rem-sizes--4rem);
-        grid-row-gap: var(--rem-sizes--4rem);
-        margin-left: var(--rem-sizes--4rem);
-    }
-
     .client-wrp {
         width: 20vw
     }
