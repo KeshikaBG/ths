@@ -1845,6 +1845,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         });
 
+        swiperWrappers.forEach(wrapper => {
+  wrapper.querySelectorAll('.client-wrp.white').forEach(slide => {
+
+    if (!slide.hasChildNodes() || slide.innerHTML.trim() === '') {
+      slide.remove();
+    }
+
+  });
+});
+
       }
 
     }
