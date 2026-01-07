@@ -1717,7 +1717,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
 
-    const [heroData, contData, munData, aboutData, stageData, clientData] = await Promise.all([
+    const [heroData, contData, munData, /*aboutData,*/ stageData, clientData] = await Promise.all([
 
       client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[0] {
         heroImages[] { asset->{ url, _type } }
@@ -1731,9 +1731,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         heroImages[] { asset->{ url, _type } }
       }`),
 
-      client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[4] {
+      /*client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[4] {
         heroImages[] { asset->{ url, _type } }
-      }`),
+      }`),*/
 
       client.fetch(`*[_type == "munchkins" && defined(heroImages)] | order(_createdAt asc)[1] {
         "images": heroImages[]{ asset->{ url } }
@@ -1747,7 +1747,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const heroImages = heroData?.heroImages || [];
     const contImages = contData?.heroImages || [];
     const munImages = munData?.heroImages || [];
-    const aboutImages = munData?.heroImages || [];
+    //const aboutImages = munData?.heroImages || [];
     const stageImages = stageData?.images || [];
 
     clientImages = clientData?.heroImages || [];
@@ -1755,7 +1755,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const heroImgDiv = document.querySelector('.e2e-img-wrp3');
     const contImgDiv = document.querySelector('.e2e-cont-img');
-    const aboutImgDiv = document.querySelector('.bg-img-div');
+    //const aboutImgDiv = document.querySelector('.bg-img-div');
     const stageContainers = document.querySelectorAll('.stage-icon-wrp');
 
 
@@ -1934,7 +1934,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     insertImageOrVideo(contImgDiv, contImages, 'Contact Media');
 
-    insertImageOrVideo(aboutImgDiv, aboutImages, 'About Media');
+    //insertImageOrVideo(aboutImgDiv, aboutImages, 'About Media');
 
 
   } catch (err) {
