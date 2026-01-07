@@ -4128,11 +4128,12 @@ a.s1 {
 }
 
 .abt-img-div {
-    aspect-ratio: 3/2;
+    /* aspect-ratio: 3/2; */
     border-radius: var(--px-sizes--5px);
-    width: 50%;
+    /* width: 50%; */
     overflow: hidden;
-    flex: 1
+    flex: 1;
+    height: 100%
 }
 
 .hori-scroll-div {
