@@ -5690,6 +5690,11 @@ a.s1 {
         width: 8vw
     }
 
+.image.ths {
+    height: 100%;
+    width: 12vw
+}
+    
     .cont-hero-flex {
         padding-right: var(--rem-sizes--3rem);
         padding-left: var(--rem-sizes--3rem);
