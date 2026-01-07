@@ -1701,230 +1701,251 @@ function initST() {
 
 
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@sanity/client';
-    const client = createClient({
-      projectId: 'n7jjk6nd',
-      dataset: 'production',
-      useCdn: true,
-      apiVersion: '2023-01-01'
-    });
-    document.addEventListener('DOMContentLoaded', async () => {
-      let clientImages = [];
-      try {
-        const [heroData, contData, munData, aboutData, stageData, clientData] = await Promise.all([
-          client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[0] {
-          heroImages[] { asset->{ url, _type } }
-        }`),
-          client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[3] {
-          heroImages[] { asset->{ url, _type } }
-        }`),
-          client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[2] {
-          heroImages[] { asset->{ url, _type } }
-        }`),
-          client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[4] {
-          heroImages[] { asset->{ url, _type } }
-        }`),
-          client.fetch(
-      `*[_type == "munchkins" && defined(heroImages)] | order(_createdAt asc)[1] {
-        "images": heroImages[]{ asset->{ url } }
-      }`
-    ),
-        client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[5] {
-          heroImages[] { asset->{ url, _type } }
-        }`)
-        ]);
-        
-        const heroImages = heroData?.heroImages || [];
-        const contImages = contData?.heroImages || [];
-        const munImages = munData?.heroImages || [];
-        const aboutImages = aboutData?.heroImages || [];
-        const stageImages = stageData?.images || [];
-        clientImages = clientData?.heroImages || [];
-        const heroImgDiv = document.querySelector('.e2e-img-wrp3');
-        const contImgDiv = document.querySelector('.e2e-cont-img');
-        const aboutImgDiv = document.querySelector('.bg-img-div');
-        const stageContainers = document.querySelectorAll('.stage-icon-wrp');
-        function applyImageStyles(
-  el,
-  {
-    absolute = false,
-    fullHeight = true,
-    objectFit = 'cover'
-  } = {}
-) {
-  if (absolute) {
-    el.style.position = 'absolute';
-    el.style.top = 0;
-    el.style.left = 0;
-  }
+<script type="module">
+import { createClient } from 'https://esm.sh/@sanity/client';
 
-  el.style.width = '100%';
-  el.style.maxWidth = 'none';
-
-  if (fullHeight) {
-    el.style.height = '100%';
-    el.style.objectFit = objectFit;
-  } else {
-    el.style.height = 'auto';
-    el.style.objectFit = 'contain';
-  }
-}
-
-
-        const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
-        const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
-        if (!swiperWrapper || !slideTemplate) {
-          console.warn('⚠️ Swiper wrapper or slide template not found.');
-        } else if (munImages.length === 0) {
-          console.warn('⚠️ No Munchkin images found.');
-        } else {
-          slideTemplate.remove();
-          munImages.forEach((media, index) => {
-            const slide = slideTemplate.cloneNode(true);
-            slide.innerHTML = '';
-            if (media.asset._type === 'sanity.imageAsset') {
-              const img = document.createElement('img');
-              img.src = media.asset.url;
-              img.alt = `Munchkin Image ${index + 1}`;
-              applyImageStyles(img);
-              slide.appendChild(img);
-            } else if (media.asset._type === 'sanity.fileAsset') {
-              const video = document.createElement('video');
-              video.src = media.asset.url;
-              video.autoplay = true;
-              video.loop = true;
-              video.muted = true;
-              video.playsInline = true;
-              applyImageStyles(video);
-              slide.appendChild(video);
-            } else {
-              console.warn(`⚠️ Unknown asset type for Munchkin media at index ${index}`);
-            }
-            swiperWrapper.appendChild(slide);
-          });
-        }
-        var mmmSwiper = new Swiper(".m-mm-swiper", {
-          direction: 'horizontal',
-          loop: true,
-          spaceBetween: 14,
-          speed: 2000,
-          slidesPerView: 'auto',
-          centeredSlides: true,
-          autoplay: {
-            delay: 1500,
-            disableOnInteraction: false
-          },
-        });
-function insertImageOrVideo(container, mediaArr, label = 'Media') {
-  if (!container) {
-    console.warn(`⚠️ ${label} container missing.`);
-    return;
-  }
-
-  if (!mediaArr || mediaArr.length === 0) {
-    return;
-  }
-
-  const media = mediaArr[0];
-  const isHero = container === heroImgDiv;
-
-  if (media.asset._type === 'sanity.imageAsset') {
-    const img = document.createElement('img');
-    img.src = media.asset.url;
-    img.alt = label;
-
-    applyImageStyles(img, {
-      fullHeight: !isHero,
-      objectFit: isHero ? 'contain' : 'cover'
-    });
-
-    container.appendChild(img);
-
-  } else if (media.asset._type === 'sanity.fileAsset') {
-    const video = document.createElement('video');
-    video.src = media.asset.url;
-    video.autoplay = true;
-    video.loop = true;
-    video.muted = true;
-    video.playsInline = true;
-
-    applyImageStyles(video, {
-      fullHeight: !isHero,
-      objectFit: isHero ? 'contain' : 'cover'
-    });
-
-    container.appendChild(video);
-
-  } else {
-    console.warn(`⚠️ Unknown asset type in ${label}`);
-  }
-}
-
-stageContainers.forEach((container, index) => {
-      const imgData = stageImages[index];
-      if (!imgData) return;
-
-      const img = document.createElement('img');
-      img.src = imgData.asset.url;
-      img.alt = `stage Image ${index + 1}`;
-
-      applyImageStyles(img);
-      container.appendChild(img);
-    });
-
-function createMedia(asset, alt = '') {
-  if (!asset?.url) return null;
-
-  // IMAGE
-  if (asset._type === 'sanity.imageAsset') {
-    const img = document.createElement('img');
-    img.src = asset.url;
-    img.alt = alt;
-    applyImageStyles(img);
-    return img;
-  }
-
-
-
-        const clientWrapper = document.querySelector('.clients-wrp');
-        if (!clientWrapper) { return; }
-        const swiperWrappers = clientWrapper.querySelectorAll('.clients-inr-wrp');
-        const clientslideTemplate = clientWrapper.querySelector('.client-wrp.white');
-        if (!clientslideTemplate) { return; }
-        if (clientImages.length === 0) { return; }
-        if (swiperWrappers.length === 0) { return; }
-        clientslideTemplate.remove();
-        clientImages.forEach((m, index) => {
-  if (!m.asset) return;
-
-  swiperWrappers.forEach(wrapper => {
-    const slide = clientslideTemplate.cloneNode(true);
-    slide.innerHTML = '';
-
-    const media = createMedia(m.asset, `client Media ${index + 1}`);
-    if (media) slide.appendChild(media);
-
-    wrapper.appendChild(slide);
-  });
+const client = createClient({
+  projectId: 'n7jjk6nd',
+  dataset: 'production',
+  useCdn: true,
+  apiVersion: '2023-01-01'
 });
 
-        swiperWrappers.forEach(wrapper => {
-          wrapper.querySelectorAll('.client-wrp.white').forEach(slide => {
-            if (!slide.hasChildNodes()) { slide.remove(); }
+document.addEventListener('DOMContentLoaded', async () => {
+
+  let clientImages = [];
+
+  try {
+
+    const [heroData, contData, munData, aboutData, stageData, clientData] = await Promise.all([
+
+      client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[0] {
+        heroImages[] { asset->{ url, _type } }
+      }`),
+
+      client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[3] {
+        heroImages[] { asset->{ url, _type } }
+      }`),
+
+      client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[2] {
+        heroImages[] { asset->{ url, _type } }
+      }`),
+
+      client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[4] {
+        heroImages[] { asset->{ url, _type } }
+      }`),
+
+      client.fetch(`*[_type == "munchkins" && defined(heroImages)] | order(_createdAt asc)[1] {
+        "images": heroImages[]{ asset->{ url } }
+      }`),
+
+      client.fetch(`*[_type == "munchkins"] | order(_createdAt asc)[5] {
+        heroImages[] { asset->{ url, _type } }
+      }`)
+    ]);
+
+    const heroImages = heroData?.heroImages || [];
+    const contImages = contData?.heroImages || [];
+    const munImages = munData?.heroImages || [];
+    const aboutImages = munData?.heroImages || [];
+    const stageImages = stageData?.images || [];
+
+    clientImages = clientData?.heroImages || [];
+
+
+    const heroImgDiv = document.querySelector('.e2e-img-wrp3');
+    const contImgDiv = document.querySelector('.e2e-cont-img');
+    const aboutImgDiv = document.querySelector('.bg-img-div');
+    const stageContainers = document.querySelectorAll('.stage-icon-wrp');
+
+
+    function applyImageStyles(
+      el,
+      {
+        absolute = false,
+        fullHeight = true,
+        objectFit = 'cover'
+      } = {}
+    ) {
+
+      if (absolute) {
+        el.style.position = 'absolute';
+        el.style.top = 0;
+        el.style.left = 0;
+      }
+
+      el.style.width = '100%';
+      el.style.maxWidth = 'none';
+
+      if (fullHeight) {
+        el.style.height = '100%';
+        el.style.objectFit = objectFit;
+      } else {
+        el.style.height = 'auto';
+        el.style.objectFit = 'contain';
+      }
+    }
+
+
+    function createMedia(asset, alt = '') {
+
+      if (!asset?.url) return null;
+
+      if (asset._type === 'sanity.imageAsset') {
+        const img = document.createElement('img');
+        img.src = asset.url;
+        img.alt = alt;
+        applyImageStyles(img);
+        return img;
+      }
+
+      if (asset._type === 'sanity.fileAsset') {
+        const video = document.createElement('video');
+        video.src = asset.url;
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        applyImageStyles(video);
+        return video;
+      }
+
+      return null;
+    }
+
+
+    const swiperWrapper = document.querySelector('.m-mm-swiper .swiper-wrapper');
+    const slideTemplate = document.querySelector('.m-mm-swiper .swiper-slide.m-mm');
+
+
+    if (!swiperWrapper || !slideTemplate) {
+
+      console.warn('Swiper wrapper or slide template not found.');
+
+    } else if (munImages.length === 0) {
+
+      console.warn('No Munchkin media found.');
+
+    } else {
+
+      slideTemplate.remove();
+
+      munImages.forEach((media, index) => {
+
+        const slide = slideTemplate.cloneNode(true);
+        slide.innerHTML = '';
+
+        const asset = media.asset;
+
+        const element = createMedia(asset, `Munchkin Media ${index + 1}`);
+
+        if (element) {
+          slide.appendChild(element);
+          swiperWrapper.appendChild(slide);
+        }
+
+      });
+
+
+      new Swiper(".m-mm-swiper", {
+        direction: 'horizontal',
+        loop: true,
+        spaceBetween: 14,
+        speed: 2000,
+        slidesPerView: 'auto',
+        centeredSlides: true,
+        autoplay: {
+          delay: 1500,
+          disableOnInteraction: false
+        }
+      });
+
+    }
+
+
+    stageContainers.forEach((container, index) => {
+
+      const imgData = stageImages[index];
+      if (!imgData?.asset?.url) return;
+
+      const img = document.createElement('img');
+
+      img.src = imgData.asset.url;
+      img.alt = `Stage Icon ${index + 1}`;
+
+      applyImageStyles(img);
+
+      container.appendChild(img);
+
+    });
+
+
+    const clientWrapper = document.querySelector('.clients-wrp');
+
+    if (clientWrapper) {
+
+      const swiperWrappers = clientWrapper.querySelectorAll('.clients-inr-wrp');
+
+      const clientslideTemplate = clientWrapper.querySelector('.client-wrp.white');
+
+      if (clientslideTemplate && clientImages.length > 0) {
+
+        clientslideTemplate.remove();
+
+        clientImages.forEach((media, index) => {
+
+          swiperWrappers.forEach(wrapper => {
+
+            const slide = clientslideTemplate.cloneNode(true);
+            slide.innerHTML = '';
+
+            const m = createMedia(media.asset, `Client Media ${index + 1}`);
+
+            if (m) {
+              slide.appendChild(m);
+              wrapper.appendChild(slide);
+            }
+
           });
+
         });
 
+      }
 
-        
+    }
 
 
-        
-        insertImageOrVideo(heroImgDiv, heroImages, 'About Hero Media');
-        insertImageOrVideo(contImgDiv, contImages, 'Contact Image');
-        insertImageOrVideo(aboutImgDiv, aboutImages, 'Contact Image');
-      } catch (err) { console.error('❌ Sanity fetch error:', err); }
-    });
-  </script>
+    function insertImageOrVideo(container, mediaArr, label = 'Media') {
+
+      if (!container || !mediaArr.length) return;
+
+      const asset = mediaArr[0].asset;
+
+      const element = createMedia(asset, label);
+
+      if (!element) return;
+
+      container.appendChild(element);
+
+    }
+
+
+    insertImageOrVideo(heroImgDiv, heroImages, 'Hero Media');
+
+    insertImageOrVideo(contImgDiv, contImages, 'Contact Media');
+
+    insertImageOrVideo(aboutImgDiv, aboutImages, 'About Media');
+
+
+  } catch (err) {
+
+    console.error('Sanity Fetch Error:', err);
+
+  }
+
+});
+
+</script>
+
 </body>
 </html>
