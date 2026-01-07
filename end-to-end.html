@@ -1873,7 +1873,17 @@ stageContainers.forEach((container, index) => {
       container.appendChild(img);
     });
 
+function createMedia(asset, alt = '') {
+  if (!asset?.url) return null;
 
+  // IMAGE
+  if (asset._type === 'sanity.imageAsset') {
+    const img = document.createElement('img');
+    img.src = asset.url;
+    img.alt = alt;
+    applyImageStyles(img);
+    return img;
+  }
 
 
 
