@@ -1879,16 +1879,16 @@ stageContainers.forEach((container, index) => {
         const clientWrapper = document.querySelector('.clients-wrp');
         if (!clientWrapper) { return; }
         const swiperWrappers = clientWrapper.querySelectorAll('.clients-inr-wrp');
-        const slideTemplate = clientWrapper.querySelector('.client-wrp.white');
-        if (!slideTemplate) { return; }
+        const clientslideTemplate = clientWrapper.querySelector('.client-wrp.white');
+        if (!clientslideTemplate) { return; }
         if (clientImages.length === 0) { return; }
         if (swiperWrappers.length === 0) { return; }
-        slideTemplate.remove();
+        clientslideTemplate.remove();
         clientImages.forEach((m, index) => {
   if (!m.asset) return;
 
   swiperWrappers.forEach(wrapper => {
-    const slide = slideTemplate.cloneNode(true);
+    const slide = clientslideTemplate.cloneNode(true);
     slide.innerHTML = '';
 
     const media = createMedia(m.asset, `client Media ${index + 1}`);
