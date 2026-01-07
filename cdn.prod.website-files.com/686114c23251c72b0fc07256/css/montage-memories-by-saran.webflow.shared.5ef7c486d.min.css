@@ -4597,6 +4597,7 @@ a.s1 {
 .clients-inr-wrp {
     grid-column-gap: var(--rem-sizes--6rem);
     grid-row-gap: var(--rem-sizes--6rem);
+    margin-left: var(--rem-sizes--6rem);
     justify-content: center;
     align-items: center;
     height: 100%
@@ -5312,7 +5313,9 @@ a.s1 {
 
     .clients-inr-wrp {
         grid-column-gap: var(--rem-sizes--8rem);
-        grid-row-gap: var(--rem-sizes--8rem)
+        grid-row-gap: var(--rem-sizes--8rem);
+        margin-left: var(--rem-sizes--8rem)
+
     }
 
     .client-wrp {
@@ -5386,7 +5389,8 @@ a.s1 {
 
     .clients-inr-wrp {
         grid-column-gap: var(--rem-sizes--12rem);
-        grid-row-gap: var(--rem-sizes--12rem)
+        grid-row-gap: var(--rem-sizes--12rem);
+        margin-left: var(--rem-sizes--12rem)
     }
 
     .client-wrp.r-m {
@@ -6339,7 +6343,8 @@ a.s1 {
 
     .clients-inr-wrp {
         grid-column-gap: var(--rem-sizes--4rem);
-        grid-row-gap: var(--rem-sizes--4rem)
+        grid-row-gap: var(--rem-sizes--4rem);
+        margin-left: var(--rem-sizes--4rem);
     }
 
     .client-wrp {
