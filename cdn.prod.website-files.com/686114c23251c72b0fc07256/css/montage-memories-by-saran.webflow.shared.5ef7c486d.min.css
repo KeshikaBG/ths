@@ -4344,15 +4344,14 @@ a.s1 {
 }
 
 .image.ths {
-    height: 100%
+    height: 100%;
+    width: 8vw
 }
 
 .logo-div {
     flex: 1;
     justify-content: center;
     align-items: center;
-    width: 100vw;
-    height: 100px;
     overflow: hidden
 }
 
