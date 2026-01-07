@@ -4352,7 +4352,7 @@ a.s1 {
     flex: 1;
     justify-content: center;
     align-items: center;
-    overflow: hidden
+    overflow: visible
 }
 
 .booking-form-wrpr {
