@@ -1148,7 +1148,7 @@ function applyDynamicRadius() {
   const rootFont = parseFloat(
     getComputedStyle(document.documentElement).fontSize
   );
-  const gapPx = rootFont * 2;
+  const gapPx = rootFont * 1;
 
   const angle = Math.PI / cardCount;
   const radius = (cardWidth + gapPx) / (2 * Math.tan(angle));
