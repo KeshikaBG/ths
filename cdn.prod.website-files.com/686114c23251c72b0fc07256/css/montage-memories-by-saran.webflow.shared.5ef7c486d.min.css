@@ -4595,9 +4595,6 @@ a.s1 {
 }
 
 .clients-inr-wrp {
-    grid-column-gap: var(--rem-sizes--6rem);
-    grid-row-gap: var(--rem-sizes--6rem);
-    margin-left: var(--rem-sizes--6rem);
     justify-content: center;
     align-items: center;
     height: 100%
@@ -5311,13 +5308,6 @@ a.s1 {
         grid-row-gap: var(--px-sizes--24px)
     }
 
-    .clients-inr-wrp {
-        grid-column-gap: var(--rem-sizes--8rem);
-        grid-row-gap: var(--rem-sizes--8rem);
-        margin-left: var(--rem-sizes--8rem)
-
-    }
-
     .client-wrp {
         overflow: visible
     }
@@ -5385,12 +5375,6 @@ a.s1 {
     .form-inr-wrp.e2e {
         grid-column-gap: var(--rem-sizes--2rem);
         grid-row-gap: var(--rem-sizes--2rem)
-    }
-
-    .clients-inr-wrp {
-        grid-column-gap: var(--rem-sizes--12rem);
-        grid-row-gap: var(--rem-sizes--12rem);
-        margin-left: var(--rem-sizes--12rem)
     }
 
     .client-wrp.r-m {
