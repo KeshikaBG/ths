@@ -557,6 +557,7 @@ gsap.to(hdr, {
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
+  height: auto !important;
   width: 100% !important;
   object-fit: cover !important;
   opacity: 0 !important;
@@ -566,7 +567,9 @@ gsap.to(hdr, {
   display: block !important;
 }
 @media screen and (min-width: 1280px) {
-  top: -15% !important;
+  .wrk-img-div img {
+    top: -15% !important;
+  }
 }
 .wrk-img-div img.fade-in {
   opacity: 1 !important;
