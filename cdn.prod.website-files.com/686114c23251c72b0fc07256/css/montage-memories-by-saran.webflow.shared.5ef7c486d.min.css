@@ -5404,6 +5404,11 @@ a.s1 {
 }
 
 @media screen and (max-width: 991px) {
+    
+    .wrk-img-div {
+       min-height: var(--rem-sizes--12rem);
+    }
+    
     .s1.white.ch {
         width: auto;
     }
