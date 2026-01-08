@@ -6190,7 +6190,7 @@ a.s1 {
     }
 
     .wrk-img-div {
-        min-height: var(--rem-sizes--6rem)
+        min-height: var(--rem-sizes--10rem)
     }
 
     .wrk-img-div.ver {
