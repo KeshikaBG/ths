@@ -3284,7 +3284,8 @@ a.s1 {
     grid-column-gap: var(--px-sizes--8px);
     grid-row-gap: var(--px-sizes--8px);
     position: absolute;
-    inset: 0% 0% auto auto
+    inset: 0% 0% auto auto;
+    cursor: pointer
 }
 
 .test-left-arr,.test-right-arr {
