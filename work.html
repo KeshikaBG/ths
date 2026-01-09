@@ -273,58 +273,94 @@
 
 
 <script>
-window.loadDone = false;
+window.loaderFinished = false;
+
 document.addEventListener("DOMContentLoaded", () => {
-  const loadEl = document.querySelector(".loader");
-  const easeFx = "power2.inOut";
-  const loadTime = 1000;
-  if (!loadEl) {
-    window.loadDone = true;
+  const loader = document.querySelector(".loader");
+  const logo = loader?.querySelector(".logo-div");
+  const ease = "power2.inOut";
+  const loaderVisibleTime = 600;
+
+  if (!loader) {
+    window.loaderFinished = true;
     return;
   }
-  gsap.set(loadEl, {
+
+  // INITIAL STATES
+  gsap.set(loader, {
     display: "flex",
     clipPath: "inset(0% 0% 0% 0%)"
   });
-  function hideLoad() {
-    gsap.to(loadEl, {
+
+  if (logo) {
+    gsap.set(logo, { opacity: 0 });
+  }
+
+  function hideLoader() {
+    gsap.to(loader, {
       clipPath: "inset(0% 0% 100% 0%)",
-      duration: 1.2,
-      ease: easeFx,
+      duration: 0.8,
+      ease,
       onComplete: () => {
-        loadEl.style.display = "none";
-        window.loadDone = true;
+        loader.style.display = "none";
+        window.loaderFinished = true;
       }
     });
   }
-  function showLoad(cb) {
-    loadEl.style.display = "flex";
-    gsap.set(loadEl, { clipPath: "inset(100% 0% 0% 0%)" });
-    gsap.to(loadEl, {
+
+  function showLoader(cb) {
+    loader.style.display = "flex";
+    gsap.set(loader, { clipPath: "inset(100% 0% 0% 0%)" });
+
+    const tl = gsap.timeline({ onComplete: cb });
+
+    tl.to(loader, {
       clipPath: "inset(0% 0% 0% 0%)",
       duration: 0.8,
-      ease: easeFx,
-      onComplete: cb
+      ease
+    });
+
+    // Fade OUT logo before navigation
+    if (logo) {
+      tl.to(logo, {
+        opacity: 0,
+        duration: 0.3,
+        ease
+      }, "-=0.4");
+    }
+  }
+
+  // Fade IN logo on page load
+  if (logo) {
+    gsap.to(logo, {
+      opacity: 1,
+      duration: 0.6,
+      ease,
+      delay: 0.2
     });
   }
-  setTimeout(hideLoad, loadTime);
-  document.querySelectorAll("a").forEach(lnk => {
-    if (!lnk.href) return;
-    if (!lnk.href.startsWith(location.origin)) return;
-    if (lnk.target === "_blank") return;
-    if (lnk.href.includes("#")) return;
-    lnk.addEventListener("click", e => {
+
+  setTimeout(hideLoader, loaderVisibleTime);
+
+  document.querySelectorAll("a").forEach(link => {
+    if (!link.href) return;
+    if (!link.href.startsWith(location.origin)) return;
+    if (link.target === "_blank") return;
+    if (link.href.includes("#")) return;
+
+    link.addEventListener("click", e => {
       e.preventDefault();
-      showLoad(() => {
-        location.href = lnk.href;
+      showLoader(() => {
+        location.href = link.href;
       });
     });
   });
 });
+
 window.addEventListener("pageshow", e => {
   if (!e.persisted) return;
-  const loadEl = document.querySelector(".loader");
-  if (loadEl) loadEl.style.display = "none";
+  const loader = document.querySelector(".loader");
+  if (loader) loader.style.display = "none";
 });
 </script>
 
@@ -333,13 +369,14 @@ window.addEventListener("pageshow", e => {
 
 
 
+
   <!-- Entry animations -->
 <script>
-(function waitLoad() {
-  if (!window.loadDone) {
-    requestAnimationFrame(waitLoad);
-  } else {
+(function waitForLoader() {
+  if (!window.loaderFinished) requestAnimationFrame(waitForLoader);
+  else {
     runAnim();
+    initST();
   }
 })();
 function runAnim(type = "all") {
