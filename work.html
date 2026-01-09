@@ -342,7 +342,7 @@ window.addEventListener("pageshow", e => {
     runAnim();
   }
 })();
-function runAnim() {
+function runAnim(type = "all") {
   const easeFx = "power2.out";
   ScrollTrigger.batch("[data-entry-anim]", {
     onEnter: grp => {
