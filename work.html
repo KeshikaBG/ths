@@ -389,7 +389,7 @@ function runAnim() {
           scrollTrigger: {
             trigger: kid,
             start: "top 90%",
-            once: true
+            once: false
           }
         }
       );
@@ -1252,10 +1252,6 @@ function initST() {
       imgTpl.style.display = 'none';
       chipAll.classList.add('selected');
 
-function resetAnims() {
-  ScrollTrigger.getAll().forEach(t => t.kill());
-  gsap.killTweensOf("*");
-}
 
       
       chips.forEach(chip => {
@@ -1266,7 +1262,6 @@ function resetAnims() {
           distClns(flt);
           flt.forEach(f => lazyImgs(f));
 
-          resetAnims();
   runAnim();
   ScrollTrigger.refresh();
 
@@ -1280,7 +1275,6 @@ function resetAnims() {
         distClns(allClns);
         allClns.forEach(f => lazyImgs(f));
 
-        resetAnims();
   runAnim();
   ScrollTrigger.refresh();
 
