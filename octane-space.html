@@ -324,13 +324,14 @@ window.addEventListener("pageshow", e => {
 
   <!-- Entry animations -->
 <script>
-(function waitLoad() {
-  if (!window.loadDone) {
-    requestAnimationFrame(waitLoad);
-  } else {
+(function waitForLoader() {
+  if (!window.loaderFinished) requestAnimationFrame(waitForLoader);
+  else {
     runAnim();
+    initST();
   }
 })();
+  
 function runAnim() {
   const easeFx = "power2.out";
   ScrollTrigger.batch("[data-entry-anim]", {
