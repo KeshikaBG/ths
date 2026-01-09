@@ -452,7 +452,7 @@ function runAnim() {
 <script src="https://unpkg.com/split-type"></script>
 <script>
 let splitReady = false;
-
+let splitInstances = [];
 function initSplitEarly() {
 // Revert old splits
   splitInstances.forEach(inst => inst.revert());
@@ -490,7 +490,7 @@ gsap.registerPlugin(ScrollTrigger);
   if (!window.loadDone) {
     requestAnimationFrame(waitLoad);
   } else {
-    initSplitEarly()
+    initSplitEarly();
     initST();
   }
 })();
