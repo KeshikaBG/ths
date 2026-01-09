@@ -454,14 +454,20 @@ function runAnim() {
 let splitReady = false;
 
 function initSplitEarly() {
-  if (splitReady) return;
-  splitReady = true;
+// Revert old splits
+  splitInstances.forEach(inst => inst.revert());
+  splitInstances = [];
 
-  new SplitType("[text-split]", {
-    types: "lines",
-    tagName: "span"
+  // Re-split current DOM
+  document.querySelectorAll("[text-split]").forEach(el => {
+    const inst = new SplitType(el, {
+      types: "lines",
+      tagName: "span"
+    });
+    splitInstances.push(inst);
   });
 
+  // Reset line styles
   document.querySelectorAll("[text-split] .line").forEach(line => {
     gsap.set(line, {
       clipPath: "inset(0% 0% 100% 0%)",
@@ -484,29 +490,22 @@ gsap.registerPlugin(ScrollTrigger);
   if (!window.loadDone) {
     requestAnimationFrame(waitLoad);
   } else {
+    initSplitEarly()
     initST();
   }
 })();
 
 function initST() {
-  if (initST.done) return;
-  initST.done = true;
+   ScrollTrigger.getAll().forEach(t => t.kill());
 
   gsap.utils.toArray("[text-split]").forEach(el => {
     const lines = el.querySelectorAll(".line");
-    const lineCount = lines.length;
+    if (!lines.length) return;
 
-    const duration = gsap.utils.clamp(
-      0.6,
-      1.1,
-      1.2 - lineCount * 0.08
-    );
+    const count = lines.length;
 
-    const stagger = gsap.utils.clamp(
-      0.04,
-      0.1,
-      0.15 - lineCount * 0.01
-    );
+    const duration = gsap.utils.clamp(0.6, 1.1, 1.2 - count * 0.08);
+    const stagger  = gsap.utils.clamp(0.04, 0.1, 0.15 - count * 0.01);
 
     gsap.to(lines, {
       clipPath: "inset(0% 0% 0% 0%)",
@@ -518,7 +517,7 @@ function initST() {
       scrollTrigger: {
         trigger: el,
         start: "top 100%",
-        once: false
+        once: true
       }
     });
   });
