@@ -3764,7 +3764,8 @@ a.s1 {
     flex: 0 auto;
     width: calc(50% - .5rem);
     position: relative;
-    overflow: hidden
+    overflow: hidden;
+    align-self: start
 }
 
 .abt-hero-flex {
