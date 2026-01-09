@@ -3593,7 +3593,8 @@ a.s1 {
 }
 
 .swiper-wrapper.white {
-    background-color: var(--color--white)
+    background-color: var(--color--white);
+    cursor: grab
 }
 
 .swiper-wrapper.white.m-mm {
