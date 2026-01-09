@@ -3153,7 +3153,7 @@ a.s1 {
     border-top-right-radius: var(--px-sizes--10px);
     border-bottom-left-radius: var(--px-sizes--10px);
     border-bottom-right-radius: var(--px-sizes--10px);
-    width: 70%;
+    width: 60%;
     max-width: none;
     overflow: hidden;
     transform: translateY(-50%)
