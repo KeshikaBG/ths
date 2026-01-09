@@ -10,8 +10,6 @@
 <link rel="preconnect" href="https://cdn.sanity.io" crossorigin>
 
 <style>
-
-
   .long-content {
   white-space: pre-line;
   }
@@ -622,9 +620,13 @@ gsap.to(hdr, {
   pointer-events: auto !important;
   display: block !important;
 }
+  .swiper-button-next, .swiper-button-prev {
+    cursor: pointer;
+  }
 .swiper-pagination-bullet {
     background: rgba(255, 255, 255, 0.5);
-  }
+    cursor: pointer;
+}
   .swiper-pagination-bullet-active {
     background: white;
   } 
