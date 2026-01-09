@@ -387,26 +387,6 @@ function runAnim() {
       }),
     once: true
   });
-  const animLine = (sel, axis) => {
-    document.querySelectorAll(sel).forEach(line => {
-      gsap.fromTo(
-        line,
-        { [axis]: 0 },
-        {
-          [axis]: 1,
-          duration: 0.6,
-          ease: easeFx,
-          scrollTrigger: {
-            trigger: line,
-            start: "top 90%",
-            once: true
-          }
-        }
-      );
-    });
-  };
-  animLine(".nav-line", "scaleX");
-  animLine(".vertical-line", "scaleY");
 }
 </script>
 
