@@ -3148,7 +3148,7 @@ a.s1 {
 }
 
 .os-cont2 {
-    aspect-ratio: 2;
+    aspect-ratio: 1.7;
     border-top-left-radius: var(--px-sizes--10px);
     border-top-right-radius: var(--px-sizes--10px);
     border-bottom-left-radius: var(--px-sizes--10px);
