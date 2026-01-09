@@ -361,7 +361,7 @@ function runAnim() {
         });
       });
     },
-    once: false
+    once: true
   });
   ScrollTrigger.batch("[scale-anim]", {
     onEnter: grp => {
@@ -371,7 +371,7 @@ function runAnim() {
         { scale: 1, duration: 0.6, ease: easeFx, stagger: 0.15 }
       );
     },
-    once: false
+    once: true
   });
   document.querySelectorAll("[slide-up-anim]").forEach((wrap, wIdx) => {
     const kids = wrap.querySelectorAll(":scope > *");
@@ -389,7 +389,7 @@ function runAnim() {
           scrollTrigger: {
             trigger: kid,
             start: "top 90%",
-            once: false
+            once: true
           }
         }
       );
@@ -405,7 +405,7 @@ function runAnim() {
       scrollTrigger: {
         trigger: el,
         start: "top 85%",
-        once: false
+        once: true
       }
     }
   );
@@ -415,7 +415,7 @@ function runAnim() {
     if (!kids.length) return;
     ScrollTrigger.batch(kids, {
       onEnter: grp => gsap.to(grp, { opacity: 1 }),
-      once: false
+      once: true
     });
   });
   document.querySelectorAll("[scale-opacity-anim]").forEach(wrap => {
@@ -428,7 +428,7 @@ function runAnim() {
           { scale: 0, opacity: 0 },
           { scale: 1, opacity: 1, duration: 0.6, ease: easeFx, stagger: 0.15 }
         ),
-      once: false
+      once: true
     });
   });
   ScrollTrigger.batch("[data-scale-img] img", {
@@ -439,7 +439,7 @@ function runAnim() {
         ease: easeFx,
         stagger: 0.03
       }),
-    once: false
+    once: true
   });
 }
 </script>
