@@ -231,6 +231,7 @@ window.loaderFinished = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   const loader = document.querySelector(".loader");
+  const logo = loader?.querySelector(".logo-div");
   const ease = "power2.inOut";
   const loaderVisibleTime = 600;
 
@@ -239,10 +240,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // INITIAL STATES
   gsap.set(loader, {
     display: "flex",
     clipPath: "inset(0% 0% 0% 0%)"
   });
+
+  if (logo) {
+    gsap.set(logo, { opacity: 0 });
+  }
 
   function hideLoader() {
     gsap.to(loader, {
@@ -260,11 +266,31 @@ document.addEventListener("DOMContentLoaded", () => {
     loader.style.display = "flex";
     gsap.set(loader, { clipPath: "inset(100% 0% 0% 0%)" });
 
-    gsap.to(loader, {
+    const tl = gsap.timeline({ onComplete: cb });
+
+    tl.to(loader, {
       clipPath: "inset(0% 0% 0% 0%)",
       duration: 0.8,
+      ease
+    });
+
+    // Fade OUT logo before navigation
+    if (logo) {
+      tl.to(logo, {
+        opacity: 0,
+        duration: 0.3,
+        ease
+      }, "-=0.4");
+    }
+  }
+
+  // Fade IN logo on page load
+  if (logo) {
+    gsap.to(logo, {
+      opacity: 1,
+      duration: 0.6,
       ease,
-      onComplete: cb
+      delay: 0.2
     });
   }
 
@@ -291,6 +317,7 @@ window.addEventListener("pageshow", e => {
   if (loader) loader.style.display = "none";
 });
 </script>
+
 
 
 
