@@ -344,6 +344,7 @@ window.addEventListener("pageshow", e => {
 })();
 function runAnim(type = "all") {
   const easeFx = "power2.out";
+  if (type === "entry" || type === "all") {
   ScrollTrigger.batch("[data-entry-anim]", {
     onEnter: grp => {
       grp.forEach(el => {
@@ -363,6 +364,8 @@ function runAnim(type = "all") {
     },
     once: true
   });
+  }
+  if (type === "scale" || type === "all") {
   ScrollTrigger.batch("[scale-anim]", {
     onEnter: grp => {
       gsap.fromTo(
@@ -373,6 +376,7 @@ function runAnim(type = "all") {
     },
     once: true
   });
+  }
   if (type === "slide" || type === "all") {
   document.querySelectorAll("[slide-up-anim]").forEach((wrap, wIdx) => {
     const kids = wrap.querySelectorAll(":scope > *");
@@ -412,6 +416,7 @@ function runAnim(type = "all") {
     }
   );
 });
+  if (type === "opacity" || type === "all") {
   document.querySelectorAll("[opacity-anim]").forEach(wrap => {
     const kids = [...wrap.children].filter(el => !el.classList.contains("overlay"));
     if (!kids.length) return;
@@ -420,6 +425,8 @@ function runAnim(type = "all") {
       once: true
     });
   });
+  }
+  if (type === "scaleop" || type === "all") {
   document.querySelectorAll("[scale-opacity-anim]").forEach(wrap => {
     const kids = [...wrap.children];
     if (!kids.length) return;
@@ -433,6 +440,7 @@ function runAnim(type = "all") {
       once: true
     });
   });
+  }
   ScrollTrigger.batch("[data-scale-img] img", {
     onEnter: grp =>
       gsap.to(grp, {
