@@ -401,6 +401,7 @@ function runAnim(type = "all") {
     });
   });
   }
+  if (type === "selfopacity" || type === "all") {
   document.querySelectorAll("[self-opacity-anim]").forEach(el => {
   gsap.fromTo(el,
     { opacity: 0 },
@@ -416,6 +417,7 @@ function runAnim(type = "all") {
     }
   );
 });
+  }
   if (type === "opacity" || type === "all") {
   document.querySelectorAll("[opacity-anim]").forEach(wrap => {
     const kids = [...wrap.children].filter(el => !el.classList.contains("overlay"));
@@ -659,7 +661,7 @@ function initST() {
         srcset="https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473dbde85d6ffd81fd2d_THE%20HAPPENING%20STORY%20BLACK-p-500.png 500w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473dbde85d6ffd81fd2d_THE%20HAPPENING%20STORY%20BLACK-p-800.png 800w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473dbde85d6ffd81fd2d_THE%20HAPPENING%20STORY%20BLACK-p-1080.png 1080w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473dbde85d6ffd81fd2d_THE%20HAPPENING%20STORY%20BLACK-p-1600.png 1600w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473dbde85d6ffd81fd2d_THE%20HAPPENING%20STORY%20BLACK-p-2000.png 2000w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473dbde85d6ffd81fd2d_THE%20HAPPENING%20STORY%20BLACK-p-2600.png 2600w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473dbde85d6ffd81fd2d_THE%20HAPPENING%20STORY%20BLACK-p-3200.png 3200w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473dbde85d6ffd81fd2d_THE%20HAPPENING%20STORY%20BLACK.png 4285w"
         alt="" class="image ths" /></div>
   </div>
-  <div slide-up-anim="" class="w-layout-hflex header _1rem-p"><a href="index.html" class="home-link w-inline-block"><img
+  <div self-opacity-anim="" class="w-layout-hflex header _1rem-p"><a href="index.html" class="home-link w-inline-block"><img
         src="../cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE.png"
         loading="lazy" sizes="(max-width: 4285px) 100vw, 4285px"
         srcset="https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE-p-500.png 500w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE-p-800.png 800w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE-p-1080.png 1080w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE-p-1600.png 1600w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE-p-2000.png 2000w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE-p-2600.png 2600w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE-p-3200.png 3200w, https://cdn.prod.website-files.com/686114c23251c72b0fc07256/68ea473c079b8a7405804ff9_THE%20HAPPENING%20STORY%20WHITE.png 4285w"
