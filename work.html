@@ -441,26 +441,6 @@ function runAnim() {
       }),
     once: true
   });
-  const animLine = (sel, axis) => {
-    document.querySelectorAll(sel).forEach(line => {
-      gsap.fromTo(
-        line,
-        { [axis]: 0 },
-        {
-          [axis]: 1,
-          duration: 0.6,
-          ease: easeFx,
-          scrollTrigger: {
-            trigger: line,
-            start: "top 90%",
-            once: true
-          }
-        }
-      );
-    });
-  };
-  animLine(".nav-line", "scaleX");
-  animLine(".vertical-line", "scaleY");
 }
 </script>
 
@@ -482,7 +462,6 @@ function initSplitEarly() {
     tagName: "span"
   });
 
-  // 🔑 Apply FROM state immediately (no animation)
   document.querySelectorAll("[text-split] .line").forEach(line => {
     gsap.set(line, {
       clipPath: "inset(0% 0% 100% 0%)",
@@ -493,15 +472,12 @@ function initSplitEarly() {
   });
 }
 
-// Run ASAP
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initSplitEarly);
 } else {
   initSplitEarly();
 }
 
-
-  
 gsap.registerPlugin(ScrollTrigger);
 
 (function waitLoad() {
@@ -1071,15 +1047,17 @@ function initST() {
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@sanity/client';
-  const client = createClient({
+
+  const sanityCli = createClient({
     projectId: 'n7jjk6nd',
     dataset: 'production',
     useCdn: true,
     apiVersion: '2023-01-01'
   });
+
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const works = await client.fetch(`
+      const wrkList = await sanityCli.fetch(`
         *[_type == "work"] | order(_createdAt asc)[1...22] {
           heroTitle,
           featuredSections[] {
@@ -1088,244 +1066,246 @@ function initST() {
           }
         }
       `);
-      const container = document.querySelector('.work-img-wrpr-div');
-      const parents = document.querySelectorAll('.work-divs-wrpr');
-      const separateWorkDiv = document.querySelector('.separate-work-div');
-      const titleInrImg = separateWorkDiv.querySelector('.title-inr-img');
-      const imagesFlex = separateWorkDiv.querySelectorAll('.images-flex');
-      const overlayWork = document.querySelector('.overlay-work');
-      const wrkClose = document.querySelector('.wrk-close');
-      const allChip = document.querySelector('.wrk-chip-all');
-      const chipWrapper = document.querySelector('.work-chip-wrp');
 
+      const imgTpl = document.querySelector('.work-img-wrpr-div');
+      const parWrps = document.querySelectorAll('.work-divs-wrpr');
+      const sepWrkDiv = document.querySelector('.separate-work-div');
+      const ttlInrImg = sepWrkDiv.querySelector('.title-inr-img');
+      const imgFlexes = sepWrkDiv.querySelectorAll('.images-flex');
+      const ovlWrk = document.querySelector('.overlay-work');
+      const wrkCls = document.querySelector('.wrk-close');
+      const chipAll = document.querySelector('.wrk-chip-all');
+      const chipWrp = document.querySelector('.work-chip-wrp');
 
-      let usedParents = window.innerWidth <= 478 ? [parents[0]] : parents;
-      usedParents.forEach(p => p.innerHTML = '');
-      chipWrapper.querySelectorAll('.wrk-chip:not(.wrk-chip-all)').forEach(chip => chip.remove());
-      const allClones = [];
+      let usedWrps = window.innerWidth <= 478 ? [parWrps[0]] : parWrps;
+      usedWrps.forEach(w => (w.innerHTML = ''));
 
-      works.forEach((work, workIndex) => {
-        if (!work.heroTitle) return;
+      chipWrp
+        .querySelectorAll('.wrk-chip:not(.wrk-chip-all)')
+        .forEach(ch => ch.remove());
+
+      const allClns = [];
+
+      /* ---------- CHIPS ---------- */
+      wrkList.forEach((wrk, idx) => {
+        if (!wrk.heroTitle) return;
+
         const chip = document.createElement('div');
         chip.classList.add('wrk-chip');
-        chip.dataset.index = workIndex;
-        const chipText = document.createElement('div');
-        chipText.classList.add('chip-text');
-        chipText.textContent = work.heroTitle;
-        chip.appendChild(chipText);
-        chipWrapper.appendChild(chip);
+        chip.dataset.index = idx;
+
+        const chipTxt = document.createElement('div');
+        chipTxt.classList.add('chip-text');
+        chipTxt.textContent = wrk.heroTitle;
+
+        chip.appendChild(chipTxt);
+        chipWrp.appendChild(chip);
       });
 
       const chips = document.querySelectorAll('.wrk-chip');
 
-      works.forEach((work, workIndex) => {
-        work.featuredSections?.forEach(section => {
-          const images = section.images || [];
-          if (!images.length) return;
+      /* ---------- WORK ITEMS ---------- */
+      wrkList.forEach((wrk, wrkIdx) => {
+        wrk.featuredSections?.forEach(sec => {
+          const imgs = sec.images || [];
+          if (!imgs.length) return;
 
-
-          section.preloadedImages = images.map((imgObj, i) => {
+          sec.preImgs = imgs.map(imgObj => {
             const img = document.createElement('img');
-            const lowRes = `${imgObj.asset?.url}?w=60&blur=30&auto=format`;
-            const highRes = `${imgObj.asset?.url}?w=1000&auto=format&fit=crop`;
-            img.src = lowRes;
-            img.dataset.src = highRes;
-            img.alt = section.title || '';
+            const low = `${imgObj.asset?.url}?w=60&blur=30&auto=format`;
+            const high = `${imgObj.asset?.url}?w=1000&auto=format&fit=crop`;
+
+            img.src = low;
+            img.dataset.src = high;
+            img.alt = sec.title || '';
             img.loading = 'lazy';
+
             img.style.height = '40vh';
             img.style.width = 'auto';
             img.style.objectFit = 'cover';
             img.style.marginRight = '1rem';
             img.style.filter = 'blur(10px)';
-            const full = new Image();
-            full.src = highRes;
-            full.onload = () => {
-              img.src = highRes;
+
+            const preload = new Image();
+            preload.src = high;
+            preload.onload = () => {
+              img.src = high;
               img.style.transition = 'filter 0.6s ease';
-              img.style.filter = 'blur(0px)';
+              img.style.filter = 'blur(0)';
             };
+
             return img;
           });
 
-          section.preloadedImages.forEach(img => {
-            const highRes = img.dataset.src;
-            if (highRes) {
-              img.classList.add('lazy-img');
-              const full = new Image();
-              full.src = highRes;
-              full.onload = () => {
-                img.src = highRes;
-                img.classList.add('loaded');
-              };
-            }
-          });
-
-          const imgUrl = images[0]?.asset?.url;
+          const imgUrl = imgs[0]?.asset?.url;
           if (!imgUrl) return;
 
-          const clone = container.cloneNode(true);
-          clone.dataset.chipIndex = workIndex;
-          clone.dataset.chipGroup = 'all';
+          const cln = imgTpl.cloneNode(true);
+          cln.dataset.chipIndex = wrkIdx;
+          cln.dataset.chipGroup = 'all';
 
-          const titleEl = clone.querySelector('.title-img');
-          if (titleEl) titleEl.textContent = section.title || '';
+          const ttlEl = cln.querySelector('.title-img');
+          if (ttlEl) ttlEl.textContent = sec.title || '';
 
-          const overlayEl = clone.querySelector('.overlay-div');
-          if (overlayEl) {
-            overlayEl.style.opacity = '0';
-            overlayEl.style.cursor = 'pointer';
+          const ovlEl = cln.querySelector('.overlay-div');
+          if (ovlEl) {
+            ovlEl.style.opacity = '0';
+            ovlEl.style.cursor = 'pointer';
 
-            overlayEl.addEventListener('click', () => {
-              separateWorkDiv.style.display = 'block';
-              setTimeout(() => separateWorkDiv.style.opacity = '1', 100);
+            ovlEl.addEventListener('click', () => {
+              sepWrkDiv.style.display = 'block';
+              setTimeout(() => (sepWrkDiv.style.opacity = '1'), 100);
 
-              overlayWork.style.display = 'block';
-              setTimeout(() => overlayWork.style.opacity = '1', 100);
+              ovlWrk.style.display = 'block';
+              setTimeout(() => (ovlWrk.style.opacity = '1'), 100);
 
-              if (titleInrImg) titleInrImg.textContent = section.title || '';
+              if (ttlInrImg) ttlInrImg.textContent = sec.title || '';
 
-   imagesFlex.forEach(flex => {
-  flex.innerHTML = '';
-  section.preloadedImages.forEach(preImg => {
-    const el = preImg.cloneNode(true);
-    el.classList.add("work-img");
-    flex.appendChild(el);
-  });
-});
-enableLightbox();
+              imgFlexes.forEach(fx => {
+                fx.innerHTML = '';
+                sec.preImgs.forEach(pImg => {
+                  const el = pImg.cloneNode(true);
+                  el.classList.add('work-img');
+                  fx.appendChild(el);
+                });
+              });
+
+              enableLightbox();
             });
           }
 
-       /* -------- BLUR-UP IMAGE FOR CARD --------*/
-let img = clone.querySelector("img");
-if (!img) {
-  img = document.createElement("img");
-  clone.prepend(img);
-}
+          let img = cln.querySelector('img');
+          if (!img) {
+            img = document.createElement('img');
+            cln.prepend(img);
+          }
 
-img.classList.add("work-img");
+          img.classList.add('work-img');
 
-const lowRes = `${imgUrl}?w=120&blur=30&auto=format`;
-//const highRes = `${imgUrl}?w=900&h=900&fit=crop&auto=format&q=75`;
-//const highRes = `${imgUrl}?w=900&fit=crop&auto=format&q=75`;
-const highRes = `${imgUrl}?w=1400&fit=crop&auto=format&q=75`;
-img.src = lowRes;
-img.dataset.src = highRes;
-img.alt = section.title || "";
-img.loading = "lazy";
+          const low = `${imgUrl}?w=120&blur=30&auto=format`;
+          const high = `${imgUrl}?w=1400&fit=crop&auto=format&q=75`;
 
-img.style.width = "100%";
-img.style.height = "100%";
-img.style.objectFit = "cover";
-img.style.filter = "blur(10px)";
-img.style.transition = "filter 0.4s ease";
+          img.src = low;
+          img.dataset.src = high;
+          img.alt = sec.title || '';
+          img.loading = 'lazy';
 
-const preload = new Image();
-preload.src = highRes;
-preload.onload = () => {
-  img.src = highRes;
-  img.style.filter = "blur(0)";
-};
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          img.style.filter = 'blur(10px)';
+          img.style.transition = 'filter 0.4s ease';
 
-          allClones.push(clone);
+          const preload = new Image();
+          preload.src = high;
+          preload.onload = () => {
+            img.src = high;
+            img.style.filter = 'blur(0)';
+          };
+
+          allClns.push(cln);
         });
       });
 
+      /* ---------- DISTRIBUTE ---------- */
+      function distClns(clns) {
+        usedWrps.forEach(w => (w.innerHTML = ''));
 
-      function distribute(clones) {
-        usedParents.forEach(p => (p.innerHTML = ''));
-
-        let counter = 0;
-        clones.forEach(clone => {
-          const parent = usedParents[counter % usedParents.length];
-          parent.appendChild(clone);
-          counter++;
+        let idx = 0;
+        clns.forEach(cln => {
+          const wrp = usedWrps[idx % usedWrps.length];
+          wrp.appendChild(cln);
+          idx++;
         });
       }
-      distribute(allClones);
-enableLightbox();
 
-      function lazyLoadVisibleImages(parentContainer) {
-        const imgs = parentContainer.querySelectorAll('img[data-src]');
+      distClns(allClns);
+      enableLightbox();
 
-        const observer = new IntersectionObserver((entries, obs) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const img = entry.target;
-              const highRes = img.dataset.src;
+      /* ---------- LAZY LOAD ---------- */
+      function lazyImgs(parent) {
+        const imgs = parent.querySelectorAll('img[data-src]');
 
-              if (highRes) {
-                const preload = new Image();
-                preload.src = highRes;
-                preload.onload = () => {
-                  img.src = highRes;
-                  img.classList.add('loaded');
-                };
-                obs.unobserve(img);
-              }
-            }
+        const obs = new IntersectionObserver(entries => {
+          entries.forEach(ent => {
+            if (!ent.isIntersecting) return;
+
+            const img = ent.target;
+            const src = img.dataset.src;
+            if (!src) return;
+
+            const preload = new Image();
+            preload.src = src;
+            preload.onload = () => {
+              img.src = src;
+              img.classList.add('loaded');
+            };
+            obs.unobserve(img);
           });
         }, { rootMargin: '50px' });
-        imgs.forEach(img => observer.observe(img));
+
+        imgs.forEach(img => obs.observe(img));
       }
 
-
-      container.style.display = 'none';
-      allChip.classList.add('selected');
+      imgTpl.style.display = 'none';
+      chipAll.classList.add('selected');
 
       chips.forEach(chip => {
         chip.addEventListener('click', () => {
-          const chipIndex = Number(chip.dataset.index);
-          const filtered = allClones.filter(div => Number(div.dataset.chipIndex) === chipIndex);
-          distribute(filtered);
-          filtered.forEach(f => lazyLoadVisibleImages(f));
+          const idx = Number(chip.dataset.index);
+          const flt = allClns.filter(d => Number(d.dataset.chipIndex) === idx);
+
+          distClns(flt);
+          flt.forEach(f => lazyImgs(f));
+
           chips.forEach(c => c.classList.remove('selected'));
-          allChip.classList.remove('selected');
+          chipAll.classList.remove('selected');
           chip.classList.add('selected');
         });
       });
 
-      allChip.addEventListener('click', () => {
-        distribute(allClones);
-        allClones.forEach(f => lazyLoadVisibleImages(f));
+      chipAll.addEventListener('click', () => {
+        distClns(allClns);
+        allClns.forEach(f => lazyImgs(f));
+
         chips.forEach(c => c.classList.remove('selected'));
-        allChip.classList.add('selected');
+        chipAll.classList.add('selected');
       });
 
-      [overlayWork, wrkClose].forEach(el => {
+      [ovlWrk, wrkCls].forEach(el => {
         el.addEventListener('click', () => {
-          separateWorkDiv.style.opacity = '0';
-          setTimeout(() => (separateWorkDiv.style.display = 'none'), 300);
-          overlayWork.style.opacity = '0';
-          setTimeout(() => (overlayWork.style.display = 'none'), 300);
+          sepWrkDiv.style.opacity = '0';
+          setTimeout(() => (sepWrkDiv.style.display = 'none'), 300);
+
+          ovlWrk.style.opacity = '0';
+          setTimeout(() => (ovlWrk.style.display = 'none'), 300);
         });
       });
 
-    } catch (err) { console.error('❌ Sanity fetch error:', err); }
+    } catch (err) {
+      console.error('❌ Sanity fetch error:', err);
+    }
 
-// ------------------- LIGHTBOX SETUP -------------------
-const lightbox = document.getElementById("lightbox");
-const lightboxImg = document.getElementById("lightboxImg");
-const lightboxClose = document.getElementById("lightboxClose");
-function enableLightbox() {
-  const galleryImages = document.querySelectorAll(".work-img");
-  galleryImages.forEach(img => {
-    img.style.cursor = "zoom-in";
-    img.addEventListener("click", () => {
-      lightboxImg.src = img.src;
-      lightbox.classList.add("active");
-      lightboxImg.style.height = "calc(100vh - 2rem)";
-      lightboxImg.style.width = "auto";
-      lightboxImg.style.objectFit = "contain";
-    });
-  });
-}
-lightboxClose.addEventListener("click", () => {
-  lightbox.classList.remove("active");
-});
-lightbox.addEventListener("click", (e) => {
-  if (e.target === lightbox) lightbox.classList.remove("active");
-});
+    /* ---------- LIGHTBOX ---------- */
+    const lbox = document.getElementById('lightbox');
+    const lboxImg = document.getElementById('lightboxImg');
+    const lboxCls = document.getElementById('lightboxClose');
+
+    function enableLightbox() {
+      document.querySelectorAll('.work-img').forEach(img => {
+        img.style.cursor = 'zoom-in';
+        img.onclick = () => {
+          lboxImg.src = img.src;
+          lbox.classList.add('active');
+          lboxImg.style.height = 'calc(100vh - 2rem)';
+          lboxImg.style.width = 'auto';
+          lboxImg.style.objectFit = 'contain';
+        };
+      });
+    }
+
+    lboxCls.onclick = () => lbox.classList.remove('active');
+    lbox.onclick = e => e.target === lbox && lbox.classList.remove('active');
   });
 </script>
 
@@ -1333,71 +1313,93 @@ lightbox.addEventListener("click", (e) => {
 
 
 
+
   
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@sanity/client';
-    const client = createClient({
-      projectId: 'n7jjk6nd',
-      dataset: 'production',
-      useCdn: true,
-      apiVersion: '2023-01-01'
-    });
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        const [heroData, contData] = await Promise.all([
-          client.fetch(`*[_type == "work"] | order(_createdAt asc)[0] {
-    featuredSections[] {
-      images[]{
-        asset->{ url, _type }
-      }
-    }
-  }`),
-          client.fetch(`*[_type == "home"] | order(_createdAt asc)[7] {
-    heroImages[] { asset->{ url, _type } }
-  }`)
-        ]);
-        const contImages = contData?.heroImages || [];
-        const heroSections = heroData?.featuredSections || [];
-        const heroImages = heroSections[0]?.images || [];
-        const contImgDiv = document.querySelector('.contact-div');
-        const heroImgDiv = document.querySelector('.swiper');
-        function applyImageStyles(el, { absolute = false } = {}) {
-          if (absolute) {
-            el.style.position = 'absolute';
-            el.style.top = 0;
-            el.style.left = 0;
+<script type="module">
+  import { createClient } from 'https://esm.sh/@sanity/client';
+
+  const sanityClient = createClient({
+    projectId: 'n7jjk6nd',
+    dataset: 'production',
+    useCdn: true,
+    apiVersion: '2023-01-01'
+  });
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const [workData, homeData] = await Promise.all([
+        sanityClient.fetch(`
+          *[_type == "work"] | order(_createdAt asc)[0] {
+            featuredSections[] {
+              images[] {
+                asset->{ url, _type }
+              }
+            }
           }
-          el.style.width = '100%';
-          el.style.height = '100%';
-          el.style.maxWidth = 'none';
-          el.style.objectFit = 'cover';
+        `),
+        sanityClient.fetch(`
+          *[_type == "home"] | order(_createdAt asc)[7] {
+            heroImages[] {
+              asset->{ url, _type }
+            }
+          }
+        `)
+      ]);
+
+      const cntMed = homeData?.heroImages || [];
+      const wrkSects = workData?.featuredSections || [];
+      const heroMedia = wrkSects[0]?.images || [];
+
+      const cntWrp = document.querySelector('.contact-div');
+      const heroWrp = document.querySelector('.swiper');
+
+      function styleImage(el, { absolute = false } = {}) {
+        if (absolute) {
+          el.style.position = 'absolute';
+          el.style.top = 0;
+          el.style.left = 0;
         }
-function insertImageOrVideo(container, mediaArr, label = 'Media') {
-  if (container && mediaArr.length > 0) {
-    const media = mediaArr[0];
-    if (media.asset._type === 'sanity.imageAsset') {
-      const img = document.createElement('img');
-      img.src = `${media.asset.url}?w=800&auto=format&q=75`; 
-      img.alt = label;
-      img.loading = "lazy";
-      applyImageStyles(img);
-      container.appendChild(img);
-    } else {console.warn(`⚠️ Unknown asset type in ${label}`);}
-  } else {console.warn(`⚠️ No ${label} found or container missing.`);}
-}
-        insertImageOrVideo(heroImgDiv, heroImages, 'Hero Media');
-        insertImageOrVideo(contImgDiv, contImages, 'Contact Media');
-      } catch (err) { console.error('❌ Sanity fetch error:', err); }
-    });
-  </script>
+        el.style.width = '100%';
+        el.style.height = '100%';
+        el.style.maxWidth = 'none';
+        el.style.objectFit = 'cover';
+      }
+
+      function insertMedia(container, mediaList, label = 'Media') {
+        if (container && mediaList.length > 0) {
+          const mediaItem = mediaList[0];
+
+          if (mediaItem.asset._type === 'sanity.imageAsset') {
+            const imgEl = document.createElement('img');
+            imgEl.src = `${mediaItem.asset.url}?w=800&auto=format&q=75`;
+            imgEl.alt = label;
+            imgEl.loading = 'lazy';
+
+            styleImage(imgEl);
+            container.appendChild(imgEl);
+          } else {
+            console.warn(`⚠️ Unknown asset type in ${label}`);
+          }
+        } else {
+          console.warn(`⚠️ No ${label} found or container missing.`);
+        }
+      }
+
+      insertMedia(heroWrp, heroMedia, 'Hero Media');
+      insertMedia(cntWrp, cntMed, 'Contact Media');
+
+    } catch (error) {
+      console.error('❌ Sanity fetch error:', error);
+    }
+  });
+</script>
 
 
 <div id="lightbox" class="lightbox">
   <img id="lightboxImg" />
   <div id="lightboxClose">×</div>
 </div>
-
 
 </body>
 </html>
