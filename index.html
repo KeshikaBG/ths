@@ -157,9 +157,15 @@ a.s1:hover {
     width: auto !important; 
 }
   .work-flex .inr-flex {
-  margin-left: 1rem;
-  margin-right: 1rem;
+  margin-left: var(--rem-sizes--2rem);
+  margin-right: var(--rem-sizes--2rem);
 }
+  @media (max-width: 991px) {
+      .work-flex .inr-flex {
+  margin-left: var(--rem-sizes--1rem);
+  margin-right: var(--rem-sizes--1rem);
+}
+  }
   .work-flex .sh1 {
     text-align: center !important;
     font-size: 28px !important;
