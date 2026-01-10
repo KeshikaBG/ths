@@ -280,16 +280,16 @@ document.addEventListener("DOMContentLoaded", () => {
       ease
     });
 
-    // LOGO: hide bottom → top when leaving
-    if (logo) {
-      tl.to(logo, {
-        opacity: 0,
-        clipPath: "inset(100% 0% 0% 0%)",
-        duration: 0.35,
-        ease
-      }, "-=0.4");
-    }
-  }
+// LOGO: hide top → bottom when leaving
+if (logo) {
+  tl.to(logo, {
+    opacity: 0,
+    clipPath: "inset(0% 0% 100% 0%)",
+    duration: 0.35,
+    ease
+  }, "-=0.4");
+}
+
 
   // LOGO: reveal top → bottom when coming
   if (logo) {
