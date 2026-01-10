@@ -267,20 +267,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const loader = document.querySelector(".loader");
   const logo = loader?.querySelector(".logo-div");
   const ease = "power2.inOut";
-  const loaderVisibleTime = 600;
+  const loaderVisibleTime = 1000;
 
   if (!loader) {
     window.loaderFinished = true;
     return;
   }
 
+  // INITIAL STATES
   gsap.set(loader, {
     display: "flex",
     clipPath: "inset(0% 0% 0% 0%)"
   });
 
   if (logo) {
-    gsap.set(logo, { opacity: 0 });
+    gsap.set(logo, {
+      opacity: 0,
+      clipPath: "inset(0% 0% 100% 0%)" // hidden from TOP
+    });
   }
 
   function hideLoader() {
@@ -307,18 +311,22 @@ document.addEventListener("DOMContentLoaded", () => {
       ease
     });
 
+// LOGO: hide bottom → top when leaving
     if (logo) {
       tl.to(logo, {
         opacity: 0,
-        duration: 0.3,
+        clipPath: "inset(100% 0% 0% 0%)",
+        duration: 0.35,
         ease
       }, "-=0.4");
     }
   }
 
+  // LOGO: reveal top → bottom when coming
   if (logo) {
     gsap.to(logo, {
       opacity: 1,
+      clipPath: "inset(0% 0% 0% 0%)",
       duration: 0.6,
       ease,
       delay: 0.2
@@ -348,7 +356,6 @@ window.addEventListener("pageshow", e => {
   if (loader) loader.style.display = "none";
 });
 </script>
-
 
 
 
