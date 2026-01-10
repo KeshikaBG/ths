@@ -3988,7 +3988,7 @@ a.s1 {
     grid-row-gap: var(--px-sizes--5px);
     flex-flow: column;
     flex: 1;
-    justify-content: space-between;
+    justify-content: start;
     align-items: flex-start
 }
 
