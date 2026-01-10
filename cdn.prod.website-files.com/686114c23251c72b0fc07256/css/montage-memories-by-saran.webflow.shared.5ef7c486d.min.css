@@ -4469,7 +4469,6 @@ a.s1 {
     filter: saturate(173%);
     object-fit: cover;
     max-width: none;
-    height: 64px
 }
 
 .ins-sec {
