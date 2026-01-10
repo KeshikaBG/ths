@@ -52,9 +52,11 @@ html {
   inset: 0;
 }
 .loader .logo-div {
-  opacity: 0;          
-  will-change: opacity; 
+  opacity: 0;
+  clip-path: inset(0% 0% 100% 0%);
+  will-change: opacity, clip-path;
 }
+
 
   [slide-up-anim] > *{
   opacity: 0;
@@ -248,7 +250,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   if (logo) {
-    gsap.set(logo, { opacity: 0 });
+    gsap.set(logo, {
+      opacity: 0,
+      clipPath: "inset(0% 0% 100% 0%)" // hidden from TOP
+    });
   }
 
   function hideLoader() {
@@ -275,20 +280,22 @@ document.addEventListener("DOMContentLoaded", () => {
       ease
     });
 
-    // Fade OUT logo before navigation
+    // LOGO: hide bottom → top when leaving
     if (logo) {
       tl.to(logo, {
         opacity: 0,
-        duration: 0.3,
+        clipPath: "inset(100% 0% 0% 0%)",
+        duration: 0.35,
         ease
       }, "-=0.4");
     }
   }
 
-  // Fade IN logo on page load
+  // LOGO: reveal top → bottom when coming
   if (logo) {
     gsap.to(logo, {
       opacity: 1,
+      clipPath: "inset(0% 0% 0% 0%)",
       duration: 0.6,
       ease,
       delay: 0.2
@@ -318,6 +325,7 @@ window.addEventListener("pageshow", e => {
   if (loader) loader.style.display = "none";
 });
 </script>
+
 
 
 
