@@ -665,8 +665,8 @@ gsap.to(hdr, {
 }
   .whatsapp-float {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: 32px;
+  right: 32px;
   width: 56px;
   height: 56px;
   background-color: #25D366;
@@ -680,13 +680,13 @@ gsap.to(hdr, {
 }
 
 .whatsapp-float img {
-  width: 32px;
-  height: 32px;
-}
-  @media screen and (max-width: 479px) {
-    .whatsapp-float img {
   width: 28px;
   height: 28px;
+}
+  @media screen and (max-width: 479px) {
+  .whatsapp-float {
+  bottom: 28px;
+  right: 28px;
 }
 }
 .whatsapp-float:hover {
